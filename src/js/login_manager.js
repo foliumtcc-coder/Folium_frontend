@@ -26,12 +26,12 @@ const LoginManager = (() => {
         });
 
         } else {
-        profileMenu.innerHTML = `
+            profileMenu.innerHTML = `
             <ul>
-            <li><a href="register-page.html">Registrar</a></li>
-            <li><a href="index.html">Entrar</a></li>
+                <li><a href="profile-page.html?id=${user.id}"><strong>${user.name1}</strong></a></li>
+                <li><a href="#" id="logout-link">Sair</a></li>
             </ul>
-        `;
+            `;
         }
 
     } catch (err) {
