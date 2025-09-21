@@ -4,37 +4,28 @@ const LoginManager = (() => {
 const profileMenuId = 'profile-dropdown-menu';
 const profileButtonId = 'profile-button';
 
-  async function fetchUser() {
-    const profileMenu = document.getElementById(profileMenuId);
-    if (!profileMenu) return;
+async function fetchUser() {
+  const profileMenu = document.getElementById(profileMenuId);
+  if (!profileMenu) return;
 
-    try {
-      const data = await getUser();
-      const user = data.user;
+  try {
+    const data = await getUser();
+    const user = data.user; // garante que user seja definido ou null
 
-      if (user) {
-        profileMenu.innerHTML = `
-          <ul>
-            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name}</strong></a></li>
-            <li><a href="#" id="logout-link">Sair</a></li>
-          </ul>
-        `;
+    if (user) {
+      profileMenu.innerHTML = `
+        <ul>
+          <li><a href="profile-page.html?id=${user.id}"><strong>${user.name}</strong></a></li>
+          <li><a href="#" id="logout-link">Sair</a></li>
+        </ul>
+      `;
 
-        document.getElementById('logout-link').addEventListener('click', async e => {
-          e.preventDefault();
-          await apiLogout();
-          fetchUser(); // atualiza menu após logout
-        });
-      } else {
-        profileMenu.innerHTML = `
-          <ul>
-            <li><a href="register-page.html">Registrar</a></li>
-            <li><a href="index.html">Entrar</a></li>
-          </ul>
-        `;
-      }
-    } catch (err) {
-      console.error(err);
+      document.getElementById('logout-link').addEventListener('click', async e => {
+        e.preventDefault();
+        await apiLogout();
+        fetchUser(); // atualiza o menu após logout
+      });
+    } else {
       profileMenu.innerHTML = `
         <ul>
           <li><a href="register-page.html">Registrar</a></li>
@@ -42,7 +33,17 @@ const profileButtonId = 'profile-button';
         </ul>
       `;
     }
+  } catch (err) {
+    console.error(err);
+    profileMenu.innerHTML = `
+      <ul>
+        <li><a href="register-page.html">Registrar</a></li>
+        <li><a href="index.html">Entrar</a></li>
+      </ul>
+    `;
   }
+}
+
 
   function setupDropdown() {
     const profileBtn = document.getElementById(profileButtonId);
