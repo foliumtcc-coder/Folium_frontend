@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://folium-backend.onrender.com';
+export const BACKEND_URL = 'https://folium-backend.onrender.com';
 
 async function postData(endpoint, data) {
   const res = await fetch(`${BACKEND_URL}${endpoint}`, {
