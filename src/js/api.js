@@ -31,10 +31,11 @@ export async function logout() {
 
 export async function getUser() {
   const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
-    credentials: 'include'
+    credentials: 'include',
+    cache: 'no-store' // evita cache
   });
 
   const json = await res.json();
-  if (!res.ok) throw new Error(json.error || 'Erro ao buscar usuário');
-  return json;
+  if (!res.ok) return { user: null };
+  return { user: json };
 }
