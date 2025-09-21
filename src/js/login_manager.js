@@ -15,7 +15,7 @@ const LoginManager = (() => {
         // Certifique-se de usar o campo correto do usuário
         profileMenu.innerHTML = `
           <ul>
-            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name || 'Usuário'}</strong></a></li>
+            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name1 || 'Usuário'}</strong></a></li>
             <li><a href="#" id="logout-link">Sair</a></li>
           </ul>
         `;
