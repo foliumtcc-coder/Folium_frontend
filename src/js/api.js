@@ -12,7 +12,6 @@ async function postData(endpoint, data) {
   return text;
 }
 
-
 export async function register(name, email, password, confipassword) {
   return postData('/api/auth/register', { name, email, password, confipassword });
 }
@@ -21,14 +20,12 @@ export async function login(email, password, rememberMe) {
   return postData('/api/auth/login', { email, password, rememberMe });
 }
 
-
-
 export async function confirmCode(code) {
   return postData('/api/auth/confirm', { code });
 }
 
 export async function logout() {
-  localStorage.removeItem('accessToken');
+  await postData('/api/auth/logout', {}); // chama rota do backend
 }
 
 
