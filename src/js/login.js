@@ -2,8 +2,6 @@ import { login /*, confirmCode */ } from './api.js';
 
 const loginForm = document.getElementById('loginForm');
 const messageDiv = document.getElementById('message');
-// const popupMsg = document.getElementById('popupMessage');
-// const confirmPopup = document.getElementById('confirmPopup');
 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -16,9 +14,9 @@ loginForm.addEventListener('submit', async (e) => {
   messageDiv.style.color = 'black';
 
   try {
-    const msg = await login(email, password, rememberMe);
+    const res = await login(email, password, rememberMe); // res é objeto JSON
     messageDiv.style.color = 'green';
-    messageDiv.textContent = msg;
+    messageDiv.textContent = res.message || 'Login realizado com sucesso!';
 
     // Redireciona direto para a home
     setTimeout(() => {
@@ -29,7 +27,7 @@ loginForm.addEventListener('submit', async (e) => {
     // confirmPopup.style.display = 'flex';
   } catch (err) {
     messageDiv.style.color = 'red';
-    messageDiv.textContent = err.message;
+    messageDiv.textContent = err.message || 'Erro no login';
   }
 });
 
