@@ -1,17 +1,17 @@
 export const BACKEND_URL = 'https://folium-backend.onrender.com';
 
 async function postData(endpoint, data) {
-  const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
-    credentials: 'include', // ESSENCIAL para sessão
+    credentials: 'include', // ESSENCIAL para manter sessão
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
-
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || 'Erro desconhecido');
-  return json;
+  const text = await response.text();
+  if (!response.ok) throw new Error(text);
+  return text;
 }
+
 
 export async function register(name, email, password, confipassword) {
   return postData('/api/auth/register', { name, email, password, confipassword });

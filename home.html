@@ -63,17 +63,12 @@
         </div>
     </header>
     <!--MENU DROPDOWN-->
+<div class="profile-button def-btn">
+  <button id="profile-button"><span class="fa-solid fa-user"></span></button>
+</div>
 <section class="dropdown-menu-section">
-  <div class="dropdown-menu hidden" id="notification-dropdown-menu">
-    <!-- Aqui você pode listar notificações -->
-    Nenhuma notificação por enquanto.
-  </div>
   <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-    <ul id="profile-menu-list">
-      <!-- O login-manager.js vai preencher automaticamente -->
-      <li><a href="register-page.html">Registrar</a></li>
-      <li><a href="index.html">Entrar</a></li>
-    </ul>
+    <!-- O conteúdo será preenchido pelo login-manager.js -->
   </div>
 </section>
     <main>
@@ -328,6 +323,7 @@
 <script src="./js/script.js"></script>
 <script src="./js/dark-mode.js"></script>
 <script type="module" src="./src/js/login_manager.js"></script>
+<script src='./src/js/api.js'></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

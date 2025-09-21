@@ -1,22 +1,15 @@
-// login-manager.js
-import { logout as apiLogout } from './api.js';
-import { BACKEND_URL, getUser, logout } from './api.js';
+import { getUser, logout as apiLogout } from './api.js';
 
 const LoginManager = (() => {
   const profileMenuId = 'profile-dropdown-menu';
   const profileButtonId = 'profile-button';
 
-  // Busca usuário logado e atualiza o dropdown
   async function fetchUser() {
     const profileMenu = document.getElementById(profileMenuId);
     if (!profileMenu) return;
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
-        credentials: 'include',
-      });
-      const data = await res.json();
-
+      const data = await getUser();
       if (data.user) {
         profileMenu.innerHTML = `
           <ul>
@@ -24,8 +17,11 @@ const LoginManager = (() => {
             <li><a href="#" id="logout-link">Sair</a></li>
           </ul>
         `;
-        const logoutLink = document.getElementById('logout-link');
-        logoutLink.addEventListener('click', logout);
+        document.getElementById('logout-link').addEventListener('click', async e => {
+          e.preventDefault();
+          await apiLogout();
+          window.location.href = 'index.html';
+        });
       } else {
         profileMenu.innerHTML = `
           <ul>
@@ -35,39 +31,24 @@ const LoginManager = (() => {
         `;
       }
     } catch (err) {
-      console.error('Erro ao buscar usuário:', err);
+      console.error(err);
     }
   }
 
-  // Faz logout
-  async function logout(e) {
-    e.preventDefault();
-    try {
-      await apiLogout();
-      window.location.href = 'index.html';
-    } catch (err) {
-      console.error('Erro ao deslogar:', err);
-    }
-  }
-
-  // Configura dropdown do perfil
   function setupDropdown() {
     const profileBtn = document.getElementById(profileButtonId);
     const profileMenu = document.getElementById(profileMenuId);
     if (!profileBtn || !profileMenu) return;
 
-    profileBtn.addEventListener('click', () => {
-      profileMenu.classList.toggle('hidden');
-    });
+    profileBtn.addEventListener('click', () => profileMenu.classList.toggle('hidden'));
 
-    document.addEventListener('click', (event) => {
-      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
         profileMenu.classList.add('hidden');
       }
     });
   }
 
-  // Inicializa
   function init() {
     fetchUser();
     setupDropdown();
@@ -76,7 +57,8 @@ const LoginManager = (() => {
   return { init };
 })();
 
-// Executa quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
   LoginManager.init();
 });
+
+
