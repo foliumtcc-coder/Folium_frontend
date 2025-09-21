@@ -12,37 +12,36 @@ const LoginManager = (() => {
       const { user } = await getUser();
 
       if (user) {
+        // Certifique-se de usar o campo correto do usuário
         profileMenu.innerHTML = `
           <ul>
-            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name1}</strong></a></li>
+            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name || 'Usuário'}</strong></a></li>
             <li><a href="#" id="logout-link">Sair</a></li>
           </ul>
         `;
 
+        // Configura logout
         const logoutLink = document.getElementById('logout-link');
         if (logoutLink) {
           logoutLink.addEventListener('click', async e => {
             e.preventDefault();
-            await logout();          // remove o token
-            updateMenuAfterLogout(); // atualiza dropdown
+            try {
+              await logout(); // remove token
+            } catch (err) {
+              console.error('Erro no logout:', err);
+            }
+            updateMenuAfterLogout();
           });
         }
-
       } else {
-        profileMenu.innerHTML = `
-          <ul>
-            <li><a href="register-page.html">Registrar</a></li>
-            <li><a href="index.html">Entrar</a></li>
-          </ul>
-        `;
+        updateMenuAfterLogout();
       }
-
     } catch (err) {
       console.error('Erro ao buscar usuário:', err);
+      updateMenuAfterLogout();
     }
   }
 
-  // 🔹 Atualiza o dropdown após logout sem recarregar a página
   function updateMenuAfterLogout() {
     const profileMenu = document.getElementById(profileMenuId);
     if (!profileMenu) return;
@@ -60,7 +59,11 @@ const LoginManager = (() => {
     const profileMenu = document.getElementById(profileMenuId);
     if (!profileBtn || !profileMenu) return;
 
-    profileBtn.addEventListener('click', () => profileMenu.classList.toggle('hidden'));
+    profileBtn.addEventListener('click', e => {
+      e.stopPropagation(); // evita fechar imediatamente
+      profileMenu.classList.toggle('hidden');
+    });
+
     document.addEventListener('click', e => {
       if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
         profileMenu.classList.add('hidden');
