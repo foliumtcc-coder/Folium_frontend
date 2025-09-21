@@ -12,7 +12,6 @@ const LoginManager = (() => {
       const { user } = await getUser();
 
       if (user) {
-        // 🔹 Usuário logado: mostra o nome e logout
         profileMenu.innerHTML = `
           <ul>
             <li><a href="profile-page.html?id=${user.id}"><strong>${user.name1}</strong></a></li>
@@ -24,13 +23,12 @@ const LoginManager = (() => {
         if (logoutLink) {
           logoutLink.addEventListener('click', async e => {
             e.preventDefault();
-            await logout(); // remove token
-            window.location.href = 'index.html';
+            await logout();          // remove o token
+            updateMenuAfterLogout(); // atualiza dropdown
           });
         }
 
       } else {
-        // 🔹 Usuário não logado: mostra links de registro e login
         profileMenu.innerHTML = `
           <ul>
             <li><a href="register-page.html">Registrar</a></li>
@@ -42,6 +40,19 @@ const LoginManager = (() => {
     } catch (err) {
       console.error('Erro ao buscar usuário:', err);
     }
+  }
+
+  // 🔹 Atualiza o dropdown após logout sem recarregar a página
+  function updateMenuAfterLogout() {
+    const profileMenu = document.getElementById(profileMenuId);
+    if (!profileMenu) return;
+
+    profileMenu.innerHTML = `
+      <ul>
+        <li><a href="register-page.html">Registrar</a></li>
+        <li><a href="index.html">Entrar</a></li>
+      </ul>
+    `;
   }
 
   function setupDropdown() {
