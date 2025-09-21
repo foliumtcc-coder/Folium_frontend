@@ -1,131 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Novo Projeto</title>
-    <link rel="stylesheet" href="./src/css/global-styles.css" />
-    <link rel="stylesheet" href="./src/css/new-project-styles.css" />
-    <link rel="stylesheet" href="./src/css/standard-header.css" />
-    <link rel="stylesheet" href="./src/css/standard-footer.css" />
-    <link rel="stylesheet" href="./src/css/dark-mode.css" />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <header>
-  <div class="header-content">
-    <div class="header-left-side">
-      <div class="home-button">
-        <a href="home.php">
-          <img src="./src/img/icons/logo1.png" alt="" class="home-button-icon" height="60px" />
-        </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo Projeto</title>
+  <link rel="stylesheet" href="./src/css/global-styles.css" />
+  <link rel="stylesheet" href="./src/css/new-project-styles.css" />
+  <link rel="stylesheet" href="./src/css/standard-header.css" />
+  <link rel="stylesheet" href="./src/css/standard-footer.css" />
+  <link rel="stylesheet" href="./src/css/dark-mode.css" />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left-side">
+        <div class="home-button">
+          <a href="home.php">
+            <img src="./src/img/icons/logo1.png" alt="" class="home-button-icon" height="60px" />
+          </a>
+        </div>
+        <div class="search-bar">
+          <img src="./src/img/icons/lupa.png" class="search-icon" alt="Lupa" />
+          <input type="text" placeholder="Pesquisar" />
+        </div>
       </div>
-      <div class="search-bar">
-        <img src="./src/img/icons/lupa.png" class="search-icon" alt="Lupa" />
-        <input type="text" placeholder="Pesquisar" />
+
+      <div class="header-right-side">
+        <!-- DARK MODE -->
+        <div class="dark-mode-toggle def-btn">
+          <button id="dark-mode-button" onclick="toggleDarkMode()">
+            <span class="fa-solid fa-moon"></span>
+          </button>
+        </div>
+
+        <!-- AJUDA -->
+        <div class="help-button def-btn">
+          <a href="help.html">
+            <button id="help-button">
+              <span class="fa-solid fa-question"></span>
+            </button>
+          </a>
+        </div>
+
+        <!-- CONFIG -->
+        <div class="config-button def-btn">
+          <a href="config.html">
+            <button id="config-button">
+              <span class="fa-solid fa-gear"></span>
+            </button>
+          </a>
+        </div>
+
+        <!-- NOTIFICAÇÕES -->
+        <div class="notification-button def-btn">
+          <a href="notification.html">
+            <button id="notification-button">
+              <span class="fa-regular fa-bell"></span>
+            </button>
+          </a>
+        </div>
+
+        <!-- PERFIL COM DROPDOWN -->
+        <div class="profile-button def-btn" style="position: relative;">
+          <button id="profile-button">
+            <span class="fa-solid fa-user"></span>
+          </button>
+          <div class="dropdown-menu hidden" id="profile-dropdown-menu">
+            <!-- Menu preenchido pelo JS -->
+          </div>
+        </div>
+
+        <!-- NOVO PROJETO -->
+        <div class="new-project-button">
+          <a href="new-project-page.html">
+            <span class="fa-solid fa-plus"></span>
+          </a>
+        </div>
       </div>
     </div>
+  </header>
 
-    <div class="header-right-side">
-      <!-- DARK MODE -->
-      <div class="dark-mode-toggle def-btn">
-        <button id="dark-mode-button" onclick="toggleDarkMode()">
-          <span class="fa-solid fa-moon"></span>
-        </button>
+  <main>
+    <div class="main-content">
+      <div class="main-header">
+        <span>CRIAR NOVO PROJETO</span>
       </div>
+      <div class="project-form-box">
+        <form id="form-projeto">
+          <div class="form-item">
+            <span>Nome do projeto: </span><br>
+            <input type="text" name="proj-name" id="proj-name" class="text" required>
+          </div><br>
 
-      <!-- AJUDA -->
-      <div class="help-button def-btn">
-        <a href="help.html">
-          <button id="help-button">
-            <span class="fa-solid fa-question"></span>
-          </button>
-        </a>
-      </div>
+          <div class="form-item">
+            <span>Imagem do projeto: </span>
+            <input type="file" name="proj-pic" id="proj-pic" class="hidden"><br>
+            <label for="proj-pic" class="fa-solid fa-file-import"></label>
+            <span id="file-name" style="margin-left:5px;"></span>
+          </div><br>
 
-      <!-- CONFIG -->
-      <div class="config-button def-btn">
-        <a href="config.html">
-          <button id="config-button">
-            <span class="fa-solid fa-gear"></span>
-          </button>
-        </a>
-      </div>
+          <div class="form-item">
+            <span>Pessoas (ids ou emails separados por vírgula): </span><br>
+            <input type="text" name="proj-members" id="proj-members" class="text" placeholder="id1,id2 ou email1,email2">
+          </div><br>
 
-      <!-- NOTIFICAÇÕES -->
-      <div class="notification-button def-btn">
-        <a href="notification.html">
-          <button id="notification-button">
-            <span class="fa-regular fa-bell"></span>
-          </button>
-        </a>
-      </div>
+          <div class="form-item">
+            <span>Descrição: </span><br>
+            <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text"></textarea>
+          </div><br>
 
-      <!-- PERFIL COM DROPDOWN -->
-      <div class="profile-button def-btn" style="position: relative;">
-        <button id="profile-button">
-          <span class="fa-solid fa-user"></span>
-        </button>
-        <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-          <!-- Menu preenchido pelo JS -->
-        </div>
-      </div>
+          <div id="message" style="margin-bottom:10px;"></div>
 
-      <!-- NOVO PROJETO -->
-      <div class="new-project-button">
-        <a href="new-project-page.html">
-          <span class="fa-solid fa-plus"></span>
-        </a>
+          <div class="form-item">
+            <input type="submit" value="Criar projeto" class="submit">
+          </div>
+        </form>
       </div>
     </div>
-  </div>
-</header>
-
-    <main>
-      <div class="main-content">
-        <div class="main-header">
-          <span>CRIAR NOVO PROJETO</span>
-        </div>
-        <div class="project-form-box">
-          <form id="form-projeto">
-            <div class="form-item">
-              <span>Nome do projeto: </span><br>
-              <input type="text" name="proj-name" id="proj-name" class="text" required>
-            </div><br>
-
-            <div class="form-item">
-              <span>Imagem do projeto: </span>
-              <input type="file" name="proj-pic" id="proj-pic" class="hidden"><br>
-              <label for="proj-pic" class="fa-solid fa-file-import"></label>
-            </div><br>
-
-            <div class="form-item">
-              <span>Pessoas (ids ou emails separados por vírgula): </span><br>
-              <input type="text" name="proj-members" id="proj-members" class="text" placeholder="id1,id2 ou email1,email2">
-            </div><br>
-
-            <div class="form-item">
-              <span>Descrição: </span><br>
-              <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text"></textarea>
-            </div><br>
-
-            <div class="form-item">
-              <input type="submit" value="Criar projeto" class="submit">
-            </div>
-          </form>
-        </div>
-      </div>
-    </main>
-
-  </body>
+  </main>
 
   <script src="./js/script.js"></script>
   <script src="./js/dark-mode.js"></script>
   <script type="module" src="./src/js/login_manager.js"></script>
-  <script src='./src/js/api.js'></script>
-  <script src='./src/js/newproject.js'></script>
-
+  <script type="module" src="./src/js/newproject.js"></script>
+</body>
 </html>
+
