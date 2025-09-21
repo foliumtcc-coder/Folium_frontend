@@ -18,25 +18,9 @@ export async function register(name, email, password, confipassword) {
 }
 
 export async function login(email, password, rememberMe) {
-  const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, rememberMe })
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text);
-  }
-
-  const data = await response.json();
-
-  if (data.accessToken) {
-    localStorage.setItem('accessToken', data.accessToken); // 🔑 salva token
-  }
-
-  return data;
+  return postData('/api/auth/login', { email, password, rememberMe });
 }
+
 
 
 export async function confirmCode(code) {
@@ -50,14 +34,8 @@ export async function logout() {
 
 export async function getUser() {
   try {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return { user: null };
-
     const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      credentials: 'include', // ✅ necessário para cookies
       cache: 'no-store'
     });
 
@@ -70,6 +48,5 @@ export async function getUser() {
     return { user: null };
   }
 }
-
 
 
