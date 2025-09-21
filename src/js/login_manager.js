@@ -1,8 +1,8 @@
 import { getUser, logout as apiLogout } from './api.js';
 
 const LoginManager = (() => {
-  const profileMenuId = 'profile-dropdown-menu';
-  const profileButtonId = 'profile-button';
+const profileMenuId = 'profile-dropdown-menu';
+const profileButtonId = 'profile-button';
 
   async function fetchUser() {
     const profileMenu = document.getElementById(profileMenuId);
@@ -10,17 +10,20 @@ const LoginManager = (() => {
 
     try {
       const data = await getUser();
-      if (data.user) {
+      const user = data.user;
+
+      if (user) {
         profileMenu.innerHTML = `
           <ul>
-            <li><a href="profile-page.html?id=${data.user.id}"><strong>${data.user.name}</strong></a></li>
+            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name}</strong></a></li>
             <li><a href="#" id="logout-link">Sair</a></li>
           </ul>
         `;
+
         document.getElementById('logout-link').addEventListener('click', async e => {
           e.preventDefault();
           await apiLogout();
-          window.location.href = 'index.html';
+          fetchUser(); // atualiza menu após logout
         });
       } else {
         profileMenu.innerHTML = `
@@ -32,6 +35,12 @@ const LoginManager = (() => {
       }
     } catch (err) {
       console.error(err);
+      profileMenu.innerHTML = `
+        <ul>
+          <li><a href="register-page.html">Registrar</a></li>
+          <li><a href="index.html">Entrar</a></li>
+        </ul>
+      `;
     }
   }
 
@@ -60,5 +69,3 @@ const LoginManager = (() => {
 document.addEventListener('DOMContentLoaded', () => {
   LoginManager.init();
 });
-
-
