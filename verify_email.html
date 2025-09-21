@@ -87,7 +87,7 @@
   if (!hash) {
     error.classList.add('active');
   } else {
-    fetch(`https://foliumbackend-production.up.railway.app/api/auth/verify?hash=${hash}`)
+    fetch(`https://folium-backend.onrender.com/api/auth/verify?hash=${hash}`)
       .then(res => {
         if (!res.ok) throw new Error('Erro na verificação');
         return res.text();
