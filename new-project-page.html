@@ -16,74 +16,74 @@
   </head>
   <body>
     <header>
-      <div class="header-content">
-        <div class="header-left-side">
-          <div class="home-button">
-            <a href="home.php">
-              <img
-                src="./src/img/icons/logo1.png"
-                alt=""
-                class="home-button-icon"
-                height="60px"
-              />
-            </a>
-          </div>
-          <div class="search-bar">
-            <img
-              src="./src/img/icons/lupa.png"
-              class="search-icon"
-              alt="Lupa"
-            />
-            <input type="text" placeholder="Pesquisar" />
-          </div>
-        </div>
-        <div class="header-right-side">
-          <!-- BOTÃO DARK MODE -->
-          <div class="dark-mode-toggle def-btn">
-            <button id="dark-mode-button" onclick="toggleDarkMode()">
-              <span class="fa-solid fa-moon"></span>
-            </button>
-          </div>
-          <!--BOTÃO AJUDA-->
-          <div class="help-button def-btn">
-            <a href="help.html">
-              <button id="help-button">
-                <span class="fa-solid fa-question"></span>
-              </button>
-            </a>
-          </div>
-          <!--BOTÃO CONFIG-->
-          <div class="config-button def-btn">
-            <a href="config.html">
-              <button id="config-button">
-                <span class="fa-solid fa-gear"></span>
-              </button>
-            </a>
-          </div>
-          <!--BOTÃO NOTIFICAÇÕES-->
-          <div class="notification-button def-btn">
-            <a href="notification.html">
-              <button id="notification-button">
-                <span class="fa-regular fa-bell"></span>
-              </button>
-            </a>
-          </div>
-          <!--BOTÃO PERFIL-->
-          <div class="profile-button def-btn">
-            <button id="profile-button">
-              <span class="fa-solid fa-user"></span>
-            </button>
-          </div>
-          <!--BOTÃO NOVO PROJETO-->
-          <div class="new-project-button">
-            <a href="new-project-page.html"
-              ><span class="fa-solid fa-plus"></span
-            ></a>
-          </div>
+  <div class="header-content">
+    <div class="header-left-side">
+      <div class="home-button">
+        <a href="home.php">
+          <img src="./src/img/icons/logo1.png" alt="" class="home-button-icon" height="60px" />
+        </a>
+      </div>
+      <div class="search-bar">
+        <img src="./src/img/icons/lupa.png" class="search-icon" alt="Lupa" />
+        <input type="text" placeholder="Pesquisar" />
+      </div>
+    </div>
+
+    <div class="header-right-side">
+      <!-- DARK MODE -->
+      <div class="dark-mode-toggle def-btn">
+        <button id="dark-mode-button" onclick="toggleDarkMode()">
+          <span class="fa-solid fa-moon"></span>
+        </button>
+      </div>
+
+      <!-- AJUDA -->
+      <div class="help-button def-btn">
+        <a href="help.html">
+          <button id="help-button">
+            <span class="fa-solid fa-question"></span>
+          </button>
+        </a>
+      </div>
+
+      <!-- CONFIG -->
+      <div class="config-button def-btn">
+        <a href="config.html">
+          <button id="config-button">
+            <span class="fa-solid fa-gear"></span>
+          </button>
+        </a>
+      </div>
+
+      <!-- NOTIFICAÇÕES -->
+      <div class="notification-button def-btn">
+        <a href="notification.html">
+          <button id="notification-button">
+            <span class="fa-regular fa-bell"></span>
+          </button>
+        </a>
+      </div>
+
+      <!-- PERFIL COM DROPDOWN -->
+      <div class="profile-button def-btn" style="position: relative;">
+        <button id="profile-button">
+          <span class="fa-solid fa-user"></span>
+        </button>
+        <div class="dropdown-menu hidden" id="profile-dropdown-menu">
+          <!-- Menu preenchido pelo JS -->
         </div>
       </div>
-    </header>
-    
+
+      <!-- NOVO PROJETO -->
+      <div class="new-project-button">
+        <a href="new-project-page.html">
+          <span class="fa-solid fa-plus"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
     <main>
       <div class="main-content">
         <div class="main-header">
@@ -126,27 +126,6 @@
   <script src="./js/dark-mode.js"></script>
   <script type="module" src="./src/js/login_manager.js"></script>
   <script src='./src/js/api.js'></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const profileBtn = document.getElementById("profile-button");
-      const profileMenu = document.getElementById("profile-dropdown-menu");
-
-      profileBtn.addEventListener("click", function () {
-        profileMenu.classList.toggle("hidden");
-      });
-
-      // Esconde ao clicar fora
-      document.addEventListener("click", function (event) {
-        if (
-          !profileBtn.contains(event.target) &&
-          !profileMenu.contains(event.target)
-        ) {
-          profileMenu.classList.add("hidden");
-        }
-      });
-    });
-
-    
-  </script>
+  <script src='./src/js/newproject.js'></script>
 
 </html>
