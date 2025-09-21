@@ -85,30 +85,8 @@
     </header>
 
     <!--MENU DROPDOWN-->
-    <section class="dropdown-menu-section">
-      <div class="dropdown-menu hidden" id="notification-dropdown-menu">
-        oii oque isso aqui faz?
-      </div>
-      <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-        <ul>
-          <?php if (isset($_SESSION['user_nome'])): ?>
-          <li id="user-name">
-            <a href="profile-page.php?id=<?php echo $_SESSION['user_id']; ?>">
-              <li id="user-name">
-                <strong
-                  ><?php echo htmlspecialchars($_SESSION['user_nome']); ?></strong
-                >
-              </li>
-            </a>
-          </li>
-          <li><a href="php/logout.php">Sair</a></li>
-          <?php else: ?>
-          <li><a href="register-page.html">Registrar</a></li>
-          <li><a href="index.html">Entrar</a></li>
-          <?php endif; ?>
-        </ul>
-      </div>
-    </section>
+    <button id="profile-button"><span class="fa-solid fa-user"></span></button>
+    <div class="dropdown-menu hidden" id="profile-dropdown-menu">
 
     <main>
       <div class="main-content">
@@ -170,4 +148,8 @@
       });
     });
   </script>
+
+  <script type="module" src="./src/js/login_manager.js"></script>
+  <script src='./src/js/api.js'></script>
+
 </html>
