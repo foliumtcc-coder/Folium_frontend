@@ -1,5 +1,6 @@
 export const BACKEND_URL = 'https://folium-backend.onrender.com';
 
+// Função auxiliar para POST com JSON
 async function postData(endpoint, data) {
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
@@ -11,10 +12,12 @@ async function postData(endpoint, data) {
   return text;
 }
 
+// Registro de usuário
 export async function register(name, email, password, confipassword) {
   return postData('/api/auth/register', { name, email, password, confipassword });
 }
 
+// Login
 export async function login(email, password) {
   const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
     method: 'POST',
@@ -32,23 +35,26 @@ export async function login(email, password) {
   return data.user;
 }
 
+// Confirmar código
 export async function confirmCode(code) {
   return postData('/api/auth/confirm', { code });
 }
 
+// Logout
 export async function logout() {
   try {
     // se tiver endpoint de logout no backend
-    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    await fetch(`${BACKEND_URL}/api/logout`, { method: 'POST', credentials: 'include' });
 
-    // remove token do localStorage ou sessionStorage
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
+    // remove token do localStorage
+    localStorage.removeItem('accessToken');
+    sessionStorage.removeItem('accessToken');
   } catch (err) {
     console.error('Erro ao fazer logout:', err);
   }
 }
 
+// Buscar usuário logado
 export async function getUser() {
   const token = localStorage.getItem('accessToken');
   if (!token) return { user: null };
@@ -71,4 +77,21 @@ export async function getUser() {
   }
 }
 
+// Criar projeto (novo endpoint)
+export async function createProject(formData) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
+  const res = await fetch(`${BACKEND_URL}/api/projects/create`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData // FormData permite enviar arquivos
+  });
+
+  const text = await res.text();
+  if (!res.ok) throw new Error(text);
+  return text;
+}
 
