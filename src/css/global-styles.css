@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "Ligconsolata";
+  src: url("../../font/Ligconsolata-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Ligconsolata";
+  src: url("../../font/Ligconsolata-Bold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+}
+
+* {
+  font-family: "Ligconsolata", sans-serif; /* 'sans-serif' como fallback se a Ligconsolata não funfar */
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+body {
+  background-color: #f0f0f0;
+}
+
+.hidden {
+  display: none;
+}
+
+@import url("../css/dark-mode.css");

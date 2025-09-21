@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrar</title>
+    <link rel="stylesheet" href="./src/css/global-styles.css" />
+    <link rel="stylesheet" href="./src/css/register-login-styles.css" />
+    <script type="module" src="./src/js/login.js"></script>
+    <style>
+      #confirmPopup {
+        display: none; /* Oculto por padrão */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      #popupContent {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+
+      #popupContent h2 {
+        margin-bottom: 10px;
+      }
+
+      #popupContent input {
+        width: 80%;
+        padding: 8px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      #popupContent button {
+        padding: 10px 20px;
+        background: #4cafef;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #popupContent button:hover {
+        background: #3b9cd9;
+      }
+
+      #popupMessage {
+        color: red;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-content">
+        <div class="header-left-side">
+          <div class="header-logo">
+            <img
+              src="./src/img/icons/logo1.png"
+              alt="Ícone da logo"
+              height="60"
+              class="logo-icon"
+            />
+            <img
+              src="./src/img/icons/logo2.png"
+              alt="Título da logo"
+              width="150"
+              class="logo-title"
+            />
+          </div>
+        </div>
+        <div class="header-right-side">
+          <a href="about.html">Sobre</a>
+          <a href="https://linktr.ee/folium_ejs">Redes Sociais</a>
+          <div class="login-page-button">
+            <a href="index.html">Entrar</a>
+          </div>
+          <div class="register-page-button">
+            <a href="./register.html">Criar conta</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="main-content">
+        <div class="main-left-side">
+          <div class="span-box">
+            <span>Entre para explorar projetos, ou use o modo visitante</span>
+          </div>
+          <div class="visit-button">
+            <a href="./home.html">
+              <span>Entrar como visitante</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="main-right-side">
+          <div class="form-box">
+            <div class="form-title">
+              <img src="./src/img/icons/logo1.png" alt="Logo" height="60" />
+              <br />
+              <span>Bem-vindo(a) ao Folium</span>
+            </div>
+
+            <form id="loginForm">
+              <label for="email">Email:</label><br />
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Insira seu e-mail"
+                class="insert"
+                required
+              /><br />
+
+              <label for="password">Senha:</label><br />
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="Insira sua senha"
+                class="insert"
+                required
+              /><br />
+
+              <label>
+                <input type="checkbox" id="rememberMe" />
+                Manter-me logado por 30 dias
+              </label><br />
+
+              <span><a href="#">Esqueceu sua senha?</a></span>
+
+              <div class="submit-button-box">
+                <button type="submit" class="submit-button">ENTRAR</button>
+              </div>
+            </form>
+
+            <div id="message" style="color: red; margin-top: 10px;"></div>
+
+            <div class="google-button">
+              <a href="#">
+                <img
+                  src="./src/img/icons/google-icon.png"
+                  alt="Google"
+                  height="30"
+                />
+                <span>Entrar com Google</span>
+              </a>
+            </div>
+
+            <span class="terms">
+              Ao continuar, você concorda com os
+              <a href="#">Termos de Serviço</a> do Folium e confirma que leu
+              nossa <a href="#">Política de Privacidade</a>.
+              <a href="#">Aviso na coleta de informações</a>.
+            </span>
+
+            <span class="redirect">
+              Ainda não está no Folium?
+              <a href="register-page.html">Crie sua conta</a>.
+            </span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Popup de confirmação -->
+    <div id="confirmPopup">
+      <div id="popupContent">
+        <h2>Confirmação de Login</h2>
+        <p>Digite o código enviado para seu e-mail:</p>
+        <input
+          type="text"
+          id="confirmCode"
+          placeholder="Código de 6 dígitos"
+          maxlength="6"
+          required
+        />
+        <div id="popupMessage"></div>
+        <button id="confirmBtn">Confirmar</button>
+      </div>
+    </div>
+
+    <script type="module">
+  import { postData } from './src/js/api.js';
+
+  // Enviar login
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const rememberMe = document.getElementById("rememberMe").checked;
+    const messageDiv = document.getElementById("message");
+
+    try {
+      const text = await postData("/api/auth/login", { email, password, rememberMe });
+
+      messageDiv.style.color = "green";
+      messageDiv.textContent = text;
+
+      // Mostrar popup de código
+      document.getElementById("confirmPopup").style.display = "flex";
+    } catch (error) {
+      console.error("Erro:", error);
+      messageDiv.style.color = "red";
+      messageDiv.textContent = error.message || "Erro ao conectar com o servidor.";
+    }
+  });
+
+  // Enviar código de confirmação
+  document.getElementById("confirmBtn").addEventListener("click", async () => {
+    const code = document.getElementById("confirmCode").value;
+    const popupMsg = document.getElementById("popupMessage");
+
+    try {
+      const text = await postData("/api/auth/confirm", { code });
+
+      popupMsg.style.color = "green";
+      popupMsg.textContent = text;
+
+      // Redirecionar após 1.5 segundos
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 1500);
+    } catch (error) {
+      console.error("Erro:", error);
+      popupMsg.style.color = "red";
+      popupMsg.textContent = error.message || "Erro ao conectar com o servidor.";
+    }
+  });
+</script>
+  </body>
+</html>
