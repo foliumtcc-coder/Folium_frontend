@@ -1,4 +1,4 @@
-import { getUser } from './api.js';
+import { getUser, logout } from './api.js';
 
 const LoginManager = (() => {
   const profileMenuId = 'profile-dropdown-menu';
@@ -9,20 +9,19 @@ const LoginManager = (() => {
     if (!profileMenu) return;
 
     try {
-      const token = localStorage.getItem('accessToken'); // token guardado no login
-      const data = await getUser(token);
+      const { user } = await getUser();
 
-      if (data.user) {
+      if (user) {
         profileMenu.innerHTML = `
           <ul>
-            <li><a href="profile-page.html?id=${data.user.id}"><strong>${data.user.email}</strong></a></li>
+            <li><a href="profile-page.html?id=${user.id}"><strong>${user.email}</strong></a></li>
             <li><a href="#" id="logout-link">Sair</a></li>
           </ul>
         `;
 
         document.getElementById('logout-link').addEventListener('click', async e => {
           e.preventDefault();
-          localStorage.removeItem('accessToken');
+          await logout(); // chama a rota do backend que destrói a sessão
           window.location.href = 'index.html';
         });
 
@@ -35,7 +34,7 @@ const LoginManager = (() => {
         `;
       }
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao buscar usuário:', err);
     }
   }
 
