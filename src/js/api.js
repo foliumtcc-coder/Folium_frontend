@@ -37,7 +37,16 @@ export async function confirmCode(code) {
 }
 
 export async function logout() {
-  localStorage.removeItem('accessToken'); // remove token
+  try {
+    // se tiver endpoint de logout no backend
+    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+
+    // remove token do localStorage ou sessionStorage
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+  } catch (err) {
+    console.error('Erro ao fazer logout:', err);
+  }
 }
 
 export async function getUser() {
