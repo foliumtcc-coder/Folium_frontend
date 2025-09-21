@@ -11,28 +11,29 @@ const LoginManager = (() => {
     try {
       const { user } = await getUser();
 
-      if (user) {
+        if (user) {
         profileMenu.innerHTML = `
-          <ul>
+            <ul>
             <li><a href="profile-page.html?id=${user.id}"><strong>${user.email}</strong></a></li>
             <li><a href="#" id="logout-link">Sair</a></li>
-          </ul>
+            </ul>
         `;
 
         document.getElementById('logout-link').addEventListener('click', async e => {
-          e.preventDefault();
-          await logout(); // chama a rota do backend que destrói a sessão
-          window.location.href = 'index.html';
+            e.preventDefault();
+            await logout(); // remove token
+            window.location.href = 'index.html';
         });
 
-      } else {
+        } else {
         profileMenu.innerHTML = `
-          <ul>
+            <ul>
             <li><a href="register-page.html">Registrar</a></li>
             <li><a href="index.html">Entrar</a></li>
-          </ul>
+            </ul>
         `;
-      }
+        }
+
     } catch (err) {
       console.error('Erro ao buscar usuário:', err);
     }

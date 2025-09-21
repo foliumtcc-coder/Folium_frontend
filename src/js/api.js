@@ -3,7 +3,6 @@ export const BACKEND_URL = 'https://folium-backend.onrender.com';
 async function postData(endpoint, data) {
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     method: 'POST',
-    credentials: 'include', // ESSENCIAL para manter sessão
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
@@ -29,7 +28,7 @@ export async function login(email, password) {
   }
 
   const data = await res.json();
-  localStorage.setItem('accessToken', data.accessToken); // 🔑 salva o token
+  localStorage.setItem('accessToken', data.accessToken); // salva o token
   return data.user;
 }
 
@@ -38,9 +37,8 @@ export async function confirmCode(code) {
 }
 
 export async function logout() {
-  await postData('/api/auth/logout', {}); // chama rota do backend
+  localStorage.removeItem('accessToken'); // remove token
 }
-
 
 export async function getUser() {
   const token = localStorage.getItem('accessToken');
