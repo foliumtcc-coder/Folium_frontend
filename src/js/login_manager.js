@@ -1,5 +1,5 @@
 // login-manager.js
-import { logout as apiLogout } from './api.js'; // importa função de logout
+import { logout as apiLogout } from './api.js';
 import { BACKEND_URL } from './api.js'; // opcional, caso precise da URL
 
 const LoginManager = (() => {
