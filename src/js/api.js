@@ -40,11 +40,12 @@ export async function getUser() {
 
     const json = await res.json();
 
-    // Aqui normalizamos a resposta para ter sempre user
-    return { user: json || null };
+    // Normaliza: se json já tiver user, usa; senão, cria
+    return { user: json.user || json || null };
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
     return { user: null };
   }
 }
+
 
