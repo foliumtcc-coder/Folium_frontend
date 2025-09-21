@@ -31,3 +31,12 @@ export async function confirmCode(code) {
 export async function logout() {
   return postData('/api/auth/logout', {});
 }
+
+export async function getUser() {
+  const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
+    credentials: 'include'
+  });
+
+  if (!res.ok) throw new Error('Erro ao buscar usuário');
+  return res.json();
+}
