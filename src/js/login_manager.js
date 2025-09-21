@@ -1,31 +1,45 @@
 import { getUser, logout as apiLogout } from './api.js';
 
 const LoginManager = (() => {
-const profileMenuId = 'profile-dropdown-menu';
-const profileButtonId = 'profile-button';
+  const profileMenuId = 'profile-dropdown-menu';
+  const profileButtonId = 'profile-button';
 
-async function fetchUser() {
-  const profileMenu = document.getElementById(profileMenuId);
-  if (!profileMenu) return;
+  // ===================== FETCH USER =====================
+  async function fetchUser() {
+    const profileMenu = document.getElementById(profileMenuId);
+    if (!profileMenu) return;
 
-  try {
-    const data = await getUser();
-    const user = data.user; // garante que user seja definido ou null
+    try {
+      const data = await getUser();
+      const user = data.user; // sempre definido ou null
 
-    if (user) {
-      profileMenu.innerHTML = `
-        <ul>
-          <li><a href="profile-page.html?id=${user.id}"><strong>${user.name}</strong></a></li>
-          <li><a href="#" id="logout-link">Sair</a></li>
-        </ul>
-      `;
+      if (user) {
+        profileMenu.innerHTML = `
+          <ul>
+            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name}</strong></a></li>
+            <li><a href="#" id="logout-link">Sair</a></li>
+          </ul>
+        `;
 
-      document.getElementById('logout-link').addEventListener('click', async e => {
-        e.preventDefault();
-        await apiLogout();
-        fetchUser(); // atualiza o menu após logout
-      });
-    } else {
+        // logout atualiza o menu dinamicamente
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+          logoutLink.addEventListener('click', async e => {
+            e.preventDefault();
+            await apiLogout();
+            fetchUser(); // atualiza menu após logout
+          });
+        }
+      } else {
+        profileMenu.innerHTML = `
+          <ul>
+            <li><a href="register-page.html">Registrar</a></li>
+            <li><a href="index.html">Entrar</a></li>
+          </ul>
+        `;
+      }
+    } catch (err) {
+      console.error('Erro ao buscar usuário:', err);
       profileMenu.innerHTML = `
         <ul>
           <li><a href="register-page.html">Registrar</a></li>
@@ -33,18 +47,9 @@ async function fetchUser() {
         </ul>
       `;
     }
-  } catch (err) {
-    console.error(err);
-    profileMenu.innerHTML = `
-      <ul>
-        <li><a href="register-page.html">Registrar</a></li>
-        <li><a href="index.html">Entrar</a></li>
-      </ul>
-    `;
   }
-}
 
-
+  // ===================== DROPDOWN =====================
   function setupDropdown() {
     const profileBtn = document.getElementById(profileButtonId);
     const profileMenu = document.getElementById(profileMenuId);
@@ -59,6 +64,7 @@ async function fetchUser() {
     });
   }
 
+  // ===================== INIT =====================
   function init() {
     fetchUser();
     setupDropdown();
@@ -67,6 +73,7 @@ async function fetchUser() {
   return { init };
 })();
 
+// Inicializa quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
   LoginManager.init();
 });

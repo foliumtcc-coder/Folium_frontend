@@ -30,12 +30,21 @@ export async function logout() {
 }
 
 export async function getUser() {
-  const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
-    credentials: 'include',
-    cache: 'no-store' // evita cache
-  });
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
+      credentials: 'include',
+      cache: 'no-store'
+    });
 
-  const json = await res.json();
-  if (!res.ok) return { user: null };
-  return { user: json };
+    if (!res.ok) return { user: null };
+
+    const json = await res.json();
+
+    // Aqui normalizamos a resposta para ter sempre user
+    return { user: json || null };
+  } catch (err) {
+    console.error('Erro ao buscar usuário:', err);
+    return { user: null };
+  }
 }
+
