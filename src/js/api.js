@@ -44,7 +44,7 @@ export async function confirmCode(code) {
 export async function logout() {
   try {
     // se tiver endpoint de logout no backend
-    await fetch(`${BACKEND_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+    await fetch(`${BACKEND_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
 
     // remove token do localStorage
     localStorage.removeItem('accessToken');
@@ -77,15 +77,15 @@ export async function getUser() {
   }
 }
 
-// Criar projeto (novo endpoint)
+// Criar projeto
 export async function createProject(formData) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/create`, { // rota corrigida
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/`, { // rota corrigida
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}` // não colocar Content-Type com FormData
+      'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
     },
     body: formData
   });
@@ -93,4 +93,41 @@ export async function createProject(formData) {
   const text = await res.text();
   if (!res.ok) throw new Error(text);
   return text;
+}
+
+// Buscar notificações do usuário logado
+export async function fetchNotifications() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return [];
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/notifications/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Erro ao buscar notificações');
+
+    const data = await res.json(); // [{id, mensagem, read}]
+    return data;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+// Marcar notificação como lida
+export async function markNotificationAsRead(id) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/notifications/read/${id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Erro ao marcar notificação como lida');
+  } catch (err) {
+    console.error(err);
+  }
 }

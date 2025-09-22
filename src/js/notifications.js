@@ -34,23 +34,25 @@ notificationButton.appendChild(badge);
 
 let notifications = [];
 
-// Busca notificações do usuário
+// Busca notificações do usuário logado via token
 async function fetchNotifications() {
   try {
     const { user } = await getUser();
     if (!user) return;
 
     const token = localStorage.getItem('accessToken');
-    const res = await fetch(`https://folium-backend.onrender.com/api/notifications/me`, {
-    headers: { Authorization: `Bearer ${token}` }
+    const res = await fetch('https://folium-backend.onrender.com/api/notifications/me', {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     if (!res.ok) throw new Error('Erro ao buscar notificações');
 
-    notifications = await res.json(); // [{id, message, read}]
+    notifications = await res.json(); // [{id, mensagem, read}]
     renderNotifications();
   } catch (err) {
     console.error('Erro ao buscar notificações:', err);
+    notifications = []; // garante que dropdown apareça mesmo sem notificações
+    renderNotifications();
   }
 }
 
@@ -68,7 +70,7 @@ function renderNotifications() {
 
   notifications.forEach(n => {
     const item = document.createElement('div');
-    item.textContent = n.message;
+    item.textContent = n.mensagem; // ⚠️ corresponde ao campo do backend
     item.style.padding = '10px';
     item.style.cursor = 'pointer';
     item.style.borderBottom = '1px solid #eee';
@@ -78,7 +80,6 @@ function renderNotifications() {
     item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
     item.addEventListener('mouseleave', () => item.style.background = n.read ? '#fff' : '#f0f8ff');
 
-    // Marca como lida ao clicar
     item.addEventListener('click', async () => {
       await markAsRead(n.id);
       n.read = true;
@@ -91,11 +92,17 @@ function renderNotifications() {
 
 // Marca notificação como lida
 async function markAsRead(notificationId) {
-  const token = localStorage.getItem('accessToken');
-  await fetch(`https://folium-backend.onrender.com/api/notifications/read/${notificationId}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  try {
+    const token = localStorage.getItem('accessToken');
+    const res = await fetch(`https://folium-backend.onrender.com/api/notifications/read/${notificationId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Erro ao marcar notificação como lida');
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 // Toggle do dropdown
@@ -112,7 +119,5 @@ document.addEventListener('click', () => {
 // Inicializa
 document.addEventListener('DOMContentLoaded', () => {
   fetchNotifications();
-  // Atualiza notificações a cada 5 segundos
   setInterval(fetchNotifications, 5000);
 });
-
