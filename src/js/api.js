@@ -41,17 +41,9 @@ export async function confirmCode(code) {
 }
 
 // Logout
-export async function logout() {
-  try {
-    // se tiver endpoint de logout no backend
-    await fetch(`${BACKEND_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
-
-    // remove token do localStorage
-    localStorage.removeItem('accessToken');
-    sessionStorage.removeItem('accessToken');
-  } catch (err) {
-    console.error('Erro ao fazer logout:', err);
-  }
+export function logout() {
+  localStorage.removeItem('accessToken');
+  sessionStorage.removeItem('accessToken');
 }
 
 // Buscar usuário logado
@@ -69,8 +61,8 @@ export async function getUser() {
 
     if (!res.ok) return { user: null };
 
-    const json = await res.json();
-    return { user: json.user || null };
+    const user = await res.json(); // já é o objeto do usuário
+    return { user };
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
     return { user: null };
@@ -82,7 +74,7 @@ export async function createProject(formData) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects`, { // rota corrigida
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/create`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
@@ -95,6 +87,27 @@ export async function createProject(formData) {
   return text;
 }
 
+// Aceitar convite
+export async function acceptInvite(projetoId) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/accept`, {
+    method: 'PATCH',
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Erro ao aceitar convite');
+  }
+
+  return res.json();
+}
+
 // Buscar notificações do usuário logado
 export async function fetchNotifications() {
   const token = localStorage.getItem('accessToken');
@@ -102,12 +115,15 @@ export async function fetchNotifications() {
 
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/notifications/me`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
 
     if (!res.ok) throw new Error('Erro ao buscar notificações');
 
-    const data = await res.json(); // [{id, mensagem, read}]
+    const data = await res.json(); // [{id, mensagem, lida, criada_em}]
     return data;
   } catch (err) {
     console.error(err);
@@ -123,7 +139,10 @@ export async function markNotificationAsRead(id) {
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/notifications/read/${id}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
 
     if (!res.ok) throw new Error('Erro ao marcar notificação como lida');

@@ -1,4 +1,4 @@
-import { getUser } from './api.js';
+import { getUser, createProject } from './api.js';
 
 const projectForm = document.getElementById('form-projeto');
 const messageDiv = document.getElementById('message');
@@ -29,25 +29,6 @@ if (fileInput && fileNameSpan) {
   });
 }
 
-// Função para criar projeto (chama a rota correta do backend)
-async function createProject(formData) {
-  const token = localStorage.getItem('accessToken'); // token JWT do usuário
-  const res = await fetch('https://folium-backend.onrender.com/api/auth/projects/create', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    body: formData
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(errText || 'Erro ao criar projeto');
-  }
-
-  return res.text();
-}
-
 // Submit do formulário
 if (projectForm) {
   projectForm.addEventListener('submit', async (e) => {
@@ -68,6 +49,7 @@ if (projectForm) {
       .map(m => m.trim())
       .filter(m => m !== '');
 
+    // Remove duplicatas
     currentMembers = [...new Set(currentMembers)];
 
     if (currentMembers.length > 10) {
@@ -76,6 +58,7 @@ if (projectForm) {
       return;
     }
 
+    // Garante que o criador esteja na lista
     if (!currentMembers.includes(loggedUserEmail)) {
       currentMembers.push(loggedUserEmail);
     }
@@ -99,6 +82,7 @@ if (projectForm) {
       projectForm.reset();
       fileNameSpan.textContent = '';
     } catch (err) {
+      console.error(err);
       messageDiv.style.color = 'red';
       messageDiv.textContent = err.message || 'Erro ao criar projeto.';
     }
@@ -107,4 +91,3 @@ if (projectForm) {
 
 // Inicializa ao carregar
 document.addEventListener('DOMContentLoaded', fetchLoggedUser);
-

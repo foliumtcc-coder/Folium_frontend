@@ -1,4 +1,4 @@
-import { getUser } from './api.js';
+import { getUser, fetchNotifications as apiFetchNotifications, markNotificationAsRead } from './api.js';
 
 const notificationButton = document.getElementById('notification-button');
 
@@ -34,24 +34,17 @@ notificationButton.appendChild(badge);
 
 let notifications = [];
 
-// Busca notificações do usuário logado via token
+// Busca notificações do usuário logado via API
 async function fetchNotifications() {
   try {
     const { user } = await getUser();
     if (!user) return;
 
-    const token = localStorage.getItem('accessToken');
-    const res = await fetch('https://folium-backend.onrender.com/api/auth/notifications/me', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Erro ao buscar notificações');
-
-    notifications = await res.json(); // [{id, mensagem, lida}]
+    notifications = await apiFetchNotifications();
     renderNotifications();
   } catch (err) {
     console.error('Erro ao buscar notificações:', err);
-    notifications = []; // garante que dropdown apareça mesmo sem notificações
+    notifications = [];
     renderNotifications();
   }
 }
@@ -60,12 +53,10 @@ async function fetchNotifications() {
 function renderNotifications() {
   notificationMenu.innerHTML = '';
 
-  // Mostra badge só se houver notificações não lidas
   const unreadCount = notifications.filter(n => !n.lida).length;
   badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
   badge.textContent = unreadCount;
 
-  // Se não houver notificações, mostra mensagem padrão
   if (notifications.length === 0) {
     notificationMenu.innerHTML = '<div style="padding:10px;">Nenhuma notificação</div>';
   } else {
@@ -82,28 +73,15 @@ function renderNotifications() {
       item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
 
       item.addEventListener('click', async () => {
-        await markAsRead(n.id);
-        n.lida = true;
-        renderNotifications();
+        if (!n.lida) {
+          await markNotificationAsRead(n.id);
+          n.lida = true;
+          renderNotifications();
+        }
       });
 
       notificationMenu.appendChild(item);
     });
-  }
-}
-
-// Marca notificação como lida
-async function markAsRead(notificationId) {
-  try {
-    const token = localStorage.getItem('accessToken');
-    const res = await fetch(`https://folium-backend.onrender.com/api/auth/notifications/read/${notificationId}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Erro ao marcar notificação como lida');
-  } catch (err) {
-    console.error(err);
   }
 }
 
@@ -121,5 +99,5 @@ document.addEventListener('click', () => {
 // Inicializa
 document.addEventListener('DOMContentLoaded', () => {
   fetchNotifications();
-  setInterval(fetchNotifications, 5000);
+  setInterval(fetchNotifications, 5000); // atualiza notificações a cada 5s
 });
