@@ -41,8 +41,8 @@ async function fetchNotifications() {
     if (!user) return;
 
     const token = localStorage.getItem('accessToken');
-    const res = await fetch(`https://folium-backend.onrender.com/api/notifications/${user.email}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    const res = await fetch(`https://folium-backend.onrender.com/api/notifications/me`, {
+    headers: { Authorization: `Bearer ${token}` }
     });
 
     if (!res.ok) throw new Error('Erro ao buscar notificações');
