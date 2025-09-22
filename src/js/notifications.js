@@ -7,31 +7,35 @@ notificationContainer.style.position = 'relative';
 // Cria menu dropdown
 const notificationMenu = document.createElement('div');
 notificationMenu.classList.add('dropdown-menu', 'hidden');
-notificationMenu.style.position = 'absolute';
-notificationMenu.style.right = '0';
-notificationMenu.style.top = '100%';
-notificationMenu.style.minWidth = '250px';
-notificationMenu.style.maxHeight = '400px';
-notificationMenu.style.overflowY = 'auto';
-notificationMenu.style.background = '#fff';
-notificationMenu.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
-notificationMenu.style.borderRadius = '8px';
-notificationMenu.style.zIndex = '1000';
+Object.assign(notificationMenu.style, {
+  position: 'absolute',
+  right: '0',
+  top: '100%',
+  minWidth: '250px',
+  maxHeight: '400px',
+  overflowY: 'auto',
+  background: '#fff',
+  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+  borderRadius: '8px',
+  zIndex: '1000',
+});
 notificationContainer.appendChild(notificationMenu);
 
 // Cria badge
 const badge = document.createElement('span');
 badge.id = 'notification-badge';
-badge.style.position = 'absolute';
-badge.style.top = '0';
-badge.style.right = '0';
-badge.style.background = 'red';
-badge.style.color = '#fff';
-badge.style.borderRadius = '50%';
-badge.style.padding = '2px 6px';
-badge.style.fontSize = '12px';
-badge.style.fontWeight = 'bold';
-badge.style.display = 'none';
+Object.assign(badge.style, {
+  position: 'absolute',
+  top: '0',
+  right: '0',
+  background: 'red',
+  color: '#fff',
+  borderRadius: '50%',
+  padding: '2px 6px',
+  fontSize: '12px',
+  fontWeight: 'bold',
+  display: 'none',
+});
 notificationContainer.appendChild(badge);
 
 let notifications = [];
@@ -58,32 +62,34 @@ function renderNotifications() {
   badge.textContent = unreadCount;
 
   if (!notifications.length) {
+    // Permite abrir dropdown mesmo sem notificações
     notificationMenu.innerHTML = '<div style="padding:10px;">Nenhuma notificação</div>';
-    return;
-  }
+  } else {
+    notifications.forEach(n => {
+      const item = document.createElement('div');
+      item.textContent = n.mensagem;
+      Object.assign(item.style, {
+        padding: '10px',
+        cursor: 'pointer',
+        borderBottom: '1px solid #eee',
+        background: n.lida ? '#fff' : '#f0f8ff',
+        transition: 'background 0.2s',
+      });
 
-  notifications.forEach(n => {
-    const item = document.createElement('div');
-    item.textContent = n.mensagem;
-    item.style.padding = '10px';
-    item.style.cursor = 'pointer';
-    item.style.borderBottom = '1px solid #eee';
-    item.style.background = n.lida ? '#fff' : '#f0f8ff';
-    item.style.transition = 'background 0.2s';
+      item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
+      item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
 
-    item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
-    item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
+      item.addEventListener('click', async () => {
+        if (!n.lida) {
+          await markNotificationAsRead(n.id);
+          n.lida = true;
+          renderNotifications();
+        }
+      });
 
-    item.addEventListener('click', async () => {
-      if (!n.lida) {
-        await markNotificationAsRead(n.id);
-        n.lida = true;
-        renderNotifications();
-      }
+      notificationMenu.appendChild(item);
     });
-
-    notificationMenu.appendChild(item);
-  });
+  }
 }
 
 // Toggle dropdown

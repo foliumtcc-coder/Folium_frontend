@@ -95,6 +95,7 @@ header {
   align-items: center;
   background: none;
   border: none;
+  position: relative;
 }
 
 #notification-button span {
