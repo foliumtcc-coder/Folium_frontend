@@ -1,6 +1,8 @@
 import { getUser, fetchNotifications as apiFetchNotifications, markNotificationAsRead } from './api.js';
 
 const notificationButton = document.getElementById('notification-button');
+const notificationContainer = notificationButton.parentElement; // div.notification-button
+notificationContainer.style.position = 'relative';
 
 // Cria menu dropdown
 const notificationMenu = document.createElement('div');
@@ -15,14 +17,14 @@ notificationMenu.style.background = '#fff';
 notificationMenu.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
 notificationMenu.style.borderRadius = '8px';
 notificationMenu.style.zIndex = '1000';
-notificationButton.parentElement.appendChild(notificationMenu);
+notificationContainer.appendChild(notificationMenu);
 
 // Cria badge
 const badge = document.createElement('span');
 badge.id = 'notification-badge';
 badge.style.position = 'absolute';
-badge.style.top = '5px';
-badge.style.right = '5px';
+badge.style.top = '0';
+badge.style.right = '0';
 badge.style.background = 'red';
 badge.style.color = '#fff';
 badge.style.borderRadius = '50%';
@@ -30,11 +32,10 @@ badge.style.padding = '2px 6px';
 badge.style.fontSize = '12px';
 badge.style.fontWeight = 'bold';
 badge.style.display = 'none';
-notificationButton.appendChild(badge);
+notificationContainer.appendChild(badge);
 
 let notifications = [];
 
-// Busca notificações do usuário logado via API
 async function fetchNotifications() {
   try {
     const { user } = await getUser();
@@ -49,43 +50,43 @@ async function fetchNotifications() {
   }
 }
 
-// Renderiza o dropdown
 function renderNotifications() {
   notificationMenu.innerHTML = '';
 
   const unreadCount = notifications.filter(n => !n.lida).length;
-  badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+  badge.style.display = unreadCount ? 'inline-block' : 'none';
   badge.textContent = unreadCount;
 
-  if (notifications.length === 0) {
+  if (!notifications.length) {
     notificationMenu.innerHTML = '<div style="padding:10px;">Nenhuma notificação</div>';
-  } else {
-    notifications.forEach(n => {
-      const item = document.createElement('div');
-      item.textContent = n.mensagem;
-      item.style.padding = '10px';
-      item.style.cursor = 'pointer';
-      item.style.borderBottom = '1px solid #eee';
-      item.style.background = n.lida ? '#fff' : '#f0f8ff';
-      item.style.transition = 'background 0.2s';
-
-      item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
-      item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
-
-      item.addEventListener('click', async () => {
-        if (!n.lida) {
-          await markNotificationAsRead(n.id);
-          n.lida = true;
-          renderNotifications();
-        }
-      });
-
-      notificationMenu.appendChild(item);
-    });
+    return;
   }
+
+  notifications.forEach(n => {
+    const item = document.createElement('div');
+    item.textContent = n.mensagem;
+    item.style.padding = '10px';
+    item.style.cursor = 'pointer';
+    item.style.borderBottom = '1px solid #eee';
+    item.style.background = n.lida ? '#fff' : '#f0f8ff';
+    item.style.transition = 'background 0.2s';
+
+    item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
+    item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
+
+    item.addEventListener('click', async () => {
+      if (!n.lida) {
+        await markNotificationAsRead(n.id);
+        n.lida = true;
+        renderNotifications();
+      }
+    });
+
+    notificationMenu.appendChild(item);
+  });
 }
 
-// Toggle do dropdown
+// Toggle dropdown
 notificationButton.addEventListener('click', (e) => {
   e.stopPropagation();
   notificationMenu.classList.toggle('hidden');
@@ -99,5 +100,5 @@ document.addEventListener('click', () => {
 // Inicializa
 document.addEventListener('DOMContentLoaded', () => {
   fetchNotifications();
-  setInterval(fetchNotifications, 5000); // atualiza notificações a cada 5s
+  setInterval(fetchNotifications, 5000);
 });
