@@ -82,7 +82,7 @@ export async function createProject(formData) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/create`, { // rota corrigida
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects`, { // rota corrigida
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
