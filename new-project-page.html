@@ -91,30 +91,36 @@
       </div>
       <div class="project-form-box">
         <form id="form-projeto">
+          <!-- Nome do Projeto -->
           <div class="form-item">
-            <span>Nome do projeto: </span><br>
+            <label for="proj-name">Nome do projeto:</label><br>
             <input type="text" name="proj-name" id="proj-name" class="text" required>
           </div><br>
 
+          <!-- Imagem do Projeto -->
           <div class="form-item">
-            <span>Imagem do projeto: </span>
-            <input type="file" name="proj-pic" id="proj-pic" class="hidden"><br>
-            <label for="proj-pic" class="fa-solid fa-file-import"></label>
+            <label for="proj-pic">Imagem do projeto (capa):</label><br>
+            <input type="file" name="proj-pic" id="proj-pic" class="hidden">
+            <label for="proj-pic" class="fa-solid fa-file-import" style="cursor:pointer;"></label>
             <span id="file-name" style="margin-left:5px;"></span>
           </div><br>
 
+          <!-- Membros do Projeto -->
           <div class="form-item">
-            <span>Pessoas (ids ou emails separados por vírgula): </span><br>
-            <input type="text" name="proj-members" id="proj-members" class="text" placeholder="id1,id2 ou email1,email2">
+            <label for="proj-members">Membros (emails separados por vírgula):</label><br>
+            <input type="text" name="proj-members" id="proj-members" class="text" placeholder="email1,email2">
           </div><br>
 
+          <!-- Descrição do Projeto -->
           <div class="form-item">
-            <span>Descrição: </span><br>
+            <label for="proj-desc">Descrição:</label><br>
             <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text"></textarea>
           </div><br>
 
+          <!-- Mensagem de feedback -->
           <div id="message" style="margin-bottom:10px;"></div>
 
+          <!-- Botão de Enviar -->
           <div class="form-item">
             <input type="submit" value="Criar projeto" class="submit">
           </div>
@@ -123,10 +129,12 @@
     </div>
   </main>
 
+  <!-- SCRIPTS -->
   <script src="./js/script.js"></script>
   <script src="./js/dark-mode.js"></script>
   <script type="module" src="./src/js/login_manager.js"></script>
   <script type="module" src="./src/js/newproject.js"></script>
+  <script type="module" src="./src/js/notifications.js"></script>
+
 </body>
 </html>
-

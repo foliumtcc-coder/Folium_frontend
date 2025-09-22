@@ -1,21 +1,21 @@
 import { createProject, getUser } from './api.js';
 
-const projectForm = document.getElementById('project-form');
+const projectForm = document.getElementById('form-projeto');
 const messageDiv = document.getElementById('message'); // div para feedback
 const fileInput = document.getElementById('proj-pic');
 const fileNameSpan = document.getElementById('file-name'); // span para mostrar nome do arquivo
 const membersInput = document.getElementById('proj-members'); // input de membros
 
-let loggedUserId = ''; // vai guardar o usuário logado
+let loggedUserEmail = ''; // vai guardar o email do usuário logado
 
 // Busca usuário logado ao carregar a página
 async function fetchLoggedUser() {
   try {
     const { user } = await getUser();
     if (user) {
-      loggedUserId = user.id || user.email; // depende de como você identifica
+      loggedUserEmail = user.email; // identifica pelo email
       // Adiciona automaticamente no input de membros
-      membersInput.value = loggedUserId;
+      membersInput.value = loggedUserEmail;
     }
   } catch (err) {
     console.error('Erro ao buscar usuário logado:', err);
@@ -49,13 +49,24 @@ if (projectForm) {
     }
 
     // Garante que o usuário logado está incluído nos membros
-    const currentMembers = membersInput.value
+    let currentMembers = membersInput.value
       .split(',')
       .map(m => m.trim())
       .filter(m => m !== '');
 
-    if (!currentMembers.includes(loggedUserId)) {
-      currentMembers.push(loggedUserId);
+    // Remove duplicados
+    currentMembers = [...new Set(currentMembers)];
+
+    // Limita a 10 membros
+    if (currentMembers.length > 10) {
+      messageDiv.style.color = 'red';
+      messageDiv.textContent = 'O projeto pode ter no máximo 10 membros.';
+      return;
+    }
+
+    // Inclui automaticamente o usuário logado
+    if (!currentMembers.includes(loggedUserEmail)) {
+      currentMembers.push(loggedUserEmail);
     }
 
     membersInput.value = currentMembers.join(',');
@@ -65,8 +76,8 @@ if (projectForm) {
     formData.append('titulo', title);
     formData.append('descricao', description);
     formData.append('imagem', imageFile);
-    formData.append('membros', membersInput.value);
-    formData.append('criado_por', loggedUserId);
+    formData.append('membros', membersInput.value); // emails separados por vírgula
+    formData.append('criado_por', loggedUserEmail);
 
     messageDiv.style.color = 'black';
     messageDiv.textContent = 'Criando projeto...';
