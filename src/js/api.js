@@ -47,6 +47,7 @@ export function logout() {
 }
 
 // Buscar usuário logado
+// Buscar usuário logado
 export async function getUser() {
   const token = localStorage.getItem('accessToken');
   if (!token) return { user: null };
@@ -61,13 +62,14 @@ export async function getUser() {
 
     if (!res.ok) return { user: null };
 
-    const user = await res.json(); // já é o objeto do usuário
-    return { user };
+    const json = await res.json(); // { user: {...} }
+    return { user: json.user || null }; // <-- corrige o undefined
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
     return { user: null };
   }
 }
+
 
 // Criar projeto
 export async function createProject(formData) {
