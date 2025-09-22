@@ -41,13 +41,13 @@ async function fetchNotifications() {
     if (!user) return;
 
     const token = localStorage.getItem('accessToken');
-    const res = await fetch('https://folium-backend.onrender.com/api/notifications/me', {
+    const res = await fetch('https://folium-backend.onrender.com/api/auth/notifications/me', {
       headers: { Authorization: `Bearer ${token}` }
     });
 
     if (!res.ok) throw new Error('Erro ao buscar notificações');
 
-    notifications = await res.json(); // [{id, mensagem, read}]
+    notifications = await res.json(); // [{id, mensagem, lida}]
     renderNotifications();
   } catch (err) {
     console.error('Erro ao buscar notificações:', err);
@@ -59,42 +59,44 @@ async function fetchNotifications() {
 // Renderiza o dropdown
 function renderNotifications() {
   notificationMenu.innerHTML = '';
-  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Mostra badge só se houver notificações não lidas
+  const unreadCount = notifications.filter(n => !n.lida).length;
   badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
   badge.textContent = unreadCount;
 
+  // Se não houver notificações, mostra mensagem padrão
   if (notifications.length === 0) {
     notificationMenu.innerHTML = '<div style="padding:10px;">Nenhuma notificação</div>';
-    return;
-  }
+  } else {
+    notifications.forEach(n => {
+      const item = document.createElement('div');
+      item.textContent = n.mensagem;
+      item.style.padding = '10px';
+      item.style.cursor = 'pointer';
+      item.style.borderBottom = '1px solid #eee';
+      item.style.background = n.lida ? '#fff' : '#f0f8ff';
+      item.style.transition = 'background 0.2s';
 
-  notifications.forEach(n => {
-    const item = document.createElement('div');
-    item.textContent = n.mensagem; // ⚠️ corresponde ao campo do backend
-    item.style.padding = '10px';
-    item.style.cursor = 'pointer';
-    item.style.borderBottom = '1px solid #eee';
-    item.style.background = n.read ? '#fff' : '#f0f8ff';
-    item.style.transition = 'background 0.2s';
+      item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
+      item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
 
-    item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
-    item.addEventListener('mouseleave', () => item.style.background = n.read ? '#fff' : '#f0f8ff');
+      item.addEventListener('click', async () => {
+        await markAsRead(n.id);
+        n.lida = true;
+        renderNotifications();
+      });
 
-    item.addEventListener('click', async () => {
-      await markAsRead(n.id);
-      n.read = true;
-      renderNotifications();
+      notificationMenu.appendChild(item);
     });
-
-    notificationMenu.appendChild(item);
-  });
+  }
 }
 
 // Marca notificação como lida
 async function markAsRead(notificationId) {
   try {
     const token = localStorage.getItem('accessToken');
-    const res = await fetch(`https://folium-backend.onrender.com/api/notifications/read/${notificationId}`, {
+    const res = await fetch(`https://folium-backend.onrender.com/api/auth/notifications/read/${notificationId}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });
