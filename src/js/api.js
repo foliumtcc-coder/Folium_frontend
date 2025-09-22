@@ -82,16 +82,15 @@ export async function createProject(formData) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/projects/create`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/create`, { // rota corrigida
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}` // não colocar Content-Type com FormData
     },
-    body: formData // FormData permite enviar arquivos
+    body: formData
   });
 
   const text = await res.text();
   if (!res.ok) throw new Error(text);
   return text;
 }
-

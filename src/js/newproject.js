@@ -1,20 +1,19 @@
-import { createProject, getUser } from './api.js';
+import { getUser } from './api.js';
 
 const projectForm = document.getElementById('form-projeto');
-const messageDiv = document.getElementById('message'); // div para feedback
+const messageDiv = document.getElementById('message');
 const fileInput = document.getElementById('proj-pic');
-const fileNameSpan = document.getElementById('file-name'); // span para mostrar nome do arquivo
-const membersInput = document.getElementById('proj-members'); // input de membros
+const fileNameSpan = document.getElementById('file-name');
+const membersInput = document.getElementById('proj-members');
 
-let loggedUserEmail = ''; // vai guardar o email do usuário logado
+let loggedUserEmail = '';
 
 // Busca usuário logado ao carregar a página
 async function fetchLoggedUser() {
   try {
     const { user } = await getUser();
     if (user) {
-      loggedUserEmail = user.email; // identifica pelo email
-      // Adiciona automaticamente no input de membros
+      loggedUserEmail = user.email;
       membersInput.value = loggedUserEmail;
     }
   } catch (err) {
@@ -25,12 +24,28 @@ async function fetchLoggedUser() {
 // Confirmação de arquivo selecionado
 if (fileInput && fileNameSpan) {
   fileInput.addEventListener('change', () => {
-    if (fileInput.files.length > 0) {
-      fileNameSpan.textContent = `Arquivo selecionado: ${fileInput.files[0].name}`;
-    } else {
-      fileNameSpan.textContent = '';
-    }
+    fileNameSpan.textContent =
+      fileInput.files.length > 0 ? `Arquivo selecionado: ${fileInput.files[0].name}` : '';
   });
+}
+
+// Função para criar projeto (chama a rota correta do backend)
+async function createProject(formData) {
+  const token = localStorage.getItem('accessToken'); // token JWT do usuário
+  const res = await fetch('https://folium-backend.onrender.com/api/auth/projects/create', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(errText || 'Erro ao criar projeto');
+  }
+
+  return res.text();
 }
 
 // Submit do formulário
@@ -48,35 +63,30 @@ if (projectForm) {
       return;
     }
 
-    // Garante que o usuário logado está incluído nos membros
     let currentMembers = membersInput.value
       .split(',')
       .map(m => m.trim())
       .filter(m => m !== '');
 
-    // Remove duplicados
     currentMembers = [...new Set(currentMembers)];
 
-    // Limita a 10 membros
     if (currentMembers.length > 10) {
       messageDiv.style.color = 'red';
       messageDiv.textContent = 'O projeto pode ter no máximo 10 membros.';
       return;
     }
 
-    // Inclui automaticamente o usuário logado
     if (!currentMembers.includes(loggedUserEmail)) {
       currentMembers.push(loggedUserEmail);
     }
 
     membersInput.value = currentMembers.join(',');
 
-    // Cria FormData
     const formData = new FormData();
     formData.append('titulo', title);
     formData.append('descricao', description);
     formData.append('imagem', imageFile);
-    formData.append('membros', membersInput.value); // emails separados por vírgula
+    formData.append('membros', membersInput.value);
     formData.append('criado_por', loggedUserEmail);
 
     messageDiv.style.color = 'black';
@@ -87,7 +97,7 @@ if (projectForm) {
       messageDiv.style.color = 'green';
       messageDiv.textContent = responseText || 'Projeto criado com sucesso!';
       projectForm.reset();
-      fileNameSpan.textContent = ''; // limpa nome do arquivo
+      fileNameSpan.textContent = '';
     } catch (err) {
       messageDiv.style.color = 'red';
       messageDiv.textContent = err.message || 'Erro ao criar projeto.';
@@ -96,7 +106,5 @@ if (projectForm) {
 }
 
 // Inicializa ao carregar
-document.addEventListener('DOMContentLoaded', () => {
-  fetchLoggedUser();
-});
+document.addEventListener('DOMContentLoaded', fetchLoggedUser);
 
