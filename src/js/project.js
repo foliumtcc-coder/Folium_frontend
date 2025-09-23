@@ -10,7 +10,10 @@ async function loadProject() {
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    const { projeto, etapas = [], membros = [], imagens = [] } = data; // garante arrays padrão
+    const projeto = data.projeto;
+    const etapas = data.etapas || [];
+    const membros = data.membros || [];
+    const imagens = data.imagens || [];
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
@@ -33,7 +36,7 @@ async function loadProject() {
     // --- Preenche etapas ---
     const stepsContainer = document.querySelector('.project-steps');
     stepsContainer.innerHTML = '';
-    etapas.forEach(etapa => {
+    (etapas || []).forEach(etapa => {
       const step = document.createElement('div');
       step.classList.add('step');
 
@@ -70,7 +73,7 @@ async function loadProject() {
     // --- Preenche membros no menu lateral ---
     const sideMenu = document.querySelector('.menu-header-people');
     sideMenu.innerHTML = '';
-    membros.forEach(m => {
+    (membros || []).forEach(m => {
       const a = document.createElement('a');
       a.href = `/profile.html?id=${m.usuario_id}`;
       a.innerHTML = `<span class="fa-solid fa-circle-user"></span><span>${m.name1}</span><br />`;
@@ -89,7 +92,7 @@ async function loadProject() {
     // --- Preenche imagens ---
     const mediaContainer = document.querySelector('.menu-media-display');
     mediaContainer.innerHTML = '';
-    imagens.forEach((url, i) => {
+    (imagens || []).forEach((url, i) => {
       const div = document.createElement('div');
       div.className = 'menu-media';
       if (i === 0) div.style.borderRadius = '15px 0 0 15px';
