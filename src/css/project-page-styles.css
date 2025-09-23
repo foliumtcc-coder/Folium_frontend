@@ -255,3 +255,109 @@ main {
   font-size: 27px;
   margin-right: 5px;
 }
+
+/* --- Botão de editar projeto --- */
+#edit-project-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50; /* verde */
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
+}
+
+#edit-project-btn:hover {
+  background-color: #45a049;
+}
+
+/* --- Popup --- */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.popup-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-content label {
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+.popup-content input[type="text"],
+.popup-content textarea,
+.popup-content input[type="file"] {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+.popup-content textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.popup-content button[type="submit"] {
+  margin-top: 15px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2196F3; /* azul */
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popup-content button[type="submit"]:hover {
+  background-color: #0b7dda;
+}
+
+/* --- Botão fechar popup --- */
+.popup-content .close-popup {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+}
+
+.popup-content .close-popup:hover {
+  color: #000;
+}
