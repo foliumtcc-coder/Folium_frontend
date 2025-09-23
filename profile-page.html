@@ -5,10 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil</title>
-  <link rel="stylesheet" href="./src/css/global-styles.css">
-  <link rel="stylesheet" href="./src/css/profile-page-styles.css">
-  <link rel="stylesheet" href="./src/css/dark-mode.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/global-styles.css">
+    <link rel="stylesheet" href="./src/css/home-styles.css">
+    <link rel="stylesheet" href="./src/css/standard-header.css">
+    <link rel="stylesheet" href="./src/css/standard-footer.css">
+    <link rel="stylesheet" href="./src/css/dark-mode.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
   <header>
@@ -130,19 +132,7 @@
   <script type="module" src="./src/js/notifications.js"></script>
   <script type="module" src="./src/js/profile.js"></script>
 
-  <script>
-    // Toggle dropdown do perfil
-    document.addEventListener("DOMContentLoaded", () => {
-      const profileBtn = document.getElementById("profile-button");
-      const profileMenu = document.getElementById("profile-dropdown-menu");
 
-      profileBtn.addEventListener("click", () => profileMenu.classList.toggle("hidden"));
-      document.addEventListener("click", (e) => {
-        if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-          profileMenu.classList.add("hidden");
-        }
-      });
-    });
   </script>
 </body>
 </html>
