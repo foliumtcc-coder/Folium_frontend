@@ -3,7 +3,7 @@ import { getUser } from './api.js';
 document.addEventListener("DOMContentLoaded", async () => {
   const editProfileBtn = document.getElementById("edit-profile-btn");
   const popup = document.getElementById("edit-profile-popup");
-  const closePopupBtn = document.getElementById("close-popup");
+  const closePopupBtn = document.getElementById("close-popup-btn"); // corrigido
   const editForm = popup.querySelector(".edit-profile-form");
 
   const nameElem = document.getElementById("name");
@@ -32,20 +32,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Buscar perfil correto
   async function loadProfile() {
     try {
-      let endpoint = '';
-      let headers = {};
+      if (!loggedUser) throw new Error("Usuário não logado");
+
       const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Usuário não logado");
+      const headers = { 'Authorization': `Bearer ${token}` };
 
-      headers = { 'Authorization': `Bearer ${token}` };
-
-      if (profileId && parseInt(profileId) !== loggedUser.id) {
-        // Perfil de outro usuário
-        endpoint = `https://folium-backend.onrender.com/api/auth/profile/${profileId}`;
-      } else {
-        // Próprio perfil
-        endpoint = `https://folium-backend.onrender.com/api/auth/profile/me`;
-      }
+      const endpoint = (profileId && parseInt(profileId) !== loggedUser.id)
+        ? `https://folium-backend.onrender.com/api/auth/profile/${profileId}`
+        : `https://folium-backend.onrender.com/api/auth/profile/me`;
 
       const res = await fetch(endpoint, { headers });
       if (!res.ok) throw new Error(await res.text());
@@ -53,11 +47,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       profileUser = data.user;
 
       // Preencher página
-      nameElem.textContent = profileUser.name1;
+      nameElem.textContent = profileUser.name1 || "Usuário";
       bioElem.textContent = profileUser.bio || "";
       avatar.src = profileUser.avatarUrl || "./src/img/icons/profile-icon.jpg";
       banner.src = profileUser.bannerUrl || "./src/img/standard-img.jpg";
 
+      // Links
       linksElem.innerHTML = "";
       const links = {
         instagram: profileUser.instagram,
@@ -90,6 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Abrir popup
   editProfileBtn.addEventListener("click", () => {
     popup.classList.remove("hidden");
+    if (!editForm) return;
     editForm.descricao.value = profileUser.bio || "";
     editForm.instagram.value = profileUser.instagram || "";
     editForm.linkedin.value = profileUser.linkedin || "";
@@ -134,13 +130,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const result = await res.json();
 
       profileUser = result.user;
-      // Atualizar elementos da página
-      nameElem.textContent = profileUser.name1;
+      nameElem.textContent = profileUser.name1 || "Usuário";
       bioElem.textContent = profileUser.bio || "";
       avatar.src = profileUser.avatarUrl || "./src/img/icons/profile-icon.jpg";
       banner.src = profileUser.bannerUrl || "./src/img/standard-img.jpg";
 
-      // Fechar popup
       popup.classList.add("hidden");
     } catch (err) {
       console.error("Erro ao atualizar perfil:", err);

@@ -5,170 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil</title>
   <link rel="stylesheet" href="./src/css/global-styles.css">
-  <link rel="stylesheet" href="./src/css/home-styles.css">
-  <link rel="stylesheet" href="./src/css/standard-header.css">
-  <link rel="stylesheet" href="./src/css/standard-footer.css">
-  <link rel="stylesheet" href="./src/css/dark-mode.css">
-  <link rel="stylesheet" href="./src/css/profile-page-styles.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-  <style>
-    .hidden { display: none; }
-
-    /* Popup */
-    #edit-profile-popup {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #edit-profile-popup .popup-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 400px;
-      width: 90%;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    #edit-profile-popup .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      border: none;
-      background: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    #edit-profile-popup form button[type="submit"] {
-      margin-top: 10px;
-    }
-  </style>
+  <link rel="stylesheet" href="./src/css/profile-styles.css">
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <div class="header-left-side">
-        <div class="home-button">
-          <a href="./home.html"> 
-            <img src="./src/img/icons/logo1.png" alt="Logo" class="home-button-icon" height="60px" />
-          </a>
-        </div>
-        <div class="search-bar">
-          <img src="./src/img/icons/lupa.png" class="search-icon" alt="Lupa" />
-          <input type="text" placeholder="Pesquisar" />
-        </div>
-      </div>
-
-      <div class="header-right-side">
-        <div class="dark-mode-toggle def-btn">
-          <button id="dark-mode-button" onclick="toggleDarkMode()">
-            <span class="fa-solid fa-moon"></span>
-          </button>
-        </div>
-
-        <div class="help-button def-btn">
-          <a href="help.html">
-            <button id="help-button">
-              <span class="fa-solid fa-question"></span>
-            </button>
-          </a>
-        </div>
-
-        <div class="config-button def-btn">
-          <a href="config.html">
-            <button id="config-button">
-              <span class="fa-solid fa-gear"></span>
-            </button>
-          </a>
-        </div>
-
-        <div class="notification-button def-btn">
-            <button id="notification-button">
-              <span class="fa-regular fa-bell"></span>
-            </button>
-        </div>
-
-        <div class="profile-button def-btn" style="position: relative;">
-          <button id="profile-button">
-            <span class="fa-solid fa-user"></span>
-          </button>
-          <div class="dropdown-menu hidden" id="profile-dropdown-menu"></div>
-        </div>
-
-        <div class="new-project-button">
-          <a href="new-project-page.html">
-            <span class="fa-solid fa-plus"></span>
-          </a>
-        </div>
-      </div>
+    <!-- Banner do perfil -->
+    <div class="profile-banner">
+      <img id="banner-img" src="./src/img/default-banner.png" alt="Banner do perfil">
     </div>
   </header>
 
   <main>
-    <div class="profile-header">
-      <div class="header-image">
-        <img id="banner" src="./src/img/standard-img.jpg" alt="Banner do usuário">
-        <input type="file" id="bannerInput" class="hidden" accept="image/*">
-        <button id="editBanner" class="edit-btn hidden"><span class="fa-solid fa-pen"></span></button>
+    <section class="profile-info">
+      <!-- Imagem do perfil -->
+      <div class="profile-picture">
+        <img id="profile-img" src="./src/img/default-profile.png" alt="Foto de perfil">
       </div>
-      <div class="profile-pic">
-        <img id="avatar" src="./src/img/icons/profile-icon.jpg" alt="Foto de Perfil" width="150">
-        <input type="file" id="avatarInput" class="hidden" accept="image/*">
-        <button id="editAvatar" class="edit-btn hidden"><span class="fa-solid fa-pen"></span></button>
+
+      <!-- Nome do usuário -->
+      <h1 id="profile-name">Nome do Usuário</h1>
+
+      <!-- Descrição -->
+      <p id="profile-description">Aqui vai a descrição do usuário.</p>
+
+      <!-- Links -->
+      <div id="profile-links">
+        <!-- Links serão inseridos pelo profile.js -->
       </div>
-      <div class="profile-name"><span id="name"></span></div>
-      <!-- Botão de editar escondido por padrão -->
-      <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
-    </div>
 
-    <!-- POPUP DE EDIÇÃO -->
-    <div id="edit-profile-popup" class="hidden">
-      <div class="popup-content">
-        <button id="close-popup" class="close-btn">&times;</button>
-        <form class="edit-profile-form">
-          <label>Descrição</label>
-          <textarea name="descricao" placeholder="Escreva sua bio..."></textarea>
-
-          <label>Instagram</label>
-          <input type="text" name="instagram" placeholder="Instagram">
-
-          <label>LinkedIn</label>
-          <input type="text" name="linkedin" placeholder="LinkedIn">
-
-          <label>GitHub</label>
-          <input type="text" name="github" placeholder="GitHub">
-
-          <button type="submit">Salvar Alterações</button>
-        </form>
-      </div>
-    </div>
-
-    <div class="bio-box">
-      <span class="bio-title">Descrição</span>
-      <span id="bio" class="bio-text"></span>
-      <div class="bio-links" id="links"></div>
-    </div>
-
-    <div class="projects-section">
-      <span class="projects-section-title">Projetos</span>
-      <div class="projects-display" id="projects"></div>
-    </div>
+      <!-- Botão para editar perfil -->
+      <button id="edit-profile-btn">Editar Perfil</button>
+    </section>
   </main>
 
-  <script src="./js/script.js" type="module"></script>
-  <script src="./js/dark-mode.js"></script>
-  <script type="module" src="./src/js/login_manager.js"></script>
-  <script type="module" src="./src/js/profile.js"></script>
-  <script type="module" src="./src/js/notifications.js"></script>
+  <!-- Popup de edição do perfil -->
+  <div id="edit-profile-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Editar Perfil</h2>
+      <label>
+        Nome:
+        <input type="text" id="edit-name">
+      </label>
+      <label>
+        Descrição:
+        <textarea id="edit-description"></textarea>
+      </label>
+      <label>
+        Link:
+        <input type="text" id="edit-link">
+      </label>
+      <button id="save-profile-btn">Salvar</button>
+      <button id="close-popup-btn">Cancelar</button>
+    </div>
+  </div>
+
+  <script src="./src/js/profile.js"></script>
 </body>
 </html>
