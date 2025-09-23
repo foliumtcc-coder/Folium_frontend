@@ -1,3 +1,4 @@
+// src/js/api.js
 export const BACKEND_URL = 'https://folium-backend.onrender.com';
 
 // Função auxiliar para POST com JSON
@@ -47,7 +48,6 @@ export function logout() {
 }
 
 // Buscar usuário logado
-// Buscar usuário logado
 export async function getUser() {
   const token = localStorage.getItem('accessToken');
   if (!token) return { user: null };
@@ -63,13 +63,12 @@ export async function getUser() {
     if (!res.ok) return { user: null };
 
     const json = await res.json(); // { user: {...} }
-    return { user: json.user || null }; // <-- corrige o undefined
+    return { user: json.user || null };
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
     return { user: null };
   }
 }
-
 
 // Criar projeto
 export async function createProject(formData) {
@@ -125,7 +124,7 @@ export async function fetchNotifications() {
 
     if (!res.ok) throw new Error('Erro ao buscar notificações');
 
-    const data = await res.json(); // [{id, mensagem, lida, criada_em}]
+    const data = await res.json();
     return data;
   } catch (err) {
     console.error(err);
@@ -151,4 +150,46 @@ export async function markNotificationAsRead(id) {
   } catch (err) {
     console.error(err);
   }
+}
+
+// ====================== NOVAS FUNÇÕES ======================
+
+// Buscar perfil de usuário por id
+export async function getUserProfile(id) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
+  const res = await fetch(`${BACKEND_URL}/api/auth/profile/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+
+  return await res.json(); // { user: {...}, projects: [...] }
+}
+
+// Buscar projeto completo por id
+export async function getProjectById(id) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
+  const res = await fetch(`${BACKEND_URL}/api/auth/projectsView/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+
+  return await res.json(); // { projeto: {...}, etapas: [...], membros: [...] }
 }
