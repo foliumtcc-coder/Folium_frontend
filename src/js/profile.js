@@ -1,9 +1,4 @@
-import { 
-  getUser, 
-  updateUserProfile, 
-  getUserProfile, 
-  getUserProjects 
-} from './api.js';
+import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
 function normalizeUser(u) {
   if (!u) return null;
@@ -45,11 +40,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let loggedUser = null;
   let profileUser = null;
+  let profileProjects = [];
 
   const params = new URLSearchParams(window.location.search);
   const profileId = params.get('id');
 
-  // 🔹 Buscar usuário logado
   try {
     const res = await getUser();
     loggedUser = res.user || null;
@@ -79,21 +74,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  function fillProjectsUI(projects) {
+    projectsContainer.innerHTML = '';
+    if (!projects.length) {
+      projectsContainer.innerHTML = '<p>Este usuário não possui projetos.</p>';
+      return;
+    }
+
+    projects.forEach(p => {
+      const projectLink = document.createElement('a');
+      const canAccess = Boolean(p.publico) || (loggedUser && Number(loggedUser.id) === Number(profileUser.id));
+      projectLink.href = canAccess ? `project-page.html?id=${p.id}` : '#';
+      projectLink.classList.add('project-block');
+
+      const projectImgDiv = document.createElement('div');
+      projectImgDiv.classList.add('project-img');
+      const img = document.createElement('img');
+      img.src = p.imagem || './src/img/icons/project-image2.png';
+      img.alt = 'Capa do projeto';
+      projectImgDiv.appendChild(img);
+
+      const projectFooter = document.createElement('div');
+      projectFooter.classList.add('project-footer');
+      projectFooter.innerHTML = `
+        <h3>${p.titulo ?? 'Projeto sem título'}</h3>
+        <p>${p.descricao ?? ''}</p>
+      `;
+
+      projectLink.appendChild(projectImgDiv);
+      projectLink.appendChild(projectFooter);
+      projectsContainer.appendChild(projectLink);
+    });
+  }
+
   async function loadProfile() {
     try {
       const idToFetch = profileId ? profileId : (loggedUser?.id ?? null);
       if (!idToFetch) return;
 
       const data = await getUserProfile(idToFetch);
-      const rawUser = data.user ?? data;
-      profileUser = normalizeUser(rawUser);
+      profileUser = normalizeUser(data.user ?? data);
+      profileProjects = data.projects ?? [];
 
       fillProfileUI(profileUser);
+      fillProjectsUI(profileProjects);
 
-      // 🔹 Busca projetos do usuário usando a função da API
-      await loadUserProjects(idToFetch);
-
-      // 🔹 Mostrar botão de editar apenas se for o próprio usuário
       if (loggedUser && profileUser && Number(loggedUser.id) === Number(profileUser.id)) {
         editProfileBtn.classList.remove('hidden');
       } else {
@@ -106,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadProfile();
 
-  // 🔹 Popup edição de perfil
+  // Popup de edição
   editProfileBtn.addEventListener('click', () => {
     if (!profileUser) return;
     popup.classList.remove('hidden');
@@ -117,8 +142,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     popupAvatar.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
     popupBanner.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
-
-    popup.querySelector('.popup-content')?.scrollTo(0, 0);
   });
 
   closePopupBtn.addEventListener('click', () => popup.classList.add('hidden'));
@@ -163,48 +186,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('Erro ao atualizar perfil.');
     }
   });
-
-  // 🔹 Função para carregar projetos do usuário usando a função da API
-  async function loadUserProjects(userId) {
-    try {
-      if (!userId) return;
-
-      const projects = await getUserProjects(userId);
-
-      projectsContainer.innerHTML = '';
-      if (!projects.length) {
-        projectsContainer.innerHTML = '<p>Este usuário não possui projetos.</p>';
-        return;
-      }
-
-      projects.forEach(p => {
-        const projectLink = document.createElement('a');
-        const canAccess = Boolean(p.publico) || (loggedUser && Number(loggedUser.id) === Number(profileUser.id));
-        projectLink.href = canAccess ? `project-page.html?id=${p.id}` : '#';
-        projectLink.classList.add('project-block');
-
-        const projectImgDiv = document.createElement('div');
-        projectImgDiv.classList.add('project-img');
-        const img = document.createElement('img');
-        img.src = p.imagem || './src/img/icons/project-image2.png';
-        img.alt = 'Capa do projeto';
-        projectImgDiv.appendChild(img);
-
-        const projectFooter = document.createElement('div');
-        projectFooter.classList.add('project-footer');
-        projectFooter.innerHTML = `
-          <h3>${p.titulo ?? 'Projeto sem título'}</h3>
-          <p>${p.descricao ?? ''}</p>
-        `;
-
-        projectLink.appendChild(projectImgDiv);
-        projectLink.appendChild(projectFooter);
-        projectsContainer.appendChild(projectLink);
-      });
-
-    } catch (err) {
-      console.error('Erro ao carregar projetos do usuário:', err);
-      projectsContainer.innerHTML = '<p>Erro ao carregar os projetos.</p>';
-    }
-  }
 });
