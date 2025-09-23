@@ -21,10 +21,12 @@ function setupPopup(popupId, innerHTML) {
 
     // Fecha ao clicar fora do conteúdo
     popup.addEventListener('click', e => {
-      if (!popup.querySelector('.popup-content').contains(e.target)) {
+      const content = popup.querySelector('.popup-content');
+      if (!content || !content.contains(e.target)) {
         popup.classList.add('hidden');
       }
     });
+
   }
   popup.classList.remove('hidden');
   return popup;

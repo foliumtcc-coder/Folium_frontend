@@ -216,10 +216,16 @@ export async function updateUserProfile(formData) {
     body: formData
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
+if (!res.ok) {
+  let errorMsg;
+  try {
+    const errJson = await res.json();
+    errorMsg = errJson.error || JSON.stringify(errJson);
+  } catch {
+    errorMsg = await res.text();
   }
+  throw new Error(errorMsg || 'Erro ao atualizar projeto');
+}
 
   return await res.json(); // { message: "...", user: {...} }
 }
