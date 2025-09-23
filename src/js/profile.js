@@ -1,5 +1,5 @@
 // src/js/profile.js
-import { getUser, updateUserProfile, getUserProfile } from './api.js';
+import { getUser, updateUserProfile, getUserProfile, BACKEND_URL } from './api.js';
 
 function normalizeUser(u) {
   if (!u) return null;
