@@ -1,7 +1,7 @@
 import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elementos do perfil
+  // Elementos principais
   const editProfileBtn = document.getElementById('edit-profile-btn');
   const popup = document.getElementById('edit-profile-popup');
   const closePopupBtn = document.getElementById('close-popup');
@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bannerElem = document.getElementById('banner');
 
   // Inputs do popup
+  const descricaoInput = document.getElementById('descricao');
+  const instagramInput = document.getElementById('instagram');
+  const linkedinInput = document.getElementById('linkedin');
+  const githubInput = document.getElementById('github');
+
   const popupAvatar = document.getElementById('popup-avatar');
   const popupBanner = document.getElementById('popup-banner');
   const avatarInputPopup = document.getElementById('popup-avatar-input');
@@ -50,10 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const projects = data.projects || [];
 
       // Preencher informações
-      nameElem.textContent = profileUser.name || 'Usuário';
-      bioElem.textContent = profileUser.bio || '';
-      avatarElem.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
-      bannerElem.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
+      nameElem.textContent = profileUser.name1 || 'Usuário';
+      bioElem.textContent = profileUser.descricao || '';
+      avatarElem.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
+      bannerElem.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
 
       // Links
       linksElem.innerHTML = '';
@@ -108,13 +113,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Abrir popup
   editProfileBtn.addEventListener('click', () => {
     popup.classList.remove('hidden');
-    editForm.descricao.value = profileUser.bio || '';
-    editForm.instagram.value = profileUser.instagram || '';
-    editForm.linkedin.value = profileUser.linkedin || '';
-    editForm.github.value = profileUser.github || '';
+    descricaoInput.value = profileUser.descricao || '';
+    instagramInput.value = profileUser.instagram || '';
+    linkedinInput.value = profileUser.linkedin || '';
+    githubInput.value = profileUser.github || '';
 
-    popupAvatar.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
-    popupBanner.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
+    popupAvatar.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
+    popupBanner.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
   });
 
   // Fechar popup
@@ -123,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.target === popup) popup.classList.add('hidden');
   });
 
-  // Alterar avatar/banner no popup
+  // Alterar avatar/banner no popup (preview)
   avatarInputPopup.addEventListener('change', () => {
     const file = avatarInputPopup.files[0];
     if (file) popupAvatar.src = URL.createObjectURL(file);
@@ -140,10 +145,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!profileUser || loggedUser.id !== profileUser.id) return;
 
     const formData = new FormData();
-    formData.append('descricao', editForm.descricao.value);
-    formData.append('instagram', editForm.instagram.value.trim());
-    formData.append('linkedin', editForm.linkedin.value.trim());
-    formData.append('github', editForm.github.value.trim());
+    formData.append('descricao', descricaoInput.value);
+    formData.append('instagram', instagramInput.value.trim());
+    formData.append('linkedin', linkedinInput.value.trim());
+    formData.append('github', githubInput.value.trim());
     if (avatarInputPopup.files[0]) formData.append('imagem_perfil', avatarInputPopup.files[0]);
     if (bannerInputPopup.files[0]) formData.append('banner_fundo', bannerInputPopup.files[0]);
 
@@ -152,10 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       profileUser = result.user;
 
       // Atualizar elementos da página
-      nameElem.textContent = profileUser.name || 'Usuário';
-      bioElem.textContent = profileUser.bio || '';
-      avatarElem.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
-      bannerElem.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
+      nameElem.textContent = profileUser.name1 || 'Usuário';
+      bioElem.textContent = profileUser.descricao || '';
+      avatarElem.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
+      bannerElem.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
 
       popup.classList.add('hidden');
     } catch (err) {

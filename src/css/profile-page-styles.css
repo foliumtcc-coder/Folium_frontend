@@ -30,7 +30,7 @@ main {
 
 .profile-pic {
   position: absolute;
-  top: 130px; /* abaixa para ficar sobre o banner */
+  top: 130px;
   left: 50%;
   transform: translateX(-50%);
   width: 150px;
@@ -47,14 +47,17 @@ main {
 }
 
 .profile-name {
-  margin-top: 90px; /* afasta do topo do main */
+  margin-top: 90px;
   font-size: 30px;
   font-weight: bold;
   text-align: center;
 }
 
+/*-----------------BOTÃO EDITAR PERFIL----------------*/
 #edit-profile-btn {
-  margin-top: 10px;
+  position: absolute;
+  top: 220px; /* logo abaixo do banner */
+  right: 50px;
   padding: 8px 15px;
   font-size: 16px;
   border-radius: 8px;
@@ -62,6 +65,7 @@ main {
   cursor: pointer;
   background-color: #8752d2;
   color: #fff;
+  z-index: 1000;
 }
 
 #edit-profile-btn.hidden {
@@ -151,7 +155,7 @@ main {
   background-color: #fff;
 }
 
-/*-------------------------POP UP EDIÇÂO---------------------------*/
+/*-------------------------POP UP EDIÇÃO---------------------------*/
 .popup {
   position: fixed;
   top: 0;
@@ -163,13 +167,19 @@ main {
   justify-content: center;
   align-items: center;
   z-index: 999;
+  overflow-y: auto; /* permite scroll se a tela for pequena */
+  padding: 20px;
 }
 
 .popup-content {
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   border-radius: 15px;
   background-color: #fff;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .hidden {
@@ -180,4 +190,15 @@ main {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.edit-profile-form button {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #8752d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
