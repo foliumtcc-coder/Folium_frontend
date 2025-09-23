@@ -10,7 +10,7 @@ async function loadProject() {
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    const { projeto, etapas, membros, imagens = [] } = data;
+    const { projeto, etapas = [], membros = [], imagens = [] } = data; // garante arrays padrão
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
