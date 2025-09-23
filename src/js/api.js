@@ -188,8 +188,11 @@ export async function updateProject(projectId, formData) {
   if (!token) throw new Error('Usuário não autenticado');
 
   const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projectId}`, {
-    method: 'PATCH',
-    headers: { 'Authorization': `Bearer ${token}` },
+    method: 'PUT', // <--- aqui deve ser PUT
+    headers: {
+      'Authorization': `Bearer ${token}`
+      // NÃO setar Content-Type para FormData
+    },
     body: formData
   });
 
@@ -200,6 +203,7 @@ export async function updateProject(projectId, formData) {
 
   return await res.json(); // { projeto: {...} }
 }
+
 
 // Atualizar perfil do usuário
 export async function updateUserProfile(formData) {

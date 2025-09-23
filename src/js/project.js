@@ -10,15 +10,15 @@ async function loadProject() {
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-if (!data || !data.projeto) {
-  alert('Projeto não encontrado.');
-  return;
-}
+    if (!data || !data.projeto) {
+      alert('Projeto não encontrado.');
+      return;
+    }
 
-const projeto = data.projeto;
-const etapas = Array.isArray(data.etapas) ? data.etapas : [];
-const membros = Array.isArray(data.membros) ? data.membros : [];
-const imagens = Array.isArray(data.imagens) ? data.imagens : [];
+    const projeto = data.projeto;
+    const etapas = Array.isArray(data.etapas) ? data.etapas : [];
+    const membros = Array.isArray(data.membros) ? data.membros : [];
+    const imagens = Array.isArray(data.imagens) ? data.imagens : [];
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
@@ -42,20 +42,23 @@ const imagens = Array.isArray(data.imagens) ? data.imagens : [];
     if (isOwner) editButton.onclick = () => openEditPopup(projeto, membros);
 
     // --- Datas e descrição ---
-    document.querySelector('.menu-header-date').innerHTML = `
+    const dateEl = document.querySelector('.menu-header-date');
+    dateEl.innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${new Date(projeto.atualizado_em).toLocaleDateString()}</span>
     `;
-    document.querySelector('.menu-desc').textContent = projeto.descricao || 'Sem descrição';
+    const descEl = document.querySelector('.menu-desc');
+    descEl.textContent = projeto.descricao || 'Sem descrição';
 
     // --- Preenche membros no menu lateral ---
     const sideMenu = document.querySelector('.menu-header-people');
     sideMenu.innerHTML = '';
     membros.forEach(m => {
-      const userName = m.usuarios?.name1 || 'Sem nome';
-      if (!m.usuario_id) return;
+      const userId = m.usuario_id || m.id; // garante que tem id
+      const userName = m.name1 || 'Sem nome';
+      if (!userId) return;
       const a = document.createElement('a');
-      a.href = `/profile-page.html?id=${m.usuario_id}`;
+      a.href = `/profile.html?id=${userId}`;
       a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
       sideMenu.appendChild(a);
     });
@@ -67,11 +70,11 @@ const imagens = Array.isArray(data.imagens) ? data.imagens : [];
       const step = document.createElement('div');
       step.classList.add('step');
 
-      const membrosHTML = (etapa.usuarios || []).map(u => `
-        <a href="/profile.html?id=${u.usuario_id}">
-          <span class="fa-solid fa-circle-user"></span> ${u.name1 || 'Sem nome'}
-        </a>
-      `).join('');
+      const membrosHTML = (etapa.usuarios || []).map(u => {
+        const id = u.usuario_id || u.id;
+        const name = u.name1 || 'Sem nome';
+        return `<a href="/profile.html?id=${id}"><span class="fa-solid fa-circle-user"></span> ${name}</a>`;
+      }).join('');
 
       const arquivosHTML = (etapa.arquivos || []).map(f => `
         <div class="step-docs">
@@ -89,7 +92,7 @@ const imagens = Array.isArray(data.imagens) ? data.imagens : [];
           <div class="step-header-people">${membrosHTML}</div>
         </div>
         <div class="section-line"></div>
-        <div class="step-main-content">${etapa.descricao}</div>
+        <div class="step-main-content">${etapa.descricao || ''}</div>
         <div class="section-line"></div>
         <div class="step-footer">${arquivosHTML}</div>
       `;
@@ -188,7 +191,7 @@ function openEditPopup(projeto, membros) {
           <label>Título:</label>
           <input type="text" id="edit-title" value="${projeto.titulo}" required>
           <label>Descrição:</label>
-          <textarea id="edit-desc" required>${projeto.descricao}</textarea>
+          <textarea id="edit-desc" required>${projeto.descricao || ''}</textarea>
           <label>Imagem de Capa:</label>
           <input type="file" id="edit-image">
           <label>Adicionar Membros (IDs separados por vírgula):</label>
