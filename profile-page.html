@@ -13,7 +13,6 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     .hidden { display: none; }
-
     /* Popup */
     #edit-profile-popup {
       position: fixed;
@@ -25,7 +24,6 @@
       align-items: center;
       z-index: 1000;
     }
-
     #edit-profile-popup .popup-content {
       background: #fff;
       padding: 20px;
@@ -37,7 +35,6 @@
       flex-direction: column;
       gap: 10px;
     }
-
     #edit-profile-popup .close-btn {
       position: absolute;
       top: 10px;
@@ -47,7 +44,12 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
-
+    #edit-profile-popup .image-preview {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
     #edit-profile-popup form button[type="submit"] {
       margin-top: 10px;
     }
@@ -97,12 +99,10 @@
     <div class="profile-header">
       <div class="header-image">
         <img id="banner" src="./src/img/standard-img.jpg" alt="Banner do usuário">
-        <input type="file" id="bannerInput" class="hidden" accept="image/*">
       </div>
 
       <div class="profile-pic">
         <img id="avatar" src="./src/img/icons/profile-icon.jpg" alt="Foto de Perfil" width="150">
-        <input type="file" id="avatarInput" class="hidden" accept="image/*">
       </div>
 
       <div class="profile-name"><span id="name"></span></div>
@@ -114,8 +114,18 @@
     <!-- POPUP DE EDIÇÃO -->
     <div id="edit-profile-popup" class="hidden">
       <div class="popup-content">
-        <button id="close-popup-btn" class="close-btn">&times;</button>
+        <button id="close-popup" class="close-btn">&times;</button>
         <form class="edit-profile-form">
+          <label>Avatar</label>
+          <img id="popup-avatar" class="image-preview" src="./src/img/icons/profile-icon.jpg" alt="Avatar Preview">
+          <button type="button" id="change-avatar-btn">Alterar Avatar</button>
+          <input type="file" id="popup-avatar-input" class="hidden" accept="image/*">
+
+          <label>Banner</label>
+          <img id="popup-banner" class="image-preview" src="./src/img/standard-img.jpg" alt="Banner Preview">
+          <button type="button" id="change-banner-btn">Alterar Banner</button>
+          <input type="file" id="popup-banner-input" class="hidden" accept="image/*">
+
           <label>Descrição</label>
           <textarea id="descricao" name="descricao" placeholder="Escreva sua bio..."></textarea>
 

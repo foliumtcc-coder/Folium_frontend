@@ -1,20 +1,28 @@
-// src/js/profile.js
-import { getUser, getUserProfile, updateUserProfile } from './api.js';
+import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Elementos
+  const editProfileBtn = document.getElementById('edit-profile-btn');
+  const popup = document.getElementById('edit-profile-popup');
+  const closePopupBtn = document.getElementById('close-popup');
+  const editForm = popup.querySelector('.edit-profile-form');
+
   const nameElem = document.getElementById('name');
   const bioElem = document.getElementById('bio');
   const linksElem = document.getElementById('links');
+  const projectsContainer = document.getElementById('projects');
+
   const avatarElem = document.getElementById('avatar');
   const bannerElem = document.getElementById('banner');
-  const editBtn = document.getElementById('edit-profile-btn');
-  const popup = document.getElementById('edit-profile-popup');
-  const closePopupBtn = document.getElementById('close-popup-btn');
-  const editForm = document.querySelector('.edit-profile-form');
-  const avatarInput = document.getElementById('avatarInput');
-  const bannerInput = document.getElementById('bannerInput');
-  
-  const projectsContainer = document.getElementById('projects');
+
+  // Inputs do popup
+  const popupAvatar = document.getElementById('popup-avatar');
+  const popupBanner = document.getElementById('popup-banner');
+  const avatarInputPopup = document.getElementById('popup-avatar-input');
+  const bannerInputPopup = document.getElementById('popup-banner-input');
+
+  const changeAvatarBtn = document.getElementById('change-avatar-btn');
+  const changeBannerBtn = document.getElementById('change-banner-btn');
 
   let loggedUser = null;
   let profileUser = null;
@@ -31,23 +39,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Erro ao buscar usuário logado:', err);
   }
 
-  // Carregar perfil
+  // Carregar perfil e projetos
   async function loadProfile() {
     try {
       let data;
       if (profileId && parseInt(profileId) !== loggedUser?.id) {
-        data = await getUserProfile(profileId); // perfil de outro usuário
+        data = await getUserProfile(profileId);
       } else {
-        data = await getUserProfile(loggedUser.id); // próprio perfil
+        data = await getUserProfile(loggedUser.id);
       }
 
       profileUser = data.user;
+      const projects = data.projects || [];
 
-      // Preencher dados do perfil
+      // Preencher informações
       nameElem.textContent = profileUser.name1;
-      bioElem.textContent = profileUser.bio || '';
-      avatarElem.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
-      bannerElem.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
+      bioElem.textContent = profileUser.descricao || '';
+      avatarElem.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
+      bannerElem.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
 
       // Links
       linksElem.innerHTML = '';
@@ -68,29 +77,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Projetos
       projectsContainer.innerHTML = '';
-      const projects = data.projects || [];
-      projects.forEach(project => {
+      projects.forEach(p => {
         const projectLink = document.createElement('a');
-        projectLink.href = `project-page.html?id=${project.id}`;
+        projectLink.href = p.publico || loggedUser.id === profileUser.id ? `project-page.html?id=${p.id}` : '#';
         projectLink.classList.add('project-block');
 
-        projectLink.innerHTML = `
-          <div class="project-img">
-            <img src="${project.imagem || './src/img/icons/project-image2.png'}" alt="${project.nome}">
-          </div>
-          <div class="project-footer">
-            <span>${project.nome}</span>
-          </div>
-        `;
+        const projectImgDiv = document.createElement('div');
+        projectImgDiv.classList.add('project-img');
+        const img = document.createElement('img');
+        img.src = p.imagem_capa || './src/img/icons/project-image2.png';
+        projectImgDiv.appendChild(img);
 
+        const projectFooter = document.createElement('div');
+        projectFooter.classList.add('project-footer');
+        projectFooter.textContent = p.nome || 'Projeto sem nome';
+
+        projectLink.appendChild(projectImgDiv);
+        projectLink.appendChild(projectFooter);
         projectsContainer.appendChild(projectLink);
       });
 
-      // Mostrar botão de editar apenas para o próprio usuário
+      // Mostrar botão de editar apenas se for o próprio usuário
       if (loggedUser?.id === profileUser.id) {
-        editBtn.classList.remove('hidden');
+        editProfileBtn.classList.remove('hidden');
       }
-
     } catch (err) {
       console.error('Erro ao carregar perfil:', err);
     }
@@ -99,29 +109,39 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadProfile();
 
   // Abrir popup
-  editBtn.addEventListener('click', () => {
+  editProfileBtn.addEventListener('click', () => {
     popup.classList.remove('hidden');
-    editForm.descricao.value = profileUser.bio || '';
+    editForm.descricao.value = profileUser.descricao || '';
     editForm.instagram.value = profileUser.instagram || '';
     editForm.linkedin.value = profileUser.linkedin || '';
     editForm.github.value = profileUser.github || '';
+
+    popupAvatar.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
+    popupBanner.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
   });
 
   // Fechar popup
   closePopupBtn.addEventListener('click', () => popup.classList.add('hidden'));
-
-  // Atualizar preview de imagens
-  avatarInput.addEventListener('change', () => {
-    const file = avatarInput.files[0];
-    if (file) avatarElem.src = URL.createObjectURL(file);
+  popup.addEventListener('click', e => {
+    if (e.target === popup) popup.classList.add('hidden');
   });
-  bannerInput.addEventListener('change', () => {
-    const file = bannerInput.files[0];
-    if (file) bannerElem.src = URL.createObjectURL(file);
+
+  // Alterar avatar/banner no popup
+  changeAvatarBtn.addEventListener('click', () => avatarInputPopup.click());
+  changeBannerBtn.addEventListener('click', () => bannerInputPopup.click());
+
+  avatarInputPopup.addEventListener('change', () => {
+    const file = avatarInputPopup.files[0];
+    if (file) popupAvatar.src = URL.createObjectURL(file);
+  });
+
+  bannerInputPopup.addEventListener('change', () => {
+    const file = bannerInputPopup.files[0];
+    if (file) popupBanner.src = URL.createObjectURL(file);
   });
 
   // Salvar alterações
-  editForm.addEventListener('submit', async (e) => {
+  editForm.addEventListener('submit', async e => {
     e.preventDefault();
     if (!profileUser || loggedUser.id !== profileUser.id) return;
 
@@ -130,18 +150,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     formData.append('instagram', editForm.instagram.value.trim());
     formData.append('linkedin', editForm.linkedin.value.trim());
     formData.append('github', editForm.github.value.trim());
-    if (avatarInput.files[0]) formData.append('imagem_perfil', avatarInput.files[0]);
-    if (bannerInput.files[0]) formData.append('banner_fundo', bannerInput.files[0]);
+    if (avatarInputPopup.files[0]) formData.append('imagem_perfil', avatarInputPopup.files[0]);
+    if (bannerInputPopup.files[0]) formData.append('banner_fundo', bannerInputPopup.files[0]);
 
     try {
-      const updated = await updateUserProfile(formData);
-      profileUser = updated.user;
+      const result = await updateUserProfile(formData);
+      profileUser = result.user;
 
       // Atualizar elementos da página
       nameElem.textContent = profileUser.name1;
-      bioElem.textContent = profileUser.bio || '';
-      avatarElem.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
-      bannerElem.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
+      bioElem.textContent = profileUser.descricao || '';
+      avatarElem.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
+      bannerElem.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
 
       popup.classList.add('hidden');
     } catch (err) {
