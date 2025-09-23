@@ -96,10 +96,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         projectLink.href = canAccess ? `project-page.html?id=${p.id}` : '#';
         projectLink.classList.add('project-block');
 
+        // Usando a imagem correta do projeto (campo "imagem")
         const projectImgDiv = document.createElement('div');
         projectImgDiv.classList.add('project-img');
         const img = document.createElement('img');
-        img.src = p.imagem_capa || './src/img/icons/project-image2.png';
+        img.src = p.imagem || './src/img/icons/project-image2.png'; // <-- alterado aqui
+        img.alt = 'Capa do projeto';
         projectImgDiv.appendChild(img);
 
         const projectFooter = document.createElement('div');
@@ -176,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (bannerInputPopup.files[0]) formData.append('banner_fundo', bannerInputPopup.files[0]);
 
     try {
-      const result = await updateUserProfile(formData); // já chama PUT /me
+      const result = await updateUserProfile(formData);
       console.log('Resposta updateUserProfile:', result);
 
       const savedRawUser = result.user ?? result;
@@ -192,4 +194,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
-
