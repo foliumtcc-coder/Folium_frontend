@@ -5,6 +5,7 @@ const messageDiv = document.getElementById('message');
 const fileInput = document.getElementById('proj-pic');
 const fileNameSpan = document.getElementById('file-name');
 const membersInput = document.getElementById('proj-members');
+const typeSelect = document.getElementById('proj-type'); // novo
 
 let loggedUserEmail = '';
 
@@ -37,8 +38,9 @@ if (projectForm) {
     const title = document.getElementById('proj-name').value.trim();
     const description = document.getElementById('proj-desc').value.trim();
     const imageFile = fileInput.files[0];
+    const tipo = typeSelect.value; // pega o tipo (publico/privado)
 
-    if (!title || !description || !imageFile) {
+    if (!title || !description || !imageFile || !tipo) {
       messageDiv.style.color = 'red';
       messageDiv.textContent = 'Preencha todos os campos e selecione uma imagem.';
       return;
@@ -71,6 +73,7 @@ if (projectForm) {
     formData.append('imagem', imageFile);
     formData.append('membros', membersInput.value);
     formData.append('criado_por', loggedUserEmail);
+    formData.append('tipo', tipo); // envia tipo do projeto
 
     messageDiv.style.color = 'black';
     messageDiv.textContent = 'Criando projeto...';

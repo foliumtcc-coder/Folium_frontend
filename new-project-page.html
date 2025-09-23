@@ -90,39 +90,51 @@
       <div class="project-form-box">
         <form id="form-projeto">
           <!-- Nome do Projeto -->
-          <div class="form-item">
-            <label for="proj-name">Nome do projeto:</label><br>
-            <input type="text" name="proj-name" id="proj-name" class="text" required>
-          </div><br>
+          <form id="form-projeto">
+            <!-- Nome do Projeto -->
+            <div class="form-item">
+              <label for="proj-name">Nome do projeto:</label><br>
+              <input type="text" name="proj-name" id="proj-name" class="text" required>
+            </div><br>
 
-          <!-- Imagem do Projeto -->
-          <div class="form-item">
-            <label for="proj-pic">Imagem do projeto (capa):</label><br>
-            <input type="file" name="proj-pic" id="proj-pic" class="hidden">
-            <label for="proj-pic" class="fa-solid fa-file-import" style="cursor:pointer;"></label>
-            <span id="file-name" style="margin-left:5px;"></span>
-          </div><br>
+            <!-- Imagem do Projeto -->
+            <div class="form-item">
+              <label for="proj-pic">Imagem do projeto (capa):</label><br>
+              <input type="file" name="proj-pic" id="proj-pic" class="hidden">
+              <label for="proj-pic" class="fa-solid fa-file-import" style="cursor:pointer;"></label>
+              <span id="file-name" style="margin-left:5px;"></span>
+            </div><br>
 
-          <!-- Membros do Projeto -->
-          <div class="form-item">
-            <label for="proj-members">Membros (emails separados por vírgula):</label><br>
-            <input type="text" name="proj-members" id="proj-members" class="text" placeholder="email1,email2">
-          </div><br>
+            <!-- Tipo de Projeto -->
+            <div class="form-item">
+              <label for="proj-type">Tipo de projeto:</label><br>
+              <select name="proj-type" id="proj-type" class="text" required>
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+              </select>
+            </div><br>
 
-          <!-- Descrição do Projeto -->
-          <div class="form-item">
-            <label for="proj-desc">Descrição:</label><br>
-            <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text"></textarea>
-          </div><br>
+            <!-- Membros do Projeto -->
+            <div class="form-item">
+              <label for="proj-members">Membros (emails separados por vírgula):</label><br>
+              <input type="text" name="proj-members" id="proj-members" class="text" placeholder="email1,email2">
+            </div><br>
 
-          <!-- Mensagem de feedback -->
-          <div id="message" style="margin-bottom:10px;"></div>
+            <!-- Descrição do Projeto -->
+            <div class="form-item">
+              <label for="proj-desc">Descrição:</label><br>
+              <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text"></textarea>
+            </div><br>
 
-          <!-- Botão de Enviar -->
-          <div class="form-item">
-            <input type="submit" value="Criar projeto" class="submit">
-          </div>
-        </form>
+            <!-- Mensagem de feedback -->
+            <div id="message" style="margin-bottom:10px;"></div>
+
+            <!-- Botão de Enviar -->
+            <div class="form-item">
+              <input type="submit" value="Criar projeto" class="submit">
+            </div>
+          </form>
+
       </div>
     </div>
   </main>
