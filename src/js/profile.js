@@ -1,127 +1,167 @@
-import { getUserProfile } from './api.js';
+import { getUser } from './api.js';
 
-// Função auxiliar para buscar usuário logado via token
-async function getUser() {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return { user: null };
+document.addEventListener("DOMContentLoaded", async () => {
+  const editProfileBtn = document.getElementById("edit-profile-btn");
+  const popup = document.getElementById("edit-profile-popup");
+  const closePopupBtn = document.getElementById("close-popup");
+  const editForm = popup.querySelector(".edit-profile-form");
 
+  const nameElem = document.getElementById("name");
+  const bioElem = document.getElementById("bio");
+  const linksElem = document.getElementById("links");
+  const avatar = document.getElementById("avatar");
+  const banner = document.getElementById("banner");
+  const avatarInput = document.getElementById("avatarInput");
+  const bannerInput = document.getElementById("bannerInput");
+
+  let loggedUser = null;
+  let profileUser = null;
+
+  // Pegar ID da URL
+  const params = new URLSearchParams(window.location.search);
+  const profileId = params.get('id');
+
+  // 1️⃣ Buscar usuário logado
   try {
-    const res = await fetch('https://folium-backend.onrender.com/api/auth/user/me', {
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-    });
-
-    if (!res.ok) return { user: null };
-    const json = await res.json();
-    return { user: json.user || null };
+    const res = await getUser();
+    loggedUser = res.user;
   } catch (err) {
-    console.error('Erro ao buscar usuário:', err);
-    return { user: null };
+    console.error("Erro ao buscar usuário logado:", err);
   }
-}
 
-const profileForm = document.querySelector('.edit-profile-form');
-const popup = document.getElementById('edit-profile-popup');
-const openBtn = document.getElementById('edit-profile-btn');
-const closeBtn = document.getElementById('close-popup');
+  // 2️⃣ Buscar perfil correto
+  async function loadProfile() {
+    try {
+      let endpoint = '';
+      let headers = {};
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Usuário não logado");
 
-// ----------------- CONTROLE DO POPUP -----------------
-function openPopup() {
-  popup.classList.remove('hidden');
-}
+      headers = { 'Authorization': `Bearer ${token}` };
 
-function closePopup() {
-  popup.classList.add('hidden');
-}
+      if (profileId && parseInt(profileId) !== loggedUser.id) {
+        // Perfil de outro usuário
+        endpoint = `https://folium-backend.onrender.com/api/auth/profile/${profileId}`;
+      } else {
+        // Próprio perfil
+        endpoint = `https://folium-backend.onrender.com/api/auth/profile/me`;
+      }
 
-// Adicionar listeners sem abrir popup automaticamente
-openBtn.addEventListener('click', openPopup);
-closeBtn.addEventListener('click', closePopup);
+      const res = await fetch(endpoint, { headers });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      profileUser = data.user;
 
-// Fechar popup ao clicar fora do conteúdo
-popup.addEventListener('click', e => {
-  if (e.target === popup) closePopup();
-});
+      // Preencher página
+      nameElem.textContent = profileUser.name1;
+      bioElem.textContent = profileUser.bio || "";
+      avatar.src = profileUser.avatarUrl || "./src/img/default-profile.jpg";
+      banner.src = profileUser.bannerUrl || "./src/img/default-banner.jpg";
 
-// ----------------- FUNÇÃO PARA CARREGAR PERFIL -----------------
-async function loadProfile() {
-  const { user } = await getUser();
-  if (!user) return window.location.href = '/login.html';
+      linksElem.innerHTML = "";
+      const links = {
+        instagram: profileUser.instagram,
+        linkedin: profileUser.linkedin,
+        github: profileUser.github
+      };
+      for (const [platform, url] of Object.entries(links)) {
+        if (url) {
+          const a = document.createElement("a");
+          a.href = url;
+          a.target = "_blank";
+          a.dataset.platform = platform;
+          a.textContent = platform;
+          linksElem.appendChild(a);
+        }
+      }
 
-  try {
-    const data = await getUserProfile(user.id); // { user: {...}, projects: [...] }
+      // 3️⃣ Mostrar botão de editar somente se for próprio perfil
+      if (loggedUser.id === profileUser.id) {
+        editProfileBtn.classList.remove("hidden");
+      } else {
+        editProfileBtn.classList.add("hidden");
+      }
 
-    // Preencher campos do popup
-    profileForm.descricao.value = data.user.bio || '';
-    profileForm.instagram.value = data.user.instagram || '';
-    profileForm.linkedin.value = data.user.linkedin || '';
-    profileForm.github.value = data.user.github || '';
-
-    document.querySelector('.profile-pic img').src = data.user.avatarUrl || '/default-avatar.png';
-    document.querySelector('.header-image img').src = data.user.bannerUrl || '/default-banner.png';
-    document.getElementById('name').textContent = data.user.name || '';
-
-    // Links
-    const linksDiv = document.getElementById('links');
-    linksDiv.innerHTML = '';
-    if (data.user.instagram) linksDiv.innerHTML += `<a href="${data.user.instagram}" target="_blank">Instagram</a> `;
-    if (data.user.linkedin) linksDiv.innerHTML += `<a href="${data.user.linkedin}" target="_blank">LinkedIn</a> `;
-    if (data.user.github) linksDiv.innerHTML += `<a href="${data.user.github}" target="_blank">GitHub</a>`;
-
-    // Carregar projetos
-    renderProjects(data.projects || []);
-  } catch (err) {
-    console.error('Erro ao carregar perfil:', err);
+    } catch (err) {
+      console.error("Erro ao carregar perfil:", err);
+    }
   }
-}
 
-// ----------------- FUNÇÃO PARA SALVAR ALTERAÇÕES DO PERFIL -----------------
-profileForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem('accessToken');
-  const formData = new FormData(profileForm);
+  await loadProfile();
 
-  try {
-    const res = await fetch('https://folium-backend.onrender.com/api/auth/profile/me', {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData
-    });
-
-    const data = await res.json();
-    if (data.error) return alert(data.error);
-
-    alert('Perfil atualizado com sucesso!');
-    closePopup();
-    loadProfile();
-  } catch (err) {
-    console.error('Erro ao atualizar perfil:', err);
-  }
-});
-
-// ----------------- FUNÇÃO PARA RENDERIZAR PROJETOS -----------------
-function renderProjects(projects) {
-  const projectsContainer = document.getElementById('projects');
-  projectsContainer.innerHTML = '';
-
-  projects.forEach(project => {
-    const projectHTML = `
-      <a href="project-page.html?id=${project.id}">
-        <div class="project-block">
-          <div class="project-img">
-            <img src="${project.image || './src/img/icons/project-image2.png'}" alt="">
-          </div>
-          <div class="project-footer">
-            <div class="project-name">
-              <span>${project.name || 'Sem nome'}</span>
-            </div>
-            <button class="project-options"><span class="fa-solid fa-ellipsis-vertical"></span></button>
-          </div>
-        </div>
-      </a>
-    `;
-    projectsContainer.insertAdjacentHTML('beforeend', projectHTML);
+  // 4️⃣ Abrir popup e preencher campos
+  editProfileBtn.addEventListener("click", () => {
+    popup.classList.remove("hidden");
+    editForm.descricao.value = profileUser.bio || "";
+    editForm.instagram.value = profileUser.instagram || "";
+    editForm.linkedin.value = profileUser.linkedin || "";
+    editForm.github.value = profileUser.github || "";
   });
-}
 
-// ----------------- INICIALIZAÇÃO -----------------
-document.addEventListener('DOMContentLoaded', loadProfile);
+  // 5️⃣ Fechar popup
+  closePopupBtn.addEventListener("click", () => popup.classList.add("hidden"));
+
+  // 6️⃣ Atualizar imagens temporariamente
+  avatarInput.addEventListener("change", () => {
+    const file = avatarInput.files[0];
+    if (file) avatar.src = URL.createObjectURL(file);
+  });
+  bannerInput.addEventListener("change", () => {
+    const file = bannerInput.files[0];
+    if (file) banner.src = URL.createObjectURL(file);
+  });
+
+  // 7️⃣ Salvar alterações (somente para próprio usuário)
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!profileUser || loggedUser.id !== profileUser.id) return;
+
+    const formData = new FormData();
+    formData.append("descricao", editForm.descricao.value);
+    formData.append("instagram", editForm.instagram.value.trim());
+    formData.append("linkedin", editForm.linkedin.value.trim());
+    formData.append("github", editForm.github.value.trim());
+    if (avatarInput.files[0]) formData.append("imagem_perfil", avatarInput.files[0]);
+    if (bannerInput.files[0]) formData.append("banner_fundo", bannerInput.files[0]);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch('https://folium-backend.onrender.com/api/auth/profile/me', {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+      const result = await res.json();
+
+      // Atualizar interface imediatamente
+      bioElem.textContent = result.user.descricao || "";
+      avatar.src = result.user.imagem_perfil || avatar.src;
+      banner.src = result.user.banner_fundo || banner.src;
+
+      linksElem.innerHTML = "";
+      const links = {
+        instagram: result.user.instagram,
+        linkedin: result.user.linkedin,
+        github: result.user.github
+      };
+      for (const [platform, url] of Object.entries(links)) {
+        if (url) {
+          const a = document.createElement("a");
+          a.href = url;
+          a.target = "_blank";
+          a.dataset.platform = platform;
+          a.textContent = platform;
+          linksElem.appendChild(a);
+        }
+      }
+
+      popup.classList.add("hidden");
+    } catch (err) {
+      console.error("Erro ao atualizar perfil:", err);
+      alert("Erro ao salvar alterações!");
+    }
+  });
+});

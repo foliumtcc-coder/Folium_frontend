@@ -192,3 +192,23 @@ export async function getProjectById(id) {
 
   return await res.json(); // { projeto: {...}, etapas: [...], membros: [...] }
 }
+
+export async function updateUserProfile(formData) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
+  const res = await fetch(`${BACKEND_URL}/api/auth/profile/update`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
+    },
+    body: formData
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+
+  return await res.json(); // { success: true, avatarUrl: "...", bannerUrl: "..." }
+}
