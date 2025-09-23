@@ -10,22 +10,22 @@ async function loadProject() {
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    const projeto = data.projeto;
-    const etapas = data.etapas || [];
-    const membros = data.membros || [];
-    const imagens = data.imagens || [];
+    const { projeto, etapas = [], membros = [], imagens = [] } = data; // garante arrays padrão
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
 
-    // --- Botão de editar ---
+    // --- Botão de editar centralizado ---
     let editButton = document.getElementById('edit-project-btn');
     if (!editButton) {
       editButton = document.createElement('button');
       editButton.id = 'edit-project-btn';
       editButton.textContent = 'Editar Projeto';
       editButton.className = 'def-btn';
-      document.querySelector('.main-header').appendChild(editButton);
+      editButton.style.position = 'absolute';
+      editButton.style.top = '20px';
+      editButton.style.right = '20px';
+      document.body.appendChild(editButton);
     }
     editButton.style.display = isOwner ? 'block' : 'none';
     if (isOwner) editButton.addEventListener('click', () => openEditPopup(projeto, membros));
@@ -43,7 +43,7 @@ async function loadProject() {
       const membrosHTML = (etapa.usuarios || []).map(u => `
         <a href="/profile.html?id=${u.usuario_id}">
           <span class="fa-solid fa-circle-user"></span>
-          <span>${u.name1}</span>
+          <span>${u.name1 || 'Sem nome'}</span>
         </a>
       `).join('');
 
@@ -76,17 +76,15 @@ async function loadProject() {
     (membros || []).forEach(m => {
       const a = document.createElement('a');
       a.href = `/profile.html?id=${m.usuario_id}`;
-      a.innerHTML = `<span class="fa-solid fa-circle-user"></span><span>${m.name1}</span><br />`;
+      a.innerHTML = `<span class="fa-solid fa-circle-user"></span><span>${m.usuarios?.name1 || 'Sem nome'}</span><br />`;
       sideMenu.appendChild(a);
     });
 
-    // --- Datas do projeto ---
+    // --- Datas do projeto e descrição ---
     document.querySelector('.menu-header-date').innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${new Date(projeto.atualizado_em).toLocaleDateString()}</span>
     `;
-
-    // --- Descrição ---
     document.querySelector('.menu-desc').textContent = projeto.descricao;
 
     // --- Preenche imagens ---
@@ -172,6 +170,9 @@ function openEditPopup(projeto, membros) {
     popup = document.createElement('div');
     popup.id = 'edit-project-popup';
     popup.className = 'popup hidden';
+    popup.style.display = 'flex';
+    popup.style.justifyContent = 'center';
+    popup.style.alignItems = 'center';
     popup.innerHTML = `
       <div class="popup-content">
         <button class="close-popup">&times;</button>
