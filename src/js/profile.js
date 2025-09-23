@@ -7,15 +7,11 @@ async function getUser() {
 
   try {
     const res = await fetch('https://folium-backend.onrender.com/api/auth/user/me', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
     });
 
     if (!res.ok) return { user: null };
-
-    const json = await res.json(); // { user: {...} }
+    const json = await res.json();
     return { user: json.user || null };
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
@@ -28,14 +24,23 @@ const popup = document.getElementById('edit-profile-popup');
 const openBtn = document.getElementById('edit-profile-btn');
 const closeBtn = document.getElementById('close-popup');
 
-// Controle do popup
-if (openBtn && closeBtn && popup) {
-  openBtn.addEventListener('click', () => popup.classList.remove('hidden'));
-  closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-  popup.addEventListener('click', e => {
-    if (e.target === popup) popup.classList.add('hidden');
-  });
+// ----------------- CONTROLE DO POPUP -----------------
+function openPopup() {
+  popup.classList.remove('hidden');
 }
+
+function closePopup() {
+  popup.classList.add('hidden');
+}
+
+// Adicionar listeners sem abrir popup automaticamente
+openBtn.addEventListener('click', openPopup);
+closeBtn.addEventListener('click', closePopup);
+
+// Fechar popup ao clicar fora do conteúdo
+popup.addEventListener('click', e => {
+  if (e.target === popup) closePopup();
+});
 
 // ----------------- FUNÇÃO PARA CARREGAR PERFIL -----------------
 async function loadProfile() {
@@ -86,8 +91,8 @@ profileForm.addEventListener('submit', async (e) => {
     if (data.error) return alert(data.error);
 
     alert('Perfil atualizado com sucesso!');
-    popup.classList.add('hidden'); // Fecha o popup
-    loadProfile(); // Recarrega os dados
+    closePopup();
+    loadProfile();
   } catch (err) {
     console.error('Erro ao atualizar perfil:', err);
   }
@@ -99,18 +104,15 @@ function renderProjects(projects) {
   projectsContainer.innerHTML = '';
 
   projects.forEach(project => {
-    const projectName = project.name || project.nome || 'Projeto sem nome';
-    const projectImage = project.image || project.imagem_capa || './src/img/icons/project-image2.png';
-
     const projectHTML = `
       <a href="project-page.html?id=${project.id}">
         <div class="project-block">
           <div class="project-img">
-            <img src="${projectImage}" alt="">
+            <img src="${project.image || './src/img/icons/project-image2.png'}" alt="">
           </div>
           <div class="project-footer">
             <div class="project-name">
-              <span>${projectName}</span>
+              <span>${project.name || 'Sem nome'}</span>
             </div>
             <button class="project-options"><span class="fa-solid fa-ellipsis-vertical"></span></button>
           </div>

@@ -62,7 +62,7 @@ export async function getUser() {
 
     if (!res.ok) return { user: null };
 
-    const json = await res.json(); // { user: {...} }
+    const json = await res.json();
     return { user: json.user || null };
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
@@ -124,8 +124,7 @@ export async function fetchNotifications() {
 
     if (!res.ok) throw new Error('Erro ao buscar notificações');
 
-    const data = await res.json();
-    return data;
+    return await res.json();
   } catch (err) {
     console.error(err);
     return [];
