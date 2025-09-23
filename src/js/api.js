@@ -212,3 +212,29 @@ export async function updateUserProfile(formData) {
 
   return await res.json(); // { message: "...", user: {...} }
 }
+
+export async function updateProject(projectId, formData) {
+  try {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!token) throw new Error('Usuário não autenticado');
+
+    const res = await fetch(`/api/projects/${projectId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+        // Não setar 'Content-Type', deixa o fetch colocar para FormData
+      },
+      body: formData
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Erro ao atualizar projeto');
+    }
+
+    return await res.json(); // espera que retorne { projeto: {...} }
+  } catch (err) {
+    console.error('updateProject error:', err);
+    throw err;
+  }
+}

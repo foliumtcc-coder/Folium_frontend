@@ -28,14 +28,12 @@
       </div>
 
       <div class="header-right-side">
-        <!-- DARK MODE -->
         <div class="dark-mode-toggle def-btn">
           <button id="dark-mode-button" onclick="toggleDarkMode()">
             <span class="fa-solid fa-moon"></span>
           </button>
         </div>
 
-        <!-- AJUDA -->
         <div class="help-button def-btn">
           <a href="help.html">
             <button id="help-button">
@@ -44,7 +42,6 @@
           </a>
         </div>
 
-        <!-- CONFIG -->
         <div class="config-button def-btn">
           <a href="config.html">
             <button id="config-button">
@@ -53,24 +50,19 @@
           </a>
         </div>
 
-        <!-- NOTIFICAÇÕES -->
         <div class="notification-button def-btn">
             <button id="notification-button">
               <span class="fa-regular fa-bell"></span>
             </button>
         </div>
 
-        <!-- PERFIL COM DROPDOWN -->
         <div class="profile-button def-btn" style="position: relative;">
           <button id="profile-button">
             <span class="fa-solid fa-user"></span>
           </button>
-          <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-            <!-- Menu preenchido pelo JS -->
-          </div>
+          <div class="dropdown-menu hidden" id="profile-dropdown-menu"></div>
         </div>
 
-        <!-- NOVO PROJETO -->
         <div class="new-project-button">
           <a href="new-project-page.html">
             <span class="fa-solid fa-plus"></span>
@@ -80,13 +72,10 @@
     </div>
   </header>
 
-  <!-- MENU DROPDOWN -->
   <section class="dropdown-menu-section">
     <div class="dropdown-menu hidden" id="notification-dropdown-menu"></div>
     <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-      <ul id="profile-dropdown-list">
-        <!-- Será preenchido pelo JS login_manager.js -->
-      </ul>
+      <ul id="profile-dropdown-list"></ul>
     </div>
   </section>
 
@@ -101,8 +90,8 @@
           </div>
         </div>
 
-        <section class="project-steps">
-          <!-- As etapas serão preenchidas pelo project.js -->
+        <section class="project-steps" id="project-steps">
+          <!-- Etapas preenchidas dinamicamente -->
         </section>
       </div>
 
@@ -111,26 +100,21 @@
         <div class="side-menu">
           <div class="side-menu-content">
             <div class="side-menu-header">
-              <div class="menu-header-people">
-                <!-- Membros do projeto preenchidos pelo project.js -->
+              <div class="menu-header-people" id="project-members">
+                <!-- Membros do projeto preenchidos pelo JS -->
               </div>
-              <div class="menu-header-date">
-                <!-- Datas do projeto preenchidas pelo project.js -->
+              <div class="menu-header-date" id="project-dates">
+                <!-- Datas do projeto preenchidas pelo JS -->
               </div>
             </div>
 
-            <div class="menu-desc">
-              <!-- Descrição do projeto preenchida pelo project.js -->
+            <div class="menu-desc" id="project-description">
+              <!-- Descrição do projeto preenchida pelo JS -->
             </div>
 
             <div class="menu-footer">
-              <div class="menu-media-display">
-                <div class="menu-media" style="border-radius: 15px 0 0 15px"><img src="" alt="" /></div>
-                <div class="menu-media"><img src="" alt="" /></div>
-                <div class="menu-media"><img src="" alt="" /></div>
-                <div class="menu-media menu-media-right" style="border-radius: 0 15px 15px 0">
-                  <span class="fa-solid fa-plus"></span>
-                </div>
+              <div class="menu-media-display" id="project-media">
+                <!-- Imagens do projeto preenchidas pelo JS -->
               </div>
             </div>
           </div>
@@ -150,6 +134,5 @@
   <script type="module" src="./src/js/api.js"></script>
   <script type="module" src="./src/js/notifications.js"></script>
   <script type="module" src="./src/js/project.js"></script>
-
 </body>
 </html>
