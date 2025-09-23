@@ -1,5 +1,9 @@
-// src/js/profile.js
-import { getUser, updateUserProfile, getUserProfile, BACKEND_URL } from './api.js';
+import { 
+  getUser, 
+  updateUserProfile, 
+  getUserProfile, 
+  getUserProjects 
+} from './api.js';
 
 function normalizeUser(u) {
   if (!u) return null;
@@ -45,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const profileId = params.get('id');
 
+  // 🔹 Buscar usuário logado
   try {
     const res = await getUser();
     loggedUser = res.user || null;
@@ -85,8 +90,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       fillProfileUI(profileUser);
 
+      // 🔹 Busca projetos do usuário usando a função da API
       await loadUserProjects(idToFetch);
 
+      // 🔹 Mostrar botão de editar apenas se for o próprio usuário
       if (loggedUser && profileUser && Number(loggedUser.id) === Number(profileUser.id)) {
         editProfileBtn.classList.remove('hidden');
       } else {
@@ -99,6 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadProfile();
 
+  // 🔹 Popup edição de perfil
   editProfileBtn.addEventListener('click', () => {
     if (!profileUser) return;
     popup.classList.remove('hidden');
@@ -148,7 +156,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await updateUserProfile(formData);
       profileUser = normalizeUser(result.user ?? result);
       fillProfileUI(profileUser);
-
       popup.classList.add('hidden');
       alert('Perfil atualizado com sucesso!');
     } catch (err) {
@@ -157,26 +164,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 🔹 Função para carregar projetos do usuário usando getUserProjects
+  // 🔹 Função para carregar projetos do usuário usando a função da API
   async function loadUserProjects(userId) {
     try {
       if (!userId) return;
 
-      const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-      const response = await fetch(`${BACKEND_URL}/projects/user/${userId}`, {
-        headers,
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        console.error(`Erro ao buscar projetos: ${response.status} ${response.statusText}`);
-        projectsContainer.innerHTML = '<p>Não foi possível carregar os projetos.</p>';
-        return;
-      }
-
-      const projects = await response.json();
+      const projects = await getUserProjects(userId);
 
       projectsContainer.innerHTML = '';
       if (!projects.length) {
@@ -208,6 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         projectLink.appendChild(projectFooter);
         projectsContainer.appendChild(projectLink);
       });
+
     } catch (err) {
       console.error('Erro ao carregar projetos do usuário:', err);
       projectsContainer.innerHTML = '<p>Erro ao carregar os projetos.</p>';

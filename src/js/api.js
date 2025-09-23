@@ -252,3 +252,24 @@ export async function deleteProject(projectId) {
 
   return data;
 }
+
+// Buscar projetos de um usuário específico (perfil)
+export async function getUserProjects(userId) {
+  if (!userId) throw new Error('ID do usuário não informado');
+
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  const res = await fetch(`${BACKEND_URL}/projects/user/${userId}`, {
+    headers,
+    credentials: 'include'
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Erro ao buscar projetos: ${res.status} ${text}`);
+  }
+
+  const projects = await res.json();
+  return projects; // array de projetos
+}
