@@ -42,20 +42,18 @@ async function loadProject() {
     if (isOwner) editButton.onclick = () => openEditPopup(projeto, membros);
 
     // --- Datas e descrição ---
-    const dateEl = document.querySelector('.menu-header-date');
-    dateEl.innerHTML = `
+    document.querySelector('.menu-header-date').innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${new Date(projeto.atualizado_em).toLocaleDateString()}</span>
     `;
-    const descEl = document.querySelector('.menu-desc');
-    descEl.textContent = projeto.descricao || 'Sem descrição';
+    document.querySelector('.menu-desc').textContent = projeto.descricao || 'Sem descrição';
 
     // --- Preenche membros no menu lateral ---
     const sideMenu = document.querySelector('.menu-header-people');
     sideMenu.innerHTML = '';
     membros.forEach(m => {
-      const userId = m.usuario_id || m.id; // garante que tem id
-      const userName = m.name1 || 'Sem nome';
+      const userId = m.usuario_id || m.id || m.usuarios?.id;
+      const userName = m.name1 || m.usuario?.name1 || 'Sem nome';
       if (!userId) return;
       const a = document.createElement('a');
       a.href = `/profile.html?id=${userId}`;
@@ -71,8 +69,9 @@ async function loadProject() {
       step.classList.add('step');
 
       const membrosHTML = (etapa.usuarios || []).map(u => {
-        const id = u.usuario_id || u.id;
-        const name = u.name1 || 'Sem nome';
+        const id = u.usuario_id || u.id || u.usuarios?.id;
+        const name = u.name1 || u.usuario?.name1 || 'Sem nome';
+        if (!id) return '';
         return `<a href="/profile.html?id=${id}"><span class="fa-solid fa-circle-user"></span> ${name}</a>`;
       }).join('');
 
@@ -92,7 +91,7 @@ async function loadProject() {
           <div class="step-header-people">${membrosHTML}</div>
         </div>
         <div class="section-line"></div>
-        <div class="step-main-content">${etapa.descricao || ''}</div>
+        <div class="step-main-content">${etapa.descricao}</div>
         <div class="section-line"></div>
         <div class="step-footer">${arquivosHTML}</div>
       `;
@@ -118,6 +117,7 @@ async function loadProject() {
       mediaContainer.appendChild(div);
     });
 
+    // Bloco "+" para futuras adições
     const addDiv = document.createElement('div');
     addDiv.className = 'menu-media menu-media-right';
     addDiv.style.borderRadius = '0 15px 15px 0';
@@ -191,7 +191,7 @@ function openEditPopup(projeto, membros) {
           <label>Título:</label>
           <input type="text" id="edit-title" value="${projeto.titulo}" required>
           <label>Descrição:</label>
-          <textarea id="edit-desc" required>${projeto.descricao || ''}</textarea>
+          <textarea id="edit-desc" required>${projeto.descricao}</textarea>
           <label>Imagem de Capa:</label>
           <input type="file" id="edit-image">
           <label>Adicionar Membros (IDs separados por vírgula):</label>
