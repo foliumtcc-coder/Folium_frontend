@@ -197,8 +197,8 @@ export async function updateUserProfile(formData) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/profile/update`, {
-    method: 'POST',
+  const res = await fetch(`${BACKEND_URL}/api/auth/profile/me`, {
+    method: 'PUT', // ALTERADO de POST para PUT
     headers: {
       'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
     },
@@ -210,5 +210,5 @@ export async function updateUserProfile(formData) {
     throw new Error(text);
   }
 
-  return await res.json(); // { success: true, avatarUrl: "...", bannerUrl: "..." }
+  return await res.json(); // { message: "...", user: {...} }
 }
