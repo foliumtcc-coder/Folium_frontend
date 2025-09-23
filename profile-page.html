@@ -13,36 +13,33 @@
   <link rel="stylesheet" href="./src/css/profile-page-styles.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Popup */
+    /* Classe hidden */
     .hidden { display: none; }
-    .popup {
+
+    /* Estilização básica do popup */
+    #edit-profile-popup {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       z-index: 1000;
     }
-    .popup-content {
+    #edit-profile-popup form {
       background: #fff;
       padding: 20px;
       border-radius: 8px;
-      width: 400px;
-      position: relative;
+      max-width: 400px;
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .close {
-      position: absolute;
-      top: 10px; right: 10px;
-      cursor: pointer;
-      font-size: 20px;
-    }
-    #edit-profile-btn {
+    #edit-profile-popup button#close-popup {
       margin-top: 10px;
-      padding: 6px 12px;
-      font-size: 14px;
-      cursor: pointer;
+      align-self: flex-end;
     }
   </style>
 </head>
@@ -127,33 +124,27 @@
         <button id="editAvatar" class="edit-btn hidden"><span class="fa-solid fa-pen"></span></button>
       </div>
       <div class="profile-name"><span id="name"></span></div>
-
-      <!-- Botão de abrir popup -->
-      <button id="edit-profile-btn" class="edit-profile-btn">
-        <span class="fa-solid fa-pen"></span> Editar Perfil
-      </button>
+      <button id="edit-profile-btn">Editar Perfil</button>
     </div>
 
-    <!-- POPUP EDITAR PERFIL -->
-    <div id="edit-profile-popup" class="popup hidden">
-      <div class="popup-content">
-        <span id="close-popup" class="close">&times;</span>
-        <form class="edit-profile-form">
-          <label>Descrição</label>
-          <textarea name="descricao" placeholder="Escreva sua bio..."></textarea>
+    <!-- POPUP DE EDIÇÃO -->
+    <div id="edit-profile-popup" class="hidden">
+      <form class="edit-profile-form">
+        <label>Descrição</label>
+        <textarea name="descricao" placeholder="Escreva sua bio..."></textarea>
 
-          <label>Instagram</label>
-          <input type="text" name="instagram" placeholder="Instagram">
+        <label>Instagram</label>
+        <input type="text" name="instagram" placeholder="Instagram">
 
-          <label>LinkedIn</label>
-          <input type="text" name="linkedin" placeholder="LinkedIn">
+        <label>LinkedIn</label>
+        <input type="text" name="linkedin" placeholder="LinkedIn">
 
-          <label>GitHub</label>
-          <input type="text" name="github" placeholder="GitHub">
+        <label>GitHub</label>
+        <input type="text" name="github" placeholder="GitHub">
 
-          <button type="submit">Salvar Alterações</button>
-        </form>
-      </div>
+        <button type="submit">Salvar Alterações</button>
+      </form>
+      <button id="close-popup">Fechar</button>
     </div>
 
     <div class="bio-box">
@@ -168,24 +159,11 @@
     </div>
   </main>
 
-  <script src="./js/script.js"></script>
+  <script src="./js/script.js" type="module"></script>
   <script src="./js/dark-mode.js"></script>
   <script type="module" src="./src/js/login_manager.js"></script>
   <script type="module" src="./src/js/api.js"></script>
   <script type="module" src="./src/js/notifications.js"></script>
   <script type="module" src="./src/js/profile.js"></script>
-
-  <script>
-    // Controle do popup
-    const popup = document.getElementById('edit-profile-popup');
-    const openBtn = document.getElementById('edit-profile-btn');
-    const closeBtn = document.getElementById('close-popup');
-
-    openBtn.addEventListener('click', () => popup.classList.remove('hidden'));
-    closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-    popup.addEventListener('click', e => {
-      if (e.target === popup) popup.classList.add('hidden');
-    });
-  </script>
 </body>
 </html>
