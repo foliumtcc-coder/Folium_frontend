@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const profileId = params.get('id');
 
-  // 1️⃣ Buscar usuário logado
+  // Buscar usuário logado
   try {
     const res = await getUser();
     loggedUser = res.user;
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Erro ao buscar usuário logado:", err);
   }
 
-  // 2️⃣ Buscar perfil correto
+  // Buscar perfil correto
   async function loadProfile() {
     try {
       let endpoint = '';
@@ -55,8 +55,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Preencher página
       nameElem.textContent = profileUser.name1;
       bioElem.textContent = profileUser.bio || "";
-      avatar.src = profileUser.avatarUrl || "./src/img/default-profile.jpg";
-      banner.src = profileUser.bannerUrl || "./src/img/default-banner.jpg";
+      avatar.src = profileUser.avatarUrl || "./src/img/icons/profile-icon.jpg";
+      banner.src = profileUser.bannerUrl || "./src/img/standard-img.jpg";
 
       linksElem.innerHTML = "";
       const links = {
@@ -75,11 +75,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
 
-      // 3️⃣ Mostrar botão de editar somente se for próprio perfil
+      // Mostrar botão de editar apenas se for o próprio usuário
       if (loggedUser.id === profileUser.id) {
         editProfileBtn.classList.remove("hidden");
-      } else {
-        editProfileBtn.classList.add("hidden");
       }
 
     } catch (err) {
@@ -89,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadProfile();
 
-  // 4️⃣ Abrir popup e preencher campos
+  // Abrir popup
   editProfileBtn.addEventListener("click", () => {
     popup.classList.remove("hidden");
     editForm.descricao.value = profileUser.bio || "";
@@ -98,10 +96,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     editForm.github.value = profileUser.github || "";
   });
 
-  // 5️⃣ Fechar popup
+  // Fechar popup
   closePopupBtn.addEventListener("click", () => popup.classList.add("hidden"));
 
-  // 6️⃣ Atualizar imagens temporariamente
+  // Atualizar preview de imagens
   avatarInput.addEventListener("change", () => {
     const file = avatarInput.files[0];
     if (file) avatar.src = URL.createObjectURL(file);
@@ -111,10 +109,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (file) banner.src = URL.createObjectURL(file);
   });
 
-  // 7️⃣ Salvar alterações (somente para próprio usuário)
+  // Salvar alterações
   editForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     if (!profileUser || loggedUser.id !== profileUser.id) return;
 
     const formData = new FormData();
@@ -136,32 +133,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!res.ok) throw new Error(await res.text());
       const result = await res.json();
 
-      // Atualizar interface imediatamente
-      bioElem.textContent = result.user.descricao || "";
-      avatar.src = result.user.imagem_perfil || avatar.src;
-      banner.src = result.user.banner_fundo || banner.src;
+      profileUser = result.user;
+      // Atualizar elementos da página
+      nameElem.textContent = profileUser.name1;
+      bioElem.textContent = profileUser.bio || "";
+      avatar.src = profileUser.avatarUrl || "./src/img/icons/profile-icon.jpg";
+      banner.src = profileUser.bannerUrl || "./src/img/standard-img.jpg";
 
-      linksElem.innerHTML = "";
-      const links = {
-        instagram: result.user.instagram,
-        linkedin: result.user.linkedin,
-        github: result.user.github
-      };
-      for (const [platform, url] of Object.entries(links)) {
-        if (url) {
-          const a = document.createElement("a");
-          a.href = url;
-          a.target = "_blank";
-          a.dataset.platform = platform;
-          a.textContent = platform;
-          linksElem.appendChild(a);
-        }
-      }
-
+      // Fechar popup
       popup.classList.add("hidden");
     } catch (err) {
       console.error("Erro ao atualizar perfil:", err);
-      alert("Erro ao salvar alterações!");
+      alert("Erro ao atualizar perfil.");
     }
   });
 });

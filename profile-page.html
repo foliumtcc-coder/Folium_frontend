@@ -70,14 +70,12 @@
       </div>
 
       <div class="header-right-side">
-        <!-- DARK MODE -->
         <div class="dark-mode-toggle def-btn">
           <button id="dark-mode-button" onclick="toggleDarkMode()">
             <span class="fa-solid fa-moon"></span>
           </button>
         </div>
 
-        <!-- AJUDA -->
         <div class="help-button def-btn">
           <a href="help.html">
             <button id="help-button">
@@ -86,7 +84,6 @@
           </a>
         </div>
 
-        <!-- CONFIG -->
         <div class="config-button def-btn">
           <a href="config.html">
             <button id="config-button">
@@ -95,24 +92,19 @@
           </a>
         </div>
 
-        <!-- NOTIFICAÇÕES -->
         <div class="notification-button def-btn">
             <button id="notification-button">
               <span class="fa-regular fa-bell"></span>
             </button>
         </div>
 
-        <!-- PERFIL COM DROPDOWN -->
         <div class="profile-button def-btn" style="position: relative;">
           <button id="profile-button">
             <span class="fa-solid fa-user"></span>
           </button>
-          <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-            <!-- Menu preenchido pelo JS -->
-          </div>
+          <div class="dropdown-menu hidden" id="profile-dropdown-menu"></div>
         </div>
 
-        <!-- NOVO PROJETO -->
         <div class="new-project-button">
           <a href="new-project-page.html">
             <span class="fa-solid fa-plus"></span>
@@ -125,17 +117,18 @@
   <main>
     <div class="profile-header">
       <div class="header-image">
-        <img id="banner" src= "./src/img/standard-img.jpg" alt="Banner do usuário">
+        <img id="banner" src="./src/img/standard-img.jpg" alt="Banner do usuário">
         <input type="file" id="bannerInput" class="hidden" accept="image/*">
         <button id="editBanner" class="edit-btn hidden"><span class="fa-solid fa-pen"></span></button>
       </div>
       <div class="profile-pic">
-        <img id="avatar" src= "./src/img/icons/profile-icon.jpg" alt="Foto de Perfil" width="150">
+        <img id="avatar" src="./src/img/icons/profile-icon.jpg" alt="Foto de Perfil" width="150">
         <input type="file" id="avatarInput" class="hidden" accept="image/*">
         <button id="editAvatar" class="edit-btn hidden"><span class="fa-solid fa-pen"></span></button>
       </div>
       <div class="profile-name"><span id="name"></span></div>
-      <button id="edit-profile-btn">Editar Perfil</button>
+      <!-- Botão de editar escondido por padrão -->
+      <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
     </div>
 
     <!-- POPUP DE EDIÇÃO -->
