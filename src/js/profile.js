@@ -1,4 +1,3 @@
-// script.js
 import { getUserProfile } from './api.js';
 
 // Função auxiliar para buscar usuário logado via token
@@ -30,11 +29,13 @@ const openBtn = document.getElementById('edit-profile-btn');
 const closeBtn = document.getElementById('close-popup');
 
 // Controle do popup
-openBtn.addEventListener('click', () => popup.classList.remove('hidden'));
-closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-popup.addEventListener('click', e => {
-  if (e.target === popup) popup.classList.add('hidden');
-});
+if (openBtn && closeBtn && popup) {
+  openBtn.addEventListener('click', () => popup.classList.remove('hidden'));
+  closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+  popup.addEventListener('click', e => {
+    if (e.target === popup) popup.classList.add('hidden');
+  });
+}
 
 // ----------------- FUNÇÃO PARA CARREGAR PERFIL -----------------
 async function loadProfile() {
@@ -98,15 +99,18 @@ function renderProjects(projects) {
   projectsContainer.innerHTML = '';
 
   projects.forEach(project => {
+    const projectName = project.name || project.nome || 'Projeto sem nome';
+    const projectImage = project.image || project.imagem_capa || './src/img/icons/project-image2.png';
+
     const projectHTML = `
       <a href="project-page.html?id=${project.id}">
         <div class="project-block">
           <div class="project-img">
-            <img src="${project.image || './src/img/icons/project-image2.png'}" alt="">
+            <img src="${projectImage}" alt="">
           </div>
           <div class="project-footer">
             <div class="project-name">
-              <span>${project.name}</span>
+              <span>${projectName}</span>
             </div>
             <button class="project-options"><span class="fa-solid fa-ellipsis-vertical"></span></button>
           </div>
