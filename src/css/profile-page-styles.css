@@ -13,7 +13,7 @@ main {
 /*--------------------HEADER------------------------*/
 .profile-header {
   width: 100%;
-  height: 300px;
+  height: 250px;
   position: relative;
 }
 
@@ -28,16 +28,17 @@ main {
   object-fit: cover;
 }
 
+/* Avatar agora alinhado à esquerda */
 .profile-pic {
   position: absolute;
-  top: 130px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 150px;
-  height: 150px;
+  bottom: -50px;
+  left: 40px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
   border: 4px solid #fff;
+  background: #f1f1f1;
 }
 
 .profile-pic img {
@@ -46,11 +47,13 @@ main {
   object-fit: cover;
 }
 
+/* Nome do usuário à esquerda embaixo do avatar */
 .profile-name {
-  margin-top: 90px;
-  font-size: 30px;
+  margin-left: 180px; /* espaço do avatar */
+  margin-top: 10px;
+  font-size: 26px;
   font-weight: bold;
-  text-align: center;
+  text-align: left;
 }
 
 /*-----------------BOTÃO EDITAR PERFIL----------------*/
@@ -82,8 +85,8 @@ main {
   flex-direction: column;
   width: 90%;
   border-radius: 15px;
-  padding: 10px;
-  margin: 15px auto;
+  padding: 15px;
+  margin: 50px auto 15px auto; /* espaço por causa do avatar */
   background-color: #fff;
   color: #323232;
 }
@@ -171,7 +174,7 @@ main {
   justify-content: center;
   align-items: center;
   z-index: 999;
-  overflow-y: auto; /* permite scroll se a tela for pequena */
+  overflow-y: auto;
   padding: 20px;
 }
 
@@ -219,6 +222,7 @@ main {
   border-radius: 50%;
   object-fit: cover;
   margin-top: 5px;
+  background: #f1f1f1;
 }
 
 #popup-banner {
@@ -228,4 +232,5 @@ main {
   border-radius: 8px;
   object-fit: cover;
   margin-top: 5px;
+  background: #f1f1f1;
 }
