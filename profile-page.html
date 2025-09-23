@@ -5,60 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil</title>
   <link rel="stylesheet" href="./src/css/global-styles.css">
-  <link rel="stylesheet" href="./src/css/profile-styles.css">
+  <link rel="stylesheet" href="./src/css/home-styles.css">
+  <link rel="stylesheet" href="./src/css/standard-header.css">
+  <link rel="stylesheet" href="./src/css/standard-footer.css">
+  <link rel="stylesheet" href="./src/css/dark-mode.css">
+  <link rel="stylesheet" href="./src/css/profile-page-styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
   <header>
-    <!-- Banner do perfil -->
-    <div class="profile-banner">
-      <img id="banner-img" src="./src/img/default-banner.png" alt="Banner do perfil">
-    </div>
+    <!-- ...header permanece igual... -->
   </header>
 
   <main>
-    <section class="profile-info">
-      <!-- Imagem do perfil -->
-      <div class="profile-picture">
-        <img id="profile-img" src="./src/img/default-profile.png" alt="Foto de perfil">
+    <div class="profile-header">
+      <div class="header-image">
+        <img id="banner" src="./src/img/standard-img.jpg" alt="Banner do usuário">
+        <input type="file" id="bannerInput" class="hidden" accept="image/*">
       </div>
 
-      <!-- Nome do usuário -->
-      <h1 id="profile-name">Nome do Usuário</h1>
-
-      <!-- Descrição -->
-      <p id="profile-description">Aqui vai a descrição do usuário.</p>
-
-      <!-- Links -->
-      <div id="profile-links">
-        <!-- Links serão inseridos pelo profile.js -->
+      <div class="profile-pic">
+        <img id="avatar" src="./src/img/icons/profile-icon.jpg" alt="Foto de Perfil" width="150">
+        <input type="file" id="avatarInput" class="hidden" accept="image/*">
       </div>
 
-      <!-- Botão para editar perfil -->
-      <button id="edit-profile-btn">Editar Perfil</button>
-    </section>
+      <div class="profile-name"><span id="name"></span></div>
+
+      <!-- Botão de editar escondido por padrão -->
+      <button id="edit-profile-btn" class="hidden">Editar Perfil</button>
+    </div>
+
+    <!-- POPUP DE EDIÇÃO -->
+    <div id="edit-profile-popup" class="hidden">
+      <div class="popup-content">
+        <button id="close-popup-btn" class="close-btn">&times;</button>
+        <form class="edit-profile-form">
+          <label>Descrição</label>
+          <textarea id="descricao" name="descricao" placeholder="Escreva sua bio..."></textarea>
+
+          <label>Instagram</label>
+          <input id="instagram" name="instagram" type="text" placeholder="Instagram">
+
+          <label>LinkedIn</label>
+          <input id="linkedin" name="linkedin" type="text" placeholder="LinkedIn">
+
+          <label>GitHub</label>
+          <input id="github" name="github" type="text" placeholder="GitHub">
+
+          <button type="submit">Salvar Alterações</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="bio-box">
+      <span class="bio-title">Descrição</span>
+      <span id="bio" class="bio-text"></span>
+      <div class="bio-links" id="links"></div>
+    </div>
+
+    <div class="projects-section">
+      <span class="projects-section-title">Projetos</span>
+      <div class="projects-display" id="projects"></div>
+    </div>
   </main>
 
-  <!-- Popup de edição do perfil -->
-  <div id="edit-profile-popup" class="popup hidden">
-    <div class="popup-content">
-      <h2>Editar Perfil</h2>
-      <label>
-        Nome:
-        <input type="text" id="edit-name">
-      </label>
-      <label>
-        Descrição:
-        <textarea id="edit-description"></textarea>
-      </label>
-      <label>
-        Link:
-        <input type="text" id="edit-link">
-      </label>
-      <button id="save-profile-btn">Salvar</button>
-      <button id="close-popup-btn">Cancelar</button>
-    </div>
-  </div>
-
-  <script src="./src/js/profile.js"></script>
+  <script src="./js/script.js" type="module"></script>
+  <script src="./js/dark-mode.js"></script>
+  <script type="module" src="./src/js/login_manager.js"></script>
+  <script type="module" src="./src/js/profile.js"></script>
+  <script type="module" src="./src/js/notifications.js"></script>
 </body>
 </html>
