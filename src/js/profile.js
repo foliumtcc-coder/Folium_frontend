@@ -1,7 +1,6 @@
 import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
 function normalizeUser(u) {
-  // Transforma formatos diferentes de resposta em um formato único usado pelo frontend
   if (!u) return null;
   return {
     id: u.id ?? u.user_id ?? null,
@@ -16,7 +15,6 @@ function normalizeUser(u) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elementos do perfil / popup
   const editProfileBtn = document.getElementById('edit-profile-btn');
   const popup = document.getElementById('edit-profile-popup');
   const closePopupBtn = document.getElementById('close-popup');
@@ -30,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const avatarElem = document.getElementById('avatar');
   const bannerElem = document.getElementById('banner');
 
-  // Inputs do popup (IDs do seu HTML)
   const descricaoInput = document.getElementById('descricao');
   const instagramInput = document.getElementById('instagram');
   const linkedinInput = document.getElementById('linkedin');
@@ -42,13 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bannerInputPopup = document.getElementById('popup-banner-input');
 
   let loggedUser = null;
-  let profileUser = null; // normalized
+  let profileUser = null;
 
-  // Pegar ID da URL (se houver)
   const params = new URLSearchParams(window.location.search);
   const profileId = params.get('id');
 
-  // buscar usuário logado
   try {
     const res = await getUser();
     loggedUser = res.user || null;
@@ -58,14 +53,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     loggedUser = null;
   }
 
-  // Função para preencher a UI com um usuário normalizado
   function fillProfileUI(u) {
     if (!u) return;
     nameElem.textContent = u.name1 || 'Usuário';
     bioElem.textContent = u.descricao || '';
     avatarElem.src = u.imagem_perfil || './src/img/icons/profile-icon.jpg';
     bannerElem.src = u.banner_fundo || './src/img/standard-img.jpg';
-    // Links
+
     linksElem.innerHTML = '';
     const links = { instagram: u.instagram, linkedin: u.linkedin, github: u.github };
     for (const [platform, url] of Object.entries(links)) {
@@ -80,15 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Carregar perfil e projetos
   async function loadProfile() {
     try {
-      // precisa de token para getUserProfile — getUser já tentou recuperar token
-      if (!loggedUser && !profileId) {
-        console.warn('Nenhum usuário logado e nenhum profileId na URL — carregando view anônima possivelmente limitada.');
-      }
-
-      // Escolhe id para buscar: id da URL (outro usuário) ou id do logado
       const idToFetch = profileId ? profileId : (loggedUser?.id ?? null);
       if (!idToFetch) {
         console.error('Não há id para buscar o perfil.');
@@ -97,13 +84,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const data = await getUserProfile(idToFetch);
       const rawUser = data.user ?? data;
-      const normalized = normalizeUser(rawUser);
-      profileUser = normalized;
+      profileUser = normalizeUser(rawUser);
 
-      // Preencher UI
       fillProfileUI(profileUser);
 
-      // Projetos
       const projects = data.projects || [];
       projectsContainer.innerHTML = '';
       projects.forEach(p => {
@@ -120,17 +104,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const projectFooter = document.createElement('div');
         projectFooter.classList.add('project-footer');
-
-        // Correção do nome do projeto: tenta vários campos possíveis
-        const projectName = p.nome ?? p.nome_projeto ?? p.titulo ?? p.name ?? 'Projeto sem nome';
-        projectFooter.textContent = projectName;
+        projectFooter.textContent = p.nome ?? p.titulo ?? p.name ?? 'Projeto sem nome';
 
         projectLink.appendChild(projectImgDiv);
         projectLink.appendChild(projectFooter);
         projectsContainer.appendChild(projectLink);
       });
 
-      // Mostrar botão de editar apenas se for o próprio usuário
       if (loggedUser && profileUser && Number(loggedUser.id) === Number(profileUser.id)) {
         editProfileBtn.classList.remove('hidden');
       } else {
@@ -144,7 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadProfile();
 
-  // Abre popup para editar (preenche inputs)
   editProfileBtn.addEventListener('click', () => {
     if (!profileUser) return;
     popup.classList.remove('hidden');
@@ -155,30 +134,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     popupAvatar.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
     popupBanner.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
+
     popup.querySelector('.popup-content')?.scrollTo(0, 0);
   });
 
-  // Fecha popup
   closePopupBtn.addEventListener('click', () => popup.classList.add('hidden'));
-  popup.addEventListener('click', e => {
-    if (e.target === popup) popup.classList.add('hidden');
-  });
+  popup.addEventListener('click', e => { if (e.target === popup) popup.classList.add('hidden'); });
 
-  // Preview avatar/banner no popup
   avatarInputPopup.addEventListener('change', () => {
     const file = avatarInputPopup.files[0];
     if (!file) return;
     popupAvatar.src = URL.createObjectURL(file);
   });
+
   bannerInputPopup.addEventListener('change', () => {
     const file = bannerInputPopup.files[0];
     if (!file) return;
     popupBanner.src = URL.createObjectURL(file);
   });
 
-  // Submit - salvar alterações
   editForm.addEventListener('submit', async e => {
     e.preventDefault();
+
     if (!profileUser || !loggedUser || Number(profileUser.id) !== Number(loggedUser.id)) {
       alert('Você não tem permissão para editar este perfil.');
       return;
@@ -199,13 +176,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (bannerInputPopup.files[0]) formData.append('banner_fundo', bannerInputPopup.files[0]);
 
     try {
-      const result = await updateUserProfile(formData);
+      const result = await updateUserProfile(formData); // já chama PUT /me
       console.log('Resposta updateUserProfile:', result);
 
       const savedRawUser = result.user ?? result;
-      const normalizedSaved = normalizeUser(savedRawUser);
-
-      profileUser = normalizedSaved;
+      profileUser = normalizeUser(savedRawUser);
       fillProfileUI(profileUser);
 
       popup.classList.add('hidden');
@@ -217,3 +192,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
