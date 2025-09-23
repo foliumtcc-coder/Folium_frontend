@@ -7,13 +7,6 @@ main {
   height: 100%;
 }
 
-.main-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 /*--------------------HEADER------------------------*/
 
 .profile-header {
@@ -35,38 +28,35 @@ main {
   height: 100%;
 }
 
-.profile-pic {
-  z-index: 900;
+.profile-info {
   position: absolute;
-  left: 50px;
   top: 75px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-}
-
-.profile-pic button {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: none;
+  left: 50px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
+  z-index: 900;
 }
 
-.profile-pic button img {
-  width: 200px;
-  height: 200px;
+.profile-pic img {
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-  border: 3px solid;
+  border: 3px solid #fff;
 }
 
 .profile-name {
-  position: absolute;
-  bottom: 0;
-  left: 300px;
-  font-size: 50px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #323232;
+}
+
+#edit-profile-btn {
+  margin-top: 10px;
+  padding: 5px 15px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 /*---------------------BIO-------------------------------*/
@@ -97,26 +87,15 @@ main {
   margin: 7px 0 0 0;
 }
 
-.links-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
 .bio-links a {
   display: flex;
   align-items: center;
   gap: 5px;
   text-decoration: none;
   color: #8752d2;
-  width: fit-content;
 }
 
-.bio-links a img {
-  height: 20px;
-}
-
-/*-----------------------sessão projetos------------------------*/
+/*-----------------------SESSÃO PROJETOS------------------------*/
 
 .projects-section {
   display: flex;
@@ -143,21 +122,14 @@ main {
   flex-wrap: wrap;
 }
 
-/*-------------------------BLOCOS DE PROJETO---------------------------*/
-
 .project-block {
   width: 350px;
   height: 200px;
   flex-shrink: 0;
-  border: 0px solid #000;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
   margin-bottom: 25px;
-}
-
-.project-block:hover .project-footer {
-  background-color: #e0e0e0;
 }
 
 .project-img {
@@ -181,30 +153,10 @@ main {
   justify-content: space-between;
   background-color: #fff;
   border-radius: 0 0 15px 15px;
+  padding: 5px 10px;
 }
 
-.project-footer .project-name {
-  margin-left: 15px;
-  margin-top: 15px;
-  color: #323232;
-  font-weight: bold;
-}
-
-.project-footer button {
-  width: 15px;
-  background: none;
-  display: inline-flex;
-  justify-content: center;
-  border: none;
-}
-
-.project-footer button span {
-  margin-top: 18px;
-  margin-right: 15px;
-  color: #323232;
-}
-
-/*-------------------------POP UP EDIÇÂO---------------------------*/
+/*-------------------------POPUP EDIÇÃO---------------------------*/
 
 .popup {
   position: fixed;
@@ -229,7 +181,7 @@ main {
   left: 50%;
   transform: translateX(-50%);
   background-color: #fff;
-  padding: 5px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -242,8 +194,7 @@ main {
 .popup-header {
   width: 100%;
   display: flex;
-  justify-content: center;
-  margin-top: 5px;
+  justify-content: space-between;
   margin-bottom: 15px;
 }
 
@@ -253,29 +204,30 @@ main {
 }
 
 .popup-header .close-btn {
-  position: fixed;
-  right: 10px;
   font-size: 25px;
   cursor: pointer;
 }
 
 .edit-profile-form {
   width: 100%;
-  height: fit-content;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
   font-size: 17px;
 }
 
-.text-input {
-  width: 400px;
-  border-radius: 15px;
-  background-color: #f0f0f0;
-  border: none;
+.edit-profile-form input,
+.edit-profile-form textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 .submit-button {
-  width: 200px;
+  width: 150px;
   margin: auto;
+  padding: 8px;
+  font-size: 16px;
+  cursor: pointer;
 }

@@ -1,10 +1,10 @@
 import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elementos
+  // Elementos do perfil
   const editProfileBtn = document.getElementById('edit-profile-btn');
   const popup = document.getElementById('edit-profile-popup');
-  const closePopupBtn = document.getElementById('close-popup-btn');
+  const closePopupBtn = document.getElementById('close-popup');
   const editForm = popup.querySelector('.edit-profile-form');
 
   const nameElem = document.getElementById('name');
@@ -20,9 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const popupBanner = document.getElementById('popup-banner');
   const avatarInputPopup = document.getElementById('popup-avatar-input');
   const bannerInputPopup = document.getElementById('popup-banner-input');
-
-  const changeAvatarBtn = document.getElementById('change-avatar-btn');
-  const changeBannerBtn = document.getElementById('change-banner-btn');
 
   let loggedUser = null;
   let profileUser = null;
@@ -53,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const projects = data.projects || [];
 
       // Preencher informações
-      nameElem.textContent = profileUser.name;
+      nameElem.textContent = profileUser.name || 'Usuário';
       bioElem.textContent = profileUser.bio || '';
       avatarElem.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
       bannerElem.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
@@ -127,9 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Alterar avatar/banner no popup
-  changeAvatarBtn.addEventListener('click', () => avatarInputPopup.click());
-  changeBannerBtn.addEventListener('click', () => bannerInputPopup.click());
-
   avatarInputPopup.addEventListener('change', () => {
     const file = avatarInputPopup.files[0];
     if (file) popupAvatar.src = URL.createObjectURL(file);
@@ -158,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       profileUser = result.user;
 
       // Atualizar elementos da página
-      nameElem.textContent = profileUser.name;
+      nameElem.textContent = profileUser.name || 'Usuário';
       bioElem.textContent = profileUser.bio || '';
       avatarElem.src = profileUser.avatarUrl || './src/img/icons/profile-icon.jpg';
       bannerElem.src = profileUser.bannerUrl || './src/img/standard-img.jpg';
