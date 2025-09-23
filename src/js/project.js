@@ -10,7 +10,15 @@ async function loadProject() {
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    const { projeto, etapas = [], membros = [], imagens = [] } = data;
+if (!data || !data.projeto) {
+  alert('Projeto não encontrado.');
+  return;
+}
+
+const projeto = data.projeto;
+const etapas = Array.isArray(data.etapas) ? data.etapas : [];
+const membros = Array.isArray(data.membros) ? data.membros : [];
+const imagens = Array.isArray(data.imagens) ? data.imagens : [];
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
@@ -47,7 +55,7 @@ async function loadProject() {
       const userName = m.usuarios?.name1 || 'Sem nome';
       if (!m.usuario_id) return;
       const a = document.createElement('a');
-      a.href = `/profile.html?id=${m.usuario_id}`;
+      a.href = `/profile-page.html?id=${m.usuario_id}`;
       a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
       sideMenu.appendChild(a);
     });
