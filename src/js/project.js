@@ -3,7 +3,7 @@ import { getUser, getProjectById, updateProject, deleteProject } from './api.js'
 const urlParams = new URLSearchParams(window.location.search);
 const projetoId = urlParams.get('id');
 
-// Função genérica para criar e controlar popups
+// --- Função genérica para criar e controlar popups ---
 function setupPopup(popupId, innerHTML) {
   let popup = document.getElementById(popupId);
 
@@ -14,32 +14,35 @@ function setupPopup(popupId, innerHTML) {
     popup.style.display = 'flex';
     popup.style.justifyContent = 'center';
     popup.style.alignItems = 'center';
-    popup.innerHTML = innerHTML;
     document.body.appendChild(popup);
-
-    // Fecha ao clicar no botão de fechar
-    const closeBtn = popup.querySelector('.close-popup');
-    if (closeBtn) closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-
-    // Fecha ao clicar fora do conteúdo
-    const onClickOutside = e => {
-      const content = popup.querySelector('.popup-content');
-      if (!content.contains(e.target)) {
-        popup.classList.add('hidden');
-        document.removeEventListener('click', onClickOutside);
-      }
-    };
-    
-    setTimeout(() => {
-      // Delay para não disparar imediatamente ao abrir
-      document.addEventListener('click', onClickOutside);
-    }, 0);
   }
+
+  popup.innerHTML = innerHTML;
+
+  const content = popup.querySelector('.popup-content');
+
+  // Fecha ao clicar no botão de fechar
+  const closeBtn = popup.querySelector('.close-popup');
+  if (closeBtn) closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+
+  // Fecha ao clicar fora do conteúdo
+  const onClickOutside = e => {
+    if (!content.contains(e.target)) {
+      popup.classList.add('hidden');
+      document.removeEventListener('mousedown', onClickOutside);
+    }
+  };
+
+  // Delay para não disparar imediatamente
+  setTimeout(() => {
+    document.addEventListener('mousedown', onClickOutside);
+  }, 0);
 
   popup.classList.remove('hidden');
   return popup;
 }
 
+// --- Carrega projeto ---
 async function loadProject() {
   try {
     const { user } = await getUser();
@@ -63,7 +66,7 @@ async function loadProject() {
     const headerText = header.querySelector('.main-header-text');
     headerText.textContent = projeto.titulo;
 
-    // Botão de 3 pontos
+    // Dropdown 3 pontos
     let dropdownBtn = document.getElementById('project-dropdown-btn');
     if (!dropdownBtn) {
       dropdownBtn = document.createElement('div');
@@ -80,12 +83,11 @@ async function loadProject() {
       header.appendChild(dropdownBtn);
     }
 
-    // Exibe opções de acordo com permissão
+    // Mostra opções conforme permissão
     document.getElementById('edit-project-option').style.display = isOwner ? 'block' : 'none';
     document.getElementById('add-step-option').style.display = (isOwner || isMember) ? 'block' : 'none';
     document.getElementById('delete-project-option').style.display = isOwner ? 'block' : 'none';
 
-    // Eventos do dropdown
     if (isOwner) document.getElementById('edit-project-option').onclick = () => openEditPopup(projeto, membros);
     if (isOwner || isMember) document.getElementById('add-step-option').onclick = () => openAddStepPopup();
     if (isOwner) document.getElementById('delete-project-option').onclick = () => openDeletePopup(projeto);
@@ -94,9 +96,7 @@ async function loadProject() {
     document.querySelector('.menu-header-date').innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${
-        projeto.atualizado_em
-          ? new Date(projeto.atualizado_em).toLocaleDateString()
-          : "Nunca"
+        projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"
       }</span>
     `;
     const menuDesc = document.querySelector('.menu-desc');
@@ -121,7 +121,7 @@ async function loadProject() {
   }
 }
 
-// --- Popup edição ---
+// --- Popup Editar Projeto ---
 function openEditPopup(projeto, membros) {
   const innerHTML = `
     <div class="popup-content">
@@ -161,6 +161,7 @@ function openEditPopup(projeto, membros) {
     }
   });
 
+  // Submit
   const form = document.getElementById('edit-project-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -183,7 +184,7 @@ function openEditPopup(projeto, membros) {
   });
 }
 
-// --- Popup adicionar etapa ---
+// --- Popup Adicionar Etapa ---
 function openAddStepPopup() {
   const innerHTML = `
     <div class="popup-content">
@@ -204,7 +205,7 @@ function openAddStepPopup() {
   });
 }
 
-// --- Popup deletar projeto ---
+// --- Popup Deletar Projeto ---
 function openDeletePopup(projeto) {
   const innerHTML = `
     <div class="popup-content">
@@ -237,4 +238,5 @@ function openDeletePopup(projeto) {
   });
 }
 
+// --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);
