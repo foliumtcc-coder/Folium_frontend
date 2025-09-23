@@ -1,195 +1,99 @@
-// src/js/api.js
-export const BACKEND_URL = 'https://folium-backend.onrender.com';
+// script.js
+import { getUser, getUserProfile } from './api.js';
 
-// Função auxiliar para POST com JSON
-async function postData(endpoint, data) {
-  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  const text = await response.text();
-  if (!response.ok) throw new Error(text);
-  return text;
-}
+const profileForm = document.querySelector('.edit-profile-form');
+const popup = document.getElementById('edit-profile-popup');
+const openBtn = document.getElementById('edit-profile-btn');
+const closeBtn = document.getElementById('close-popup');
 
-// Registro de usuário
-export async function register(name, email, password, confipassword) {
-  return postData('/api/auth/register', { name, email, password, confipassword });
-}
+// Controle do popup
+openBtn.addEventListener('click', () => popup.classList.remove('hidden'));
+closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+popup.addEventListener('click', e => {
+  if (e.target === popup) popup.classList.add('hidden');
+});
 
-// Login
-export async function login(email, password) {
-  const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
-  }
-
-  const data = await res.json();
-  localStorage.setItem('accessToken', data.accessToken); // salva o token
-  return data.user;
-}
-
-// Confirmar código
-export async function confirmCode(code) {
-  return postData('/api/auth/confirm', { code });
-}
-
-// Logout
-export function logout() {
-  localStorage.removeItem('accessToken');
-  sessionStorage.removeItem('accessToken');
-}
-
-// Buscar usuário logado
-export async function getUser() {
+// ----------------- FUNÇÃO PARA CARREGAR PERFIL -----------------
+async function loadProfile() {
   const token = localStorage.getItem('accessToken');
-  if (!token) return { user: null };
+  const { user } = await getUser();
+  if (!user) return window.location.href = '/login.html';
 
   try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/user/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    const data = await getUserProfile(user.id); // { user: {...}, projects: [...] }
 
-    if (!res.ok) return { user: null };
+    // Preencher campos do popup
+    profileForm.descricao.value = data.user.bio || '';
+    profileForm.instagram.value = data.user.instagram || '';
+    profileForm.linkedin.value = data.user.linkedin || '';
+    profileForm.github.value = data.user.github || '';
 
-    const json = await res.json(); // { user: {...} }
-    return { user: json.user || null };
+    document.querySelector('.profile-pic img').src = data.user.avatarUrl || '/default-avatar.png';
+    document.querySelector('.header-image img').src = data.user.bannerUrl || '/default-banner.png';
+    document.getElementById('name').textContent = data.user.name || '';
+
+    // Links
+    const linksDiv = document.getElementById('links');
+    linksDiv.innerHTML = '';
+    if (data.user.instagram) linksDiv.innerHTML += `<a href="${data.user.instagram}" target="_blank">Instagram</a> `;
+    if (data.user.linkedin) linksDiv.innerHTML += `<a href="${data.user.linkedin}" target="_blank">LinkedIn</a> `;
+    if (data.user.github) linksDiv.innerHTML += `<a href="${data.user.github}" target="_blank">GitHub</a>`;
+
+    // Carregar projetos
+    renderProjects(data.projects || []);
   } catch (err) {
-    console.error('Erro ao buscar usuário:', err);
-    return { user: null };
+    console.error('Erro ao carregar perfil:', err);
   }
 }
 
-// Criar projeto
-export async function createProject(formData) {
+// ----------------- FUNÇÃO PARA SALVAR ALTERAÇÕES DO PERFIL -----------------
+profileForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
   const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não logado');
-
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/create`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
-    },
-    body: formData
-  });
-
-  const text = await res.text();
-  if (!res.ok) throw new Error(text);
-  return text;
-}
-
-// Aceitar convite
-export async function acceptInvite(projetoId) {
-  const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não logado');
-
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/accept`, {
-    method: 'PATCH',
-    headers: { 
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Erro ao aceitar convite');
-  }
-
-  return res.json();
-}
-
-// Buscar notificações do usuário logado
-export async function fetchNotifications() {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return [];
+  const formData = new FormData(profileForm);
 
   try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/notifications/me`, {
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+    const res = await fetch('/api/auth/profile/me', {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
     });
-
-    if (!res.ok) throw new Error('Erro ao buscar notificações');
 
     const data = await res.json();
-    return data;
+    if (data.error) return alert(data.error);
+
+    alert('Perfil atualizado com sucesso!');
+    popup.classList.add('hidden'); // Fecha o popup
+    loadProfile(); // Recarrega os dados
   } catch (err) {
-    console.error(err);
-    return [];
+    console.error('Erro ao atualizar perfil:', err);
   }
-}
+});
 
-// Marcar notificação como lida
-export async function markNotificationAsRead(id) {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return;
+// ----------------- FUNÇÃO PARA RENDERIZAR PROJETOS -----------------
+function renderProjects(projects) {
+  const projectsContainer = document.getElementById('projects');
+  projectsContainer.innerHTML = '';
 
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/notifications/read/${id}`, {
-      method: 'POST',
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!res.ok) throw new Error('Erro ao marcar notificação como lida');
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// ====================== NOVAS FUNÇÕES ======================
-
-// Buscar perfil de usuário por id
-export async function getUserProfile(id) {
-  const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não logado');
-
-  const res = await fetch(`${BACKEND_URL}/api/auth/profile/${id}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+  projects.forEach(project => {
+    const projectHTML = `
+      <a href="project-page.html?id=${project.id}">
+        <div class="project-block">
+          <div class="project-img">
+            <img src="${project.image || './src/img/icons/project-image2.png'}" alt="">
+          </div>
+          <div class="project-footer">
+            <div class="project-name">
+              <span>${project.name}</span>
+            </div>
+            <button class="project-options"><span class="fa-solid fa-ellipsis-vertical"></span></button>
+          </div>
+        </div>
+      </a>
+    `;
+    projectsContainer.insertAdjacentHTML('beforeend', projectHTML);
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
-  }
-
-  return await res.json(); // { user: {...}, projects: [...] }
 }
 
-// Buscar projeto completo por id
-export async function getProjectById(id) {
-  const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não logado');
-
-  const res = await fetch(`${BACKEND_URL}/api/auth/projectsView/${id}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
-  }
-
-  return await res.json(); // { projeto: {...}, etapas: [...], membros: [...] }
-}
+// ----------------- INICIALIZAÇÃO -----------------
+document.addEventListener('DOMContentLoaded', loadProfile);
