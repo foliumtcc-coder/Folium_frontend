@@ -1,20 +1,15 @@
-import { getUser } from './api.js';
+// src/js/project.js
+import { getUser, getProjectById } from './api.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const projetoId = urlParams.get('id');
 
 async function loadProject() {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return window.location.href = '/login.html';
+  const { user } = await getUser();
+  if (!user) return window.location.href = '/login.html';
 
   try {
-    const res = await fetch(`/api/projects/${projetoId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-
+    const data = await getProjectById(projetoId); // usa função do api.js
     const { projeto, etapas, membros } = data;
 
     // Preenche header
@@ -29,7 +24,7 @@ async function loadProject() {
 
       // membros da etapa
       const membrosHTML = (etapa.usuarios || []).map(u => `
-        <a href="/profile?id=${u.usuario_id}">
+        <a href="/profile.html?id=${u.usuario_id}">
           <span class="fa-solid fa-circle-user"></span>
           <span>${u.name1}</span>
         </a>
@@ -65,7 +60,7 @@ async function loadProject() {
     sideMenu.innerHTML = '';
     membros.forEach(m => {
       const a = document.createElement('a');
-      a.href = `/profile?id=${m.usuario_id}`;
+      a.href = `/profile.html?id=${m.usuario_id}`;
       a.innerHTML = `<span class="fa-solid fa-circle-user"></span><span>${m.name1}</span><br />`;
       sideMenu.appendChild(a);
     });
@@ -80,7 +75,7 @@ async function loadProject() {
     document.querySelector('.menu-desc').textContent = projeto.descricao;
 
   } catch (err) {
-    console.error(err);
+    console.error('Erro ao carregar projeto:', err);
   }
 }
 
