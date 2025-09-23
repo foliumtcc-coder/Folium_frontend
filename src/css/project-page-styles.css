@@ -256,26 +256,36 @@ main {
   margin-right: 5px;
 }
 
-/* --- Botão de editar projeto --- */
+/* Botão de editar projeto */
 #edit-project-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   background-color: #4CAF50; /* verde */
   color: white;
   border: none;
-  padding: 10px 18px;
-  font-size: 1rem;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  z-index: 1000;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-left: 20px; /* distância do título do projeto */
 }
 
 #edit-project-btn:hover {
-  background-color: #45a049;
+  background-color: #45a049; /* verde mais escuro */
+  transform: scale(1.05); /* leve zoom ao passar o mouse */
 }
+
+#edit-project-btn:active {
+  transform: scale(0.95); /* leve pressão ao clicar */
+}
+
+/* Para garantir alinhamento vertical com o título no header */
+.main-header {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* espaço entre o título e o botão */
+}
+
 
 /* --- Popup --- */
 .popup {

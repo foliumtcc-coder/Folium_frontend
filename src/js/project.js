@@ -10,40 +10,58 @@ async function loadProject() {
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    const { projeto, etapas = [], membros = [], imagens = [] } = data; // garante arrays padrão
+    const { projeto, etapas = [], membros = [], imagens = [] } = data;
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
 
-    // --- Botão de editar centralizado ---
+    // --- Preenche header ---
+    const header = document.querySelector('.main-header');
+    const headerText = header.querySelector('.main-header-text');
+    headerText.textContent = projeto.titulo;
+
+    // --- Botão de editar dentro do header ---
     let editButton = document.getElementById('edit-project-btn');
     if (!editButton) {
       editButton = document.createElement('button');
       editButton.id = 'edit-project-btn';
       editButton.textContent = 'Editar Projeto';
       editButton.className = 'def-btn';
-      editButton.style.position = 'absolute';
-      editButton.style.top = '20px';
-      editButton.style.right = '20px';
-      document.body.appendChild(editButton);
+      editButton.style.marginLeft = '20px';
+      header.appendChild(editButton);
     }
-    editButton.style.display = isOwner ? 'block' : 'none';
-    if (isOwner) editButton.addEventListener('click', () => openEditPopup(projeto, membros));
+    editButton.style.display = isOwner ? 'inline-block' : 'none';
+    if (isOwner) editButton.onclick = () => openEditPopup(projeto, membros);
 
-    // --- Preenche header ---
-    document.querySelector('.main-header-text').textContent = projeto.titulo;
+    // --- Datas e descrição ---
+    document.querySelector('.menu-header-date').innerHTML = `
+      <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
+      <span>Atualizado por último em: ${new Date(projeto.atualizado_em).toLocaleDateString()}</span>
+    `;
+    document.querySelector('.menu-desc').textContent = projeto.descricao || 'Sem descrição';
+
+    // --- Preenche membros no menu lateral ---
+    const sideMenu = document.querySelector('.menu-header-people');
+    sideMenu.innerHTML = '';
+    membros.forEach(m => {
+      const userName = m.usuarios?.name1 || 'Sem nome';
+      if (!m.usuario_id) return;
+      const a = document.createElement('a');
+      a.href = `/profile.html?id=${m.usuario_id}`;
+      a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
+      sideMenu.appendChild(a);
+    });
 
     // --- Preenche etapas ---
     const stepsContainer = document.querySelector('.project-steps');
     stepsContainer.innerHTML = '';
-    (etapas || []).forEach(etapa => {
+    etapas.forEach(etapa => {
       const step = document.createElement('div');
       step.classList.add('step');
 
       const membrosHTML = (etapa.usuarios || []).map(u => `
         <a href="/profile.html?id=${u.usuario_id}">
-          <span class="fa-solid fa-circle-user"></span>
-          <span>${u.name1 || 'Sem nome'}</span>
+          <span class="fa-solid fa-circle-user"></span> ${u.name1 || 'Sem nome'}
         </a>
       `).join('');
 
@@ -70,27 +88,10 @@ async function loadProject() {
       stepsContainer.appendChild(step);
     });
 
-    // --- Preenche membros no menu lateral ---
-    const sideMenu = document.querySelector('.menu-header-people');
-    sideMenu.innerHTML = '';
-    (membros || []).forEach(m => {
-      const a = document.createElement('a');
-      a.href = `/profile.html?id=${m.usuario_id}`;
-      a.innerHTML = `<span class="fa-solid fa-circle-user"></span><span>${m.usuarios?.name1 || 'Sem nome'}</span><br />`;
-      sideMenu.appendChild(a);
-    });
-
-    // --- Datas do projeto e descrição ---
-    document.querySelector('.menu-header-date').innerHTML = `
-      <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
-      <span>Atualizado por último em: ${new Date(projeto.atualizado_em).toLocaleDateString()}</span>
-    `;
-    document.querySelector('.menu-desc').textContent = projeto.descricao;
-
     // --- Preenche imagens ---
     const mediaContainer = document.querySelector('.menu-media-display');
     mediaContainer.innerHTML = '';
-    (imagens || []).forEach((url, i) => {
+    imagens.forEach((url, i) => {
       const div = document.createElement('div');
       div.className = 'menu-media';
       if (i === 0) div.style.borderRadius = '15px 0 0 15px';
@@ -106,7 +107,6 @@ async function loadProject() {
       mediaContainer.appendChild(div);
     });
 
-    // Bloco "+" para futuras adições
     const addDiv = document.createElement('div');
     addDiv.className = 'menu-media menu-media-right';
     addDiv.style.borderRadius = '0 15px 15px 0';
@@ -209,7 +209,7 @@ function openEditPopup(projeto, membros) {
         await updateProject(projetoId, formData);
         alert('Projeto atualizado com sucesso!');
         popup.classList.add('hidden');
-        loadProject(); // recarrega página
+        loadProject();
       } catch (err) {
         console.error('Erro ao atualizar projeto:', err);
         alert('Erro ao atualizar projeto.');
