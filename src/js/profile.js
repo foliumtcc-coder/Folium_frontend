@@ -1,3 +1,4 @@
+// src/js/profile.js
 import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
 function normalizeUser(u) {
@@ -88,30 +89,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       fillProfileUI(profileUser);
 
-      const projects = data.projects || [];
-      projectsContainer.innerHTML = '';
-      projects.forEach(p => {
-        const projectLink = document.createElement('a');
-        const canAccess = Boolean(p.publico) || (loggedUser && Number(loggedUser.id) === Number(profileUser.id));
-        projectLink.href = canAccess ? `project-page.html?id=${p.id}` : '#';
-        projectLink.classList.add('project-block');
-
-        // Usando a imagem correta do projeto (campo "imagem")
-        const projectImgDiv = document.createElement('div');
-        projectImgDiv.classList.add('project-img');
-        const img = document.createElement('img');
-        img.src = p.imagem || './src/img/icons/project-image2.png'; // <-- alterado aqui
-        img.alt = 'Capa do projeto';
-        projectImgDiv.appendChild(img);
-
-        const projectFooter = document.createElement('div');
-        projectFooter.classList.add('project-footer');
-        projectFooter.textContent = p.nome ?? p.titulo ?? p.name ?? 'Projeto sem nome';
-
-        projectLink.appendChild(projectImgDiv);
-        projectLink.appendChild(projectFooter);
-        projectsContainer.appendChild(projectLink);
-      });
+      // 🔹 Busca os projetos do usuário separado
+      await loadUserProjects(idToFetch);
 
       if (loggedUser && profileUser && Number(loggedUser.id) === Number(profileUser.id)) {
         editProfileBtn.classList.remove('hidden');
@@ -193,4 +172,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('Erro ao atualizar perfil: ' + msg);
     }
   });
+
+  // 🔹 Função para buscar os projetos do usuário
+  async function loadUserProjects(userId) {
+    try {
+      const response = await fetch(`${BACKEND_URL}/projects/user/${userId}`, {
+        credentials: 'include'
+      });
+      const projects = await response.json();
+
+      projectsContainer.innerHTML = '';
+      projects.forEach(p => {
+        const projectLink = document.createElement('a');
+        const canAccess = Boolean(p.publico) || (loggedUser && Number(loggedUser.id) === Number(profileUser.id));
+        projectLink.href = canAccess ? `project-page.html?id=${p.id}` : '#';
+        projectLink.classList.add('project-block');
+
+        const projectImgDiv = document.createElement('div');
+        projectImgDiv.classList.add('project-img');
+        const img = document.createElement('img');
+        img.src = p.imagem || './src/img/icons/project-image2.png';
+        img.alt = 'Capa do projeto';
+        projectImgDiv.appendChild(img);
+
+        const projectFooter = document.createElement('div');
+        projectFooter.classList.add('project-footer');
+        projectFooter.textContent = p.nome ?? p.titulo ?? 'Projeto sem nome';
+
+        projectLink.appendChild(projectImgDiv);
+        projectLink.appendChild(projectFooter);
+        projectsContainer.appendChild(projectLink);
+      });
+    } catch (err) {
+      console.error('Erro ao carregar projetos do usuário:', err);
+    }
+  }
 });

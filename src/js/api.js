@@ -223,3 +223,26 @@ export async function updateUserProfile(formData) {
 
   return await res.json(); // { message: "...", user: {...} }
 }
+
+// DELETE projeto
+export async function deleteProject(projectId) {
+  const token = localStorage.getItem('token'); // ou de onde você armazena o token
+
+  if (!token) throw new Error('Usuário não autenticado');
+
+  const response = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Erro ao deletar projeto');
+  }
+
+  return data;
+}
