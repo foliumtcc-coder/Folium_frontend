@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Elementos
   const editProfileBtn = document.getElementById('edit-profile-btn');
   const popup = document.getElementById('edit-profile-popup');
-  const closePopupBtn = document.getElementById('close-popup');
+  const closePopupBtn = document.getElementById('close-popup-btn'); // corrigido
   const editForm = popup.querySelector('.edit-profile-form');
 
   const nameElem = document.getElementById('name');
@@ -39,11 +39,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Erro ao buscar usuário logado:', err);
   }
 
+  if (!loggedUser) return; // evita erros se não houver usuário logado
+
   // Carregar perfil e projetos
   async function loadProfile() {
     try {
       let data;
-      if (profileId && parseInt(profileId) !== loggedUser?.id) {
+      if (profileId && parseInt(profileId) !== loggedUser.id) {
         data = await getUserProfile(profileId);
       } else {
         data = await getUserProfile(loggedUser.id);
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       projectsContainer.innerHTML = '';
       projects.forEach(p => {
         const projectLink = document.createElement('a');
-        projectLink.href = p.publico || loggedUser.id === profileUser.id ? `project-page.html?id=${p.id}` : '#';
+        projectLink.href = (p.publico || loggedUser.id === profileUser.id) ? `project-page.html?id=${p.id}` : '#';
         projectLink.classList.add('project-block');
 
         const projectImgDiv = document.createElement('div');
@@ -98,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       // Mostrar botão de editar apenas se for o próprio usuário
-      if (loggedUser?.id === profileUser.id) {
+      if (loggedUser.id === profileUser.id) {
         editProfileBtn.classList.remove('hidden');
       }
     } catch (err) {
