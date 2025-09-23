@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const res = await getUser();
     loggedUser = res.user || null;
-    console.log('Usuário logado (getUser):', loggedUser);
   } catch (err) {
     console.error('Erro ao buscar usuário logado:', err);
     loggedUser = null;
@@ -78,10 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadProfile() {
     try {
       const idToFetch = profileId ? profileId : (loggedUser?.id ?? null);
-      if (!idToFetch) {
-        console.error('Não há id para buscar o perfil.');
-        return;
-      }
+      if (!idToFetch) return;
 
       const data = await getUserProfile(idToFetch);
       const rawUser = data.user ?? data;
@@ -89,7 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       fillProfileUI(profileUser);
 
-      // 🔹 Busca os projetos do usuário separado
       await loadUserProjects(idToFetch);
 
       if (loggedUser && profileUser && Number(loggedUser.id) === Number(profileUser.id)) {
@@ -97,7 +92,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         editProfileBtn.classList.add('hidden');
       }
-
     } catch (err) {
       console.error('Erro ao carregar perfil:', err);
     }
@@ -142,12 +136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-    if (!token) {
-      alert('Sessão expirada. Faça login novamente.');
-      return;
-    }
-
     const formData = new FormData();
     formData.append('descricao', descricaoInput.value || '');
     formData.append('instagram', instagramInput.value.trim() || '');
@@ -158,30 +146,44 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const result = await updateUserProfile(formData);
-      console.log('Resposta updateUserProfile:', result);
-
-      const savedRawUser = result.user ?? result;
-      profileUser = normalizeUser(savedRawUser);
+      profileUser = normalizeUser(result.user ?? result);
       fillProfileUI(profileUser);
 
       popup.classList.add('hidden');
       alert('Perfil atualizado com sucesso!');
     } catch (err) {
       console.error('Erro ao atualizar perfil:', err);
-      const msg = (err && err.message) ? err.message : String(err);
-      alert('Erro ao atualizar perfil: ' + msg);
+      alert('Erro ao atualizar perfil.');
     }
   });
 
-  // 🔹 Função para buscar os projetos do usuário
+  // 🔹 Função para carregar projetos do usuário usando getUserProjects
   async function loadUserProjects(userId) {
     try {
+      if (!userId) return;
+
+      const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
       const response = await fetch(`${BACKEND_URL}/projects/user/${userId}`, {
+        headers,
         credentials: 'include'
       });
+
+      if (!response.ok) {
+        console.error(`Erro ao buscar projetos: ${response.status} ${response.statusText}`);
+        projectsContainer.innerHTML = '<p>Não foi possível carregar os projetos.</p>';
+        return;
+      }
+
       const projects = await response.json();
 
       projectsContainer.innerHTML = '';
+      if (!projects.length) {
+        projectsContainer.innerHTML = '<p>Este usuário não possui projetos.</p>';
+        return;
+      }
+
       projects.forEach(p => {
         const projectLink = document.createElement('a');
         const canAccess = Boolean(p.publico) || (loggedUser && Number(loggedUser.id) === Number(profileUser.id));
@@ -197,7 +199,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const projectFooter = document.createElement('div');
         projectFooter.classList.add('project-footer');
-        projectFooter.textContent = p.nome ?? p.titulo ?? 'Projeto sem nome';
+        projectFooter.innerHTML = `
+          <h3>${p.titulo ?? 'Projeto sem título'}</h3>
+          <p>${p.descricao ?? ''}</p>
+        `;
 
         projectLink.appendChild(projectImgDiv);
         projectLink.appendChild(projectFooter);
@@ -205,6 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     } catch (err) {
       console.error('Erro ao carregar projetos do usuário:', err);
+      projectsContainer.innerHTML = '<p>Erro ao carregar os projetos.</p>';
     }
   }
 });

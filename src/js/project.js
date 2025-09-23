@@ -11,6 +11,12 @@ function setupPopup(popupId, innerHTML) {
     popup = document.createElement('div');
     popup.id = popupId;
     popup.className = 'popup hidden';
+    popup.style.position = 'fixed';
+    popup.style.top = '0';
+    popup.style.left = '0';
+    popup.style.width = '100%';
+    popup.style.height = '100%';
+    popup.style.background = 'rgba(0,0,0,0.5)';
     popup.style.display = 'flex';
     popup.style.justifyContent = 'center';
     popup.style.alignItems = 'center';
@@ -95,16 +101,14 @@ async function loadProject() {
     // Datas e descrição
     document.querySelector('.menu-header-date').innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
-      <span>Atualizado por último em: ${
-        projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"
-      }</span>
+      <span>Atualizado por último em: ${projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"}</span>
     `;
     const menuDesc = document.querySelector('.menu-desc');
-    menuDesc.innerHTML = `<h4>Descrição</h4><p>${projeto.descricao || 'Sem descrição'}</p>`;
+    menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
 
     // Membros
     const sideMenu = document.querySelector('.menu-header-people');
-    sideMenu.innerHTML = `<h4>Membros</h4>`;
+    sideMenu.innerHTML = `<h2>Membros</h2>`;
     membros.forEach(m => {
       const userId = m.usuario_id || m.usuarios?.id;
       const userName = m.usuarios?.name1 || "Sem nome";
