@@ -5,17 +5,17 @@ const urlParams = new URLSearchParams(window.location.search);
 const projetoId = urlParams.get('id');
 
 async function loadProject() {
-  const { user } = await getUser();
-  if (!user) return window.location.href = '/login.html';
-
   try {
+    const { user } = await getUser();
+    if (!user) return window.location.href = '/login.html';
+
     const data = await getProjectById(projetoId);
     const { projeto, etapas, membros, imagens = [] } = data;
 
     // --- Verifica se usuário logado é dono ---
     const isOwner = Number(user.id) === Number(projeto.criado_por);
 
-    // Botão de editar
+    // --- Botão de editar ---
     let editButton = document.getElementById('edit-project-btn');
     if (!editButton) {
       editButton = document.createElement('button');
@@ -24,10 +24,8 @@ async function loadProject() {
       editButton.className = 'def-btn';
       document.querySelector('.main-header').appendChild(editButton);
     }
-    if (!isOwner) editButton.style.display = 'none';
-    else editButton.style.display = 'block';
-
-    editButton.addEventListener('click', () => openEditPopup(projeto, membros));
+    editButton.style.display = isOwner ? 'block' : 'none';
+    if (isOwner) editButton.addEventListener('click', () => openEditPopup(projeto, membros));
 
     // --- Preenche header ---
     document.querySelector('.main-header-text').textContent = projeto.titulo;
@@ -79,7 +77,7 @@ async function loadProject() {
       sideMenu.appendChild(a);
     });
 
-    // --- Data do projeto ---
+    // --- Datas do projeto ---
     document.querySelector('.menu-header-date').innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${new Date(projeto.atualizado_em).toLocaleDateString()}</span>
@@ -118,10 +116,11 @@ async function loadProject() {
 
   } catch (err) {
     console.error('Erro ao carregar projeto:', err);
+    alert('Erro ao carregar projeto.');
   }
 }
 
-// --- Funções do modal de imagens ---
+// --- Modal de imagens ---
 function createImageModal(imagens) {
   const modal = document.createElement('div');
   modal.id = 'image-modal';
@@ -163,7 +162,7 @@ function createImageModal(imagens) {
   modal.addEventListener('click', () => modal.style.display = 'none');
 }
 
-// --- Função para abrir popup de edição ---
+// --- Popup de edição ---
 function openEditPopup(projeto, membros) {
   let popup = document.getElementById('edit-project-popup');
   if (!popup) {
@@ -203,10 +202,10 @@ function openEditPopup(projeto, membros) {
       formData.append('membros', JSON.stringify(memberIds));
 
       try {
-        const updated = await updateProject(projetoId, formData);
+        await updateProject(projetoId, formData);
         alert('Projeto atualizado com sucesso!');
         popup.classList.add('hidden');
-        loadProject(); // recarrega página com novas informações
+        loadProject(); // recarrega página
       } catch (err) {
         console.error('Erro ao atualizar projeto:', err);
         alert('Erro ao atualizar projeto.');
