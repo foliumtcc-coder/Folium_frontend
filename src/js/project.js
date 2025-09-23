@@ -6,6 +6,7 @@ const projetoId = urlParams.get('id');
 // Função genérica para criar e controlar popups
 function setupPopup(popupId, innerHTML) {
   let popup = document.getElementById(popupId);
+
   if (!popup) {
     popup = document.createElement('div');
     popup.id = popupId;
@@ -17,17 +18,24 @@ function setupPopup(popupId, innerHTML) {
     document.body.appendChild(popup);
 
     // Fecha ao clicar no botão de fechar
-    popup.querySelector('.close-popup').addEventListener('click', () => popup.classList.add('hidden'));
+    const closeBtn = popup.querySelector('.close-popup');
+    if (closeBtn) closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
 
     // Fecha ao clicar fora do conteúdo
-    popup.addEventListener('click', e => {
+    const onClickOutside = e => {
       const content = popup.querySelector('.popup-content');
-      if (!content || !content.contains(e.target)) {
+      if (!content.contains(e.target)) {
         popup.classList.add('hidden');
+        document.removeEventListener('click', onClickOutside);
       }
-    });
-
+    };
+    
+    setTimeout(() => {
+      // Delay para não disparar imediatamente ao abrir
+      document.addEventListener('click', onClickOutside);
+    }, 0);
   }
+
   popup.classList.remove('hidden');
   return popup;
 }
