@@ -32,7 +32,7 @@ export async function login(email, password) {
   }
 
   const data = await res.json();
-  localStorage.setItem('accessToken', data.accessToken); // salva o token
+  localStorage.setItem('accessToken', data.accessToken);
   return data.user;
 }
 
@@ -59,9 +59,7 @@ export async function getUser() {
         'Content-Type': 'application/json'
       }
     });
-
     if (!res.ok) return { user: null };
-
     const json = await res.json();
     return { user: json.user || null };
   } catch (err) {
@@ -77,9 +75,7 @@ export async function createProject(formData) {
 
   const res = await fetch(`${BACKEND_URL}/api/auth/projects/create`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
-    },
+    headers: { 'Authorization': `Bearer ${token}` },
     body: formData
   });
 
@@ -109,11 +105,10 @@ export async function acceptInvite(projetoId) {
   return res.json();
 }
 
-// Buscar notificações do usuário logado
+// Buscar notificações
 export async function fetchNotifications() {
   const token = localStorage.getItem('accessToken');
   if (!token) return [];
-
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/notifications/me`, {
       headers: { 
@@ -121,9 +116,7 @@ export async function fetchNotifications() {
         'Content-Type': 'application/json'
       }
     });
-
     if (!res.ok) throw new Error('Erro ao buscar notificações');
-
     return await res.json();
   } catch (err) {
     console.error(err);
@@ -135,7 +128,6 @@ export async function fetchNotifications() {
 export async function markNotificationAsRead(id) {
   const token = localStorage.getItem('accessToken');
   if (!token) return;
-
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/notifications/read/${id}`, {
       method: 'POST',
@@ -144,14 +136,11 @@ export async function markNotificationAsRead(id) {
         'Content-Type': 'application/json'
       }
     });
-
     if (!res.ok) throw new Error('Erro ao marcar notificação como lida');
   } catch (err) {
     console.error(err);
   }
 }
-
-// ====================== NOVAS FUNÇÕES ======================
 
 // Buscar perfil de usuário por id
 export async function getUserProfile(id) {
@@ -174,12 +163,11 @@ export async function getUserProfile(id) {
 }
 
 // Buscar projeto completo por id
-// Buscar projeto completo por id
 export async function getProjectById(id) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${id}`, { // <<< alterado
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${id}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -199,12 +187,9 @@ export async function updateProject(projectId, formData) {
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projectId}`, { // <<< alterado
-    method: 'PATCH', // seu backend usa PATCH
-    headers: {
-      'Authorization': `Bearer ${token}`
-      // Não setar Content-Type para FormData
-    },
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Authorization': `Bearer ${token}` },
     body: formData
   });
 
@@ -216,15 +201,14 @@ export async function updateProject(projectId, formData) {
   return await res.json(); // { projeto: {...} }
 }
 
+// Atualizar perfil do usuário
 export async function updateUserProfile(formData) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
   const res = await fetch(`${BACKEND_URL}/api/auth/profile/me`, {
-    method: 'PUT', // ALTERADO de POST para PUT
-    headers: {
-      'Authorization': `Bearer ${token}` // FormData não precisa de Content-Type
-    },
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` },
     body: formData
   });
 
@@ -234,30 +218,4 @@ export async function updateUserProfile(formData) {
   }
 
   return await res.json(); // { message: "...", user: {...} }
-}
-
-export async function updateProject(projectId, formData) {
-  try {
-    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-    if (!token) throw new Error('Usuário não autenticado');
-
-    const res = await fetch(`/api/projects/${projectId}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`
-        // Não setar 'Content-Type', deixa o fetch colocar para FormData
-      },
-      body: formData
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Erro ao atualizar projeto');
-    }
-
-    return await res.json(); // espera que retorne { projeto: {...} }
-  } catch (err) {
-    console.error('updateProject error:', err);
-    throw err;
-  }
 }
