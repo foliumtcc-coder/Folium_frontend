@@ -5,7 +5,8 @@ import {
   deleteProject, 
   createEtapa, 
   updateEtapa, 
-  deleteEtapa 
+  deleteEtapa,
+  getEtapasByProjeto
 } from './api.js';
 
 // --- Pega o projetoId da URL ---
@@ -76,7 +77,7 @@ function renderStep(etapa) {
       ${etapa.arquivos?.map(file => `
         <div class="step-docs">
           <span class="fa-solid fa-file file-icon"></span>
-          <a href="${file.caminho_arquivo}" download class="file-text">${file.nome_arquivo || 'arquivo.doc'}</a>
+          <span class="file-text" style="cursor:pointer; color:blue; text-decoration:underline;" onclick="window.open('${file.caminho_arquivo}', '_blank')">${file.nome_arquivo || 'arquivo.doc'}</span>
         </div>
       `).join('') || ''}
     </div>
@@ -113,9 +114,7 @@ async function loadProject() {
     if (!data || !data.projeto) return alert('Projeto não encontrado.');
 
     const projeto = data.projeto;
-    let etapas = Array.isArray(data.etapas) ? data.etapas : [];
     const membros = Array.isArray(data.membros) ? data.membros : [];
-
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
 
@@ -185,12 +184,14 @@ async function loadProject() {
       });
     }
 
-    // Renderiza etapas ordenadas
+    // Carrega e renderiza etapas
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
+      const etapasData = await getEtapasByProjeto(projetoId); // <-- chama endpoint de etapas
+      const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
       etapas
-        .sort((a, b) => a.numero_etapa - b.numero_etapa)
+        .sort((a,b) => a.numero_etapa - b.numero_etapa)
         .forEach(etapa => {
           const el = renderStep(etapa);
           etapasContainer.appendChild(el);
