@@ -276,23 +276,24 @@ function openAddStepPopup() {
   `;
   const popup = setupPopup('add-step-popup', innerHTML);
 
-  document.getElementById('add-step-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    const nome = document.getElementById('step-name').value.trim();
-    const descricao = document.getElementById('step-desc').value.trim();
-    const filesInput = document.getElementById('step-files');
-    const files = filesInput.files;
+document.getElementById('add-step-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nome = document.getElementById('step-name').value.trim();
+  const descricao = document.getElementById('step-desc').value.trim();
+  const filesInput = document.getElementById('step-files');
+  const files = Array.from(filesInput.files); // <-- isso corrige o erro
 
-    try {
-      await createEtapa(projetoId, nome, descricao, files); // ajustado para enviar arquivos
-      alert('Etapa criada com sucesso!');
-      popup.classList.add('hidden');
-      loadProject();
-    } catch(err) {
-      console.error(err);
-      alert('Erro ao criar etapa');
-    }
-  });
+  try {
+    await createEtapa(projetoId, nome, descricao, files);
+    alert('Etapa criada com sucesso!');
+    popup.classList.add('hidden');
+    loadProject();
+  } catch(err) {
+    console.error(err);
+    alert('Erro ao criar etapa');
+  }
+});
+
 }
 
 // --- Popup Editar Etapa ---
