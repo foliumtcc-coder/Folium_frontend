@@ -230,33 +230,29 @@ if (!res.ok) {
   return await res.json(); // { message: "...", user: {...} }
 }
 
-export async function deleteProject(projectId) {
-  if (!projectId) throw new Error('ID do projeto não informado');
+// --- Deletar projeto (com etapas e arquivos em cascata) ---
+export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
+  const { user } = await getUser();
+  if (!user) throw new Error('Usuário não logado');
 
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não autenticado');
+  const formData = new FormData();
+  formData.append('projeto_id', projetoId);
+  formData.append('nome_etapa', nome);
+  formData.append('descricao_etapa', descricao);
 
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projectId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+  arquivos.forEach((arquivo) => {
+    formData.append('arquivos', arquivo);
+  });
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || `Erro ao deletar projeto. Status: ${res.status}`);
-    }
+  const res = await fetch(`${BACKEND_URL}/etapas/create`, { // ✅ URL corrigida
+    method: 'POST',
+    body: formData,
+  });
 
-    return await res.json();
-
-  } catch (err) {
-    console.error('Erro ao deletar projeto:', err);
-    throw err;
-  }
+  if (!res.ok) throw new Error('Erro ao criar etapa');
+  return await res.json();
 }
+
 
 
 
