@@ -353,31 +353,54 @@ export async function deleteProject(projectId) {
   return await res.json();
 }
 
-export async function renderStep(etapa, arquivos = []) {
-  const stepDiv = document.createElement('div');
-  stepDiv.className = 'step';
+function renderStep(etapa) {
+  const div = document.createElement('div');
+  div.className = 'step';
+  div.dataset.etapaId = etapa.id;
 
-  const date = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
+  const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
 
-  stepDiv.innerHTML = `
+  div.innerHTML = `
     <div class="step-header">
       <div class="step-header-text">
-        <span class="step-name">${etapa.nome_etapa}</span>
-        <span class="step-date">${date}</span>
+        <span class="step-name">${etapa.nome || 'Sem nome'}</span>
+        <span class="step-date">${stepDate}</span>
+      </div>
+      <div class="step-actions">
+        <button class="edit-step-btn">✎</button>
+        <button class="delete-step-btn">🗑️</button>
       </div>
     </div>
     <div class="section-line"></div>
-    <div class="step-main-content">${etapa.descricao_etapa || 'Sem descrição'}</div>
+    <div class="step-main-content">${etapa.descricao || ''}</div>
     <div class="section-line"></div>
     <div class="step-footer">
-      ${arquivos.map(f => `
+      ${etapa.arquivos?.map(file => `
         <div class="step-docs">
           <span class="fa-solid fa-file file-icon"></span>
-          <span class="file-text">${f.nome_arquivo}</span>
+          <span class="file-text">${file.nome || file.name}</span>
         </div>
-      `).join('')}
+      `).join('') || ''}
     </div>
   `;
 
-  return stepDiv;
+  // ações de editar/deletar
+  div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
+  div.querySelector('.delete-step-btn')?.addEventListener('click', async () => {
+    if (confirm(`Deseja realmente deletar a etapa "${etapa.nome || 'Sem nome'}"?`)) {
+      try {
+        await deleteEtapa(etapa.id);
+        div.remove();
+        alert('Etapa deletada com sucesso!');
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao deletar etapa.');
+      }
+    }
+  });
+
+  const etapasContainer = document.querySelector('.etapas-container');
+  if (etapasContainer) etapasContainer.appendChild(div);
+
+  return div;
 }
