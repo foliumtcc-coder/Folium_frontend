@@ -3,7 +3,7 @@ import { getUser, getProjectById, updateProject, deleteProject } from './api.js'
 const urlParams = new URLSearchParams(window.location.search);
 const projetoId = urlParams.get('id');
 
-// --- Função genérica para criar e controlar popups ---
+// --- Função genérica para abrir popups ---
 function setupPopup(popupId, innerHTML) {
   let popup = document.getElementById(popupId);
 
