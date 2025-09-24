@@ -24,17 +24,21 @@ function setupPopup(popupId, innerHTML) {
   if (closeBtn) closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
 
   // Fecha ao clicar fora do conteúdo
-  const onClickOutside = e => {
-    if (!content.contains(e.target)) {
-      popup.classList.add('hidden');
-      document.removeEventListener('mousedown', onClickOutside);
-    }
-  };
+// Fecha ao clicar fora do conteúdo
+const onClickOutside = e => {
+  if (!content.contains(e.target)) {
+    popup.classList.add('hidden');
+    document.removeEventListener('mousedown', onClickOutside);
+  }
+};
 
-  // Só adiciona listener quando o popup estiver visível
-  setTimeout(() => {
+// Adiciona listener após garantir que o popup está visível
+setTimeout(() => {
+  if (!popup.classList.contains('hidden')) {
     document.addEventListener('mousedown', onClickOutside);
-  }, 0);
+  }
+}, 0);
+
 
   popup.classList.remove('hidden');
   return popup;
@@ -164,7 +168,16 @@ function openEditPopup(projeto, membros) {
     const formData = new FormData();
     formData.append('titulo', document.getElementById('edit-title').value.trim());
     formData.append('descricao', document.getElementById('edit-desc').value.trim());
-    formData.append('membros', document.getElementById('edit-members').value.trim());
+    const inputMembros = document.getElementById('edit-members').value
+  .split(',')
+  .map(e => e.trim())
+  .filter(Boolean); // remove strings vazias
+
+const membrosExistentes = membros.map(m => m.usuarios?.email).filter(Boolean);
+
+const todosMembros = Array.from(new Set([...membrosExistentes, ...inputMembros])); // remove duplicados
+
+formData.append('membros', todosMembros.join(','));
     formData.append('publico', document.getElementById('edit-publico').checked);
     if (imageInput.files[0]) formData.append('imagem', imageInput.files[0]);
 
