@@ -8,13 +8,13 @@ import {
   deleteEtapa 
 } from './api.js';
 
-// --- Função para pegar o projetoId da URL ---
+// --- Pega o projetoId da URL ---
 function getProjetoIdFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('id');
 }
 
-// --- Função genérica para criar e controlar popups ---
+// --- Setup genérico de popup ---
 function setupPopup(popupId, innerHTML) {
   let popup = document.getElementById(popupId);
   if (!popup) {
@@ -50,7 +50,7 @@ function setupPopup(popupId, innerHTML) {
   return popup;
 }
 
-// --- Função para renderizar etapas individualmente (retorna elemento) ---
+// --- Renderiza uma etapa ---
 function renderStep(etapa) {
   const div = document.createElement('div');
   div.className = 'step';
@@ -76,13 +76,12 @@ function renderStep(etapa) {
       ${etapa.arquivos?.map(file => `
         <div class="step-docs">
           <span class="fa-solid fa-file file-icon"></span>
-          <span class="file-text">${file.nome || 'Arquivo'}</span>
+          <span class="file-text">${file.nome_arquivo || 'Arquivo'}</span>
         </div>
       `).join('') || ''}
     </div>
   `;
 
-  // Ações de editar/deletar etapa
   div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
   div.querySelector('.delete-step-btn')?.addEventListener('click', async () => {
     if (confirm(`Deseja realmente deletar a etapa "${etapa.nome_etapa}"?`)) {
@@ -97,10 +96,10 @@ function renderStep(etapa) {
     }
   });
 
-  return div; // retorna o elemento sem mexer no DOM
+  return div;
 }
 
-// --- Carrega projeto e renderiza tudo ---
+// --- Carrega projeto completo ---
 async function loadProject() {
   try {
     const projetoId = getProjetoIdFromURL();
@@ -203,7 +202,9 @@ async function loadProject() {
   }
 }
 
-// --- Popups (editar projeto, adicionar/editar etapa, deletar projeto) ---
+// --- POPUPS ---
+
+// Editar projeto
 function openEditPopup(projeto, membros) {
   const innerHTML = `
     <div class="popup-content">
@@ -286,7 +287,7 @@ function openEditPopup(projeto, membros) {
   });
 }
 
-// --- Adicionar Etapa ---
+// Adicionar etapa
 function openAddStepPopup() {
   const innerHTML = `
     <div class="popup-content">
@@ -331,7 +332,7 @@ function openAddStepPopup() {
   });
 }
 
-// --- Editar Etapa ---
+// Editar etapa
 function openEditStepPopup(etapa) {
   const innerHTML = `
     <div class="popup-content">
@@ -364,7 +365,7 @@ function openEditStepPopup(etapa) {
   });
 }
 
-// --- Deletar Projeto ---
+// Deletar projeto
 function openDeletePopup(projeto) {
   const innerHTML = `
     <div class="popup-content">
