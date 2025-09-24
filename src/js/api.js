@@ -230,26 +230,34 @@ if (!res.ok) {
   return await res.json(); // { message: "...", user: {...} }
 }
 
-// --- Deletar projeto (com etapas e arquivos em cascata) ---
-export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
-  const { user } = await getUser();
-  if (!user) throw new Error('Usuário não logado');
+export async function createEtapa(projetoId, titulo, descricao, arquivos) {
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não autenticado');
 
   const formData = new FormData();
   formData.append('projeto_id', projetoId);
-  formData.append('nome_etapa', nome);
-  formData.append('descricao_etapa', descricao);
+  formData.append('titulo', titulo);
+  formData.append('descricao', descricao);
 
-  arquivos.forEach((arquivo) => {
-    formData.append('arquivos', arquivo);
-  });
+  if (arquivos && arquivos.length > 0) {
+    for (const file of arquivos) {
+      formData.append('arquivos', file);
+    }
+  }
 
-  const res = await fetch(`${BACKEND_URL}/etapas/create`, { // ✅ URL corrigida
+  const res = await fetch(`${BACKEND_URL}/api/etapas/create`, {
     method: 'POST',
-    body: formData,
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
   });
 
-  if (!res.ok) throw new Error('Erro ao criar etapa');
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Erro ao criar etapa');
+  }
+
   return await res.json();
 }
 
