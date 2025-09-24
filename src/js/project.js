@@ -189,22 +189,14 @@ async function loadProject() {
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
 
-      const etapasData = await getEtapasByProjeto(projetoId); // busca etapas
-      const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
+ const etapasData = await getEtapasByProjeto(projetoId);
+const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
-      for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
-        // busca arquivos de cada etapa
-        try {
-          const arquivosData = await getArquivosByEtapa(etapa.id);
-          etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
-        } catch(err) {
-          console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
-          etapa.arquivos = [];
-        }
+for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+  const el = renderStep(etapa);
+  etapasContainer.appendChild(el);
+}
 
-        const el = renderStep(etapa);
-        etapasContainer.appendChild(el);
-      }
     }
 
   } catch (err) {
