@@ -273,3 +273,87 @@ export async function getUserProjects(userId) {
     throw err;
   }
 }
+
+export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
+  const { user } = await getUser();
+  if (!user) throw new Error('Usuário não logado');
+
+  const formData = new FormData();
+  formData.append('projeto_id', projetoId);
+  formData.append('nome_etapa', nome);
+  formData.append('descricao_etapa', descricao);
+
+  arquivos.forEach((arquivo, idx) => {
+    formData.append(`arquivos[${idx}]`, arquivo);
+  });
+
+  const res = await fetch(`${BACKEND_URL}/etapas`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Erro ao criar etapa');
+  return await res.json();
+}
+
+// --- Listar etapas de um projeto ---
+export async function getEtapasByProjeto(projetoId) {
+  const res = await fetch(`${BACKEND_URL}/etapas?projeto_id=${projetoId}`);
+  if (!res.ok) throw new Error('Erro ao listar etapas');
+  return await res.json(); // Deve retornar array de etapas
+}
+
+// --- Editar etapa ---
+export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
+  const formData = new FormData();
+  formData.append('nome_etapa', nome);
+  formData.append('descricao_etapa', descricao);
+
+  arquivos.forEach((arquivo, idx) => {
+    formData.append(`arquivos[${idx}]`, arquivo);
+  });
+
+  const res = await fetch(`${BACKEND_URL}/etapas/${etapaId}`, {
+    method: 'PUT',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Erro ao atualizar etapa');
+  return await res.json();
+}
+
+// --- Deletar etapa ---
+export async function deleteEtapa(etapaId) {
+  const res = await fetch(`${BACKEND_URL}/etapas/${etapaId}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) throw new Error('Erro ao deletar etapa');
+  return await res.json();
+}
+
+// --- Adicionar arquivos à etapa existente ---
+export async function addArquivosEtapa(etapaId, arquivos = []) {
+  const formData = new FormData();
+  arquivos.forEach((arquivo, idx) => {
+    formData.append(`arquivos[${idx}]`, arquivo);
+  });
+
+  const res = await fetch(`${BACKEND_URL}/etapas/${etapaId}/arquivos`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Erro ao adicionar arquivos');
+  return await res.json();
+}
+
+// --- Deletar arquivo de uma etapa ---
+export async function deleteArquivoEtapa(arquivoId) {
+  const res = await fetch(`${BACKEND_URL}/etapa-arquivos/${arquivoId}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) throw new Error('Erro ao deletar arquivo da etapa');
+  return await res.json();
+}
