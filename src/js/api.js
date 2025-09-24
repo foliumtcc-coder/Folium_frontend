@@ -307,13 +307,18 @@ export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
 
 // --- Deletar etapa ---
 export async function deleteEtapa(etapaId) {
-  const res = await fetch(`${BACKEND_URL}/etapas/delete/${etapaId}`, {
-    method: 'DELETE',
-  });
-
-  if (!res.ok) throw new Error('Erro ao deletar etapa');
-  return await res.json();
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/etapas/delete/${etapaId}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) throw new Error('Erro ao deletar etapa');
+    return await res.json();
+  } catch(err) {
+    console.error(err);
+    throw err;
+  }
 }
+
 
 // --- Adicionar arquivos à etapa existente ---
 export async function addArquivosEtapa(etapaId, arquivos = []) {

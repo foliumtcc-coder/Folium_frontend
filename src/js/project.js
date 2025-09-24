@@ -184,18 +184,27 @@ async function loadProject() {
       });
     }
 
-    // Carrega e renderiza etapas
+    // --- Carrega e renderiza etapas com arquivos ---
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
-      const etapasData = await getEtapasByProjeto(projetoId); // <-- chama endpoint de etapas
+
+      const etapasData = await getEtapasByProjeto(projetoId); // busca etapas
       const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
-      etapas
-        .sort((a,b) => a.numero_etapa - b.numero_etapa)
-        .forEach(etapa => {
-          const el = renderStep(etapa);
-          etapasContainer.appendChild(el);
-        });
+
+      for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+        // busca arquivos de cada etapa
+        try {
+          const arquivosData = await getArquivosByEtapa(etapa.id);
+          etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+        } catch(err) {
+          console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
+          etapa.arquivos = [];
+        }
+
+        const el = renderStep(etapa);
+        etapasContainer.appendChild(el);
+      }
     }
 
   } catch (err) {
