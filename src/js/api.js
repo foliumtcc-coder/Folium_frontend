@@ -230,11 +230,9 @@ if (!res.ok) {
   return await res.json(); // { message: "...", user: {...} }
 }
 
-// Função para deletar projeto
-async function deleteProject(projectId) {
+export async function deleteProject(projectId) {
   if (!projectId) throw new Error('ID do projeto não informado');
 
-  // Pega token do usuário logado
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
@@ -248,19 +246,18 @@ async function deleteProject(projectId) {
     });
 
     if (!res.ok) {
-      // Se a resposta não for OK, pega o texto para não tentar parsear JSON inválido
       const text = await res.text();
       throw new Error(text || `Erro ao deletar projeto. Status: ${res.status}`);
     }
 
-    // Se OK, retorna o JSON
-    return await res.json(); // { message: "...", projeto: {...} }
+    return await res.json();
 
   } catch (err) {
     console.error('Erro ao deletar projeto:', err);
-    throw err; // rethrow para ser tratado onde a função for chamada
+    throw err;
   }
 }
+
 
 
 // Buscar projetos de um usuário específico (perfil)
