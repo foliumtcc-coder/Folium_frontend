@@ -30,13 +30,16 @@ function setupPopup(popupId, innerHTML) {
     document.removeEventListener('mousedown', onClickOutside);
   };
 
+  // Fecha ao clicar no botão de fechar
   const closeBtn = popup.querySelector('.close-popup');
   if (closeBtn) closeBtn.addEventListener('click', closePopup);
 
+  // Fecha ao clicar fora do conteúdo
   const onClickOutside = e => {
     if (!content.contains(e.target)) closePopup();
   };
 
+  // Adiciona listener de clique fora
   setTimeout(() => {
     if (!popup.classList.contains('hidden')) {
       document.addEventListener('mousedown', onClickOutside);
@@ -67,40 +70,58 @@ async function loadProject() {
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
 
     // Header
-    const headerText = document.querySelector('.main-header-text');
-    if (headerText) headerText.textContent = projeto.titulo;
+    const header = document.querySelector('.main-header');
+    const headerText = header.querySelector('.main-header-text');
+    headerText.textContent = projeto.titulo;
 
-    // Datas
-    const menuDates = document.getElementById('project-dates');
-    if (menuDates) {
-      menuDates.innerHTML = `
-        <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
-        <span>Atualizado por último em: ${projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"}</span>
+    // Dropdown 3 pontos
+    let dropdownBtn = document.getElementById('project-dropdown-btn');
+    if (!dropdownBtn) {
+      dropdownBtn = document.createElement('div');
+      dropdownBtn.id = 'project-dropdown-btn';
+      dropdownBtn.className = 'dropdown';
+      dropdownBtn.innerHTML = `
+        <button class="dropbtn">⋮</button>
+        <div class="dropdown-content">
+          <a href="#" id="edit-project-option">Editar Projeto</a>
+          <a href="#" id="add-step-option">Adicionar Etapa</a>
+          <a href="#" id="delete-project-option">Deletar Projeto</a>
+        </div>
       `;
+      header.appendChild(dropdownBtn);
     }
 
-    // Descrição
-    const menuDesc = document.getElementById('project-description');
-    if (menuDesc) menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
+    document.getElementById('edit-project-option').style.display = isOwner ? 'block' : 'none';
+    document.getElementById('add-step-option').style.display = (isOwner || isMember) ? 'block' : 'none';
+    document.getElementById('delete-project-option').style.display = isOwner ? 'block' : 'none';
+
+    if (isOwner) document.getElementById('edit-project-option').onclick = () => openEditPopup(projeto, membros);
+    if (isOwner || isMember) document.getElementById('add-step-option').onclick = () => openAddStepPopup();
+    if (isOwner) document.getElementById('delete-project-option').onclick = () => openDeletePopup(projeto);
+
+    // Datas e descrição
+    document.querySelector('.menu-header-date').innerHTML = `
+      <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
+      <span>Atualizado por último em: ${projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"}</span>
+    `;
+    const menuDesc = document.querySelector('.menu-desc');
+    menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
 
     // Membros
-    const membersContainer = document.getElementById('project-members');
-    if (membersContainer) {
-      membersContainer.innerHTML = '<h2>Membros</h2>';
-      membros.forEach(m => {
-        const userId = m.usuario_id || m.usuarios?.id;
-        const userName = m.usuarios?.name1 || "Sem nome";
-        if (!userId) return;
-        const a = document.createElement('a');
-        a.href = `/profile-page.html?id=${userId}`;
-        a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
-        membersContainer.appendChild(a);
-      });
-    }
+    const sideMenu = document.querySelector('.menu-header-people');
+    sideMenu.innerHTML = `<h2>Membros</h2>`;
+    membros.forEach(m => {
+      const userId = m.usuario_id || m.usuarios?.id;
+      const userName = m.usuarios?.name1 || "Sem nome";
+      if (!userId) return;
+      const a = document.createElement('a');
+      a.href = `/profile-page.html?id=${userId}`;
+      a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
+      sideMenu.appendChild(a);
+    });
 
-    // Container das etapas
-    const etapasContainer = document.getElementById('project-steps');
-    if (!etapasContainer) return;
+    // Etapas
+    const etapasContainer = document.querySelector('.etapas-container');
     etapasContainer.innerHTML = '';
     etapas.sort((a,b)=> a.numero_etapa - b.numero_etapa).forEach(etapa => {
       const div = document.createElement('div');
@@ -125,7 +146,10 @@ async function loadProject() {
       const dropdownContent = div.querySelector('.etapa-dropdown-content');
       dropdownBtn.addEventListener('click', () => dropdownContent.classList.toggle('hidden'));
 
+      // Editar etapa
       div.querySelector('.edit-etapa-btn').addEventListener('click', () => openEditStepPopup(etapa));
+
+      // Deletar etapa
       div.querySelector('.delete-etapa-btn').addEventListener('click', async () => {
         if (confirm('Deseja realmente deletar esta etapa?')) {
           await deleteEtapa(etapa.id);
@@ -161,7 +185,7 @@ function openEditPopup(projeto, membros) {
             </div>` : '';
           }).join('')}
         </div>
-        <input type="text" id="new-member-email" placeholder="Adicionar email" style="width:70%; margin-bottom:5px;">
+        <input type="text" id="new-member-email" placeholder="Adicionar email" style="width:70%;">
         <button type="button" id="add-member-btn">Adicionar</button>
 
         <label>Projeto Público:</label>
@@ -218,6 +242,7 @@ function openEditPopup(projeto, membros) {
     const formData = new FormData();
     formData.append('titulo', document.getElementById('edit-title').value.trim());
     formData.append('descricao', document.getElementById('edit-desc').value.trim());
+
     const todosMembros = [...membersList.children].map(c => c.dataset.email);
     formData.append('membros', todosMembros.join(','));
     formData.append('publico', document.getElementById('edit-publico').checked);
