@@ -140,7 +140,7 @@ main {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #fff;
+  background-color: #F5F5F5; /* antes #fff */
   border-radius: 0 0 15px 15px;
 }
 

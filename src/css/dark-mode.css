@@ -67,7 +67,7 @@ body.dark-mode .new-project-button:hover {
   background-color: #7127d8;
 }
 
-/* ------- DARK MODE: DROPDOWN MENU ------- */
+/* ------- DARK MODE: DROPDOWN MENU LOGIN ------- */
 body.dark-mode .dropdown-menu {
   background-color: #2a2a2a;
   box-shadow: 2px 2px 7px -3px #000000;
@@ -76,6 +76,13 @@ body.dark-mode .dropdown-menu {
 body.dark-mode .dropdown-menu a,
 body.dark-mode #profile-dropdown-menu ul li #user-name {
   color: #f0f0f0;
+}
+
+/* ------- DARK MODE: DROPDOWN MENU NOTIFICATIONS ------- */
+body.dark-mode .dropdown-notifications {
+  background: #222;
+  color: #f1f1f1;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
 }
 
 /* -----------DARK MODE: FOOTER---------- */
