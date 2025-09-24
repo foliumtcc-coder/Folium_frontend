@@ -50,23 +50,50 @@ function setupPopup(popupId, innerHTML) {
   return popup;
 }
 
+// --- Função para renderizar etapas individualmente ---
+function renderStep(etapa) {
+  const etapasContainer = document.querySelector('.etapas-container');
+  if (!etapasContainer) return;
+
+  const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
+  
+  const div = document.createElement('div');
+  div.className = 'step';
+  div.dataset.etapaId = etapa.id;
+  div.innerHTML = `
+    <div class="step-header">
+      <div class="step-header-text">
+        <span class="step-name">${etapa.nome_etapa}</span>
+        <span class="step-date">${stepDate}</span>
+      </div>
+    </div>
+    <div class="section-line"></div>
+    <div class="step-main-content">${etapa.descricao_etapa || ''}</div>
+    <div class="section-line"></div>
+    <div class="step-footer">
+      ${etapa.arquivos?.map(file => `
+        <div class="step-docs">
+          <span class="fa-solid fa-file file-icon"></span>
+          <span class="file-text">${file.nome}</span>
+        </div>
+      `).join('') || ''}
+    </div>
+  `;
+
+  etapasContainer.appendChild(div);
+}
+
 // --- Carrega projeto ---
 async function loadProject() {
   try {
     const projetoId = getProjetoIdFromURL();
-    if (!projetoId) {
-      alert('ID do projeto não encontrado na URL.');
-      return;
-    }
+    if (!projetoId) return alert('ID do projeto não encontrado na URL.');
 
     const { user } = await getUser();
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    if (!data || !data.projeto) {
-      alert('Projeto não encontrado.');
-      return;
-    }
+    if (!data || !data.projeto) return alert('Projeto não encontrado.');
 
     const projeto = data.projeto;
     const etapas = Array.isArray(data.etapas) ? data.etapas : [];
@@ -145,37 +172,7 @@ async function loadProject() {
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
-      etapas.sort((a,b)=> a.numero_etapa - b.numero_etapa).forEach(etapa => {
-        const div = document.createElement('div');
-        div.className = 'etapa-item';
-        div.dataset.etapaId = etapa.id;
-        div.innerHTML = `
-          <div class="etapa-header">
-            <span>${etapa.numero_etapa}. ${etapa.nome_etapa}</span>
-            <div class="etapa-options">
-              <button class="etapa-dropdown-btn">⋮</button>
-              <div class="etapa-dropdown-content hidden">
-                <a href="#" class="edit-etapa-btn">Editar</a>
-                <a href="#" class="delete-etapa-btn">Deletar</a>
-              </div>
-            </div>
-          </div>
-          <p>${etapa.descricao_etapa || ''}</p>
-        `;
-        etapasContainer.appendChild(div);
-
-        const dropdownBtn = div.querySelector('.etapa-dropdown-btn');
-        const dropdownContent = div.querySelector('.etapa-dropdown-content');
-        dropdownBtn.addEventListener('click', () => dropdownContent.classList.toggle('hidden'));
-
-        div.querySelector('.edit-etapa-btn').addEventListener('click', () => openEditStepPopup(etapa));
-        div.querySelector('.delete-etapa-btn').addEventListener('click', async () => {
-          if (confirm('Deseja realmente deletar esta etapa?')) {
-            await deleteEtapa(etapa.id);
-            loadProject();
-          }
-        });
-      });
+      etapas.sort((a,b)=> a.numero_etapa - b.numero_etapa).forEach(etapa => renderStep(etapa));
     }
 
   } catch (err) {
@@ -300,10 +297,10 @@ function openAddStepPopup() {
     }
 
     try {
-      await createEtapa(projetoId, nome, descricao, files);
+      const novaEtapa = await createEtapa(projetoId, nome, descricao, files);
+      renderStep(novaEtapa); // renderiza a etapa sem reload
       alert('Etapa criada com sucesso!');
       popup.classList.add('hidden');
-      loadProject();
     } catch(err) {
       console.error(err);
       alert('Erro ao criar etapa');
@@ -380,4 +377,3 @@ function openDeletePopup(projeto) {
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);
-

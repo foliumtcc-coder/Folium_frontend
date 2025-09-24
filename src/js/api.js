@@ -352,3 +352,32 @@ export async function deleteProject(projectId) {
 
   return await res.json();
 }
+
+export async function renderStep(etapa, arquivos = []) {
+  const stepDiv = document.createElement('div');
+  stepDiv.className = 'step';
+
+  const date = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
+
+  stepDiv.innerHTML = `
+    <div class="step-header">
+      <div class="step-header-text">
+        <span class="step-name">${etapa.nome_etapa}</span>
+        <span class="step-date">${date}</span>
+      </div>
+    </div>
+    <div class="section-line"></div>
+    <div class="step-main-content">${etapa.descricao_etapa || 'Sem descrição'}</div>
+    <div class="section-line"></div>
+    <div class="step-footer">
+      ${arquivos.map(f => `
+        <div class="step-docs">
+          <span class="fa-solid fa-file file-icon"></span>
+          <span class="file-text">${f.nome_arquivo}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  return stepDiv;
+}
