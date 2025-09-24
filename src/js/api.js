@@ -230,14 +230,14 @@ if (!res.ok) {
   return await res.json(); // { message: "...", user: {...} }
 }
 
-export async function createEtapa(projetoId, titulo, descricao, arquivos) {
+export async function createEtapa(projetoId, nome, descricao, arquivos) {
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
   const formData = new FormData();
   formData.append('projeto_id', projetoId);
-  formData.append('titulo', titulo);
-  formData.append('descricao', descricao);
+  formData.append('nome_etapa', nome);       // ✅ nome correto
+  formData.append('descricao_etapa', descricao); // ✅ nome correto
 
   if (arquivos && arquivos.length > 0) {
     for (const file of arquivos) {
@@ -247,9 +247,7 @@ export async function createEtapa(projetoId, titulo, descricao, arquivos) {
 
   const res = await fetch(`${BACKEND_URL}/api/auth/etapas/create`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    },
+    headers: { 'Authorization': `Bearer ${token}` },
     body: formData
   });
 
@@ -260,6 +258,7 @@ export async function createEtapa(projetoId, titulo, descricao, arquivos) {
 
   return await res.json();
 }
+
 
 // Buscar projetos de um usuário específico (perfil)
 // Retorna os projetos de um usuário usando getUserProfile
