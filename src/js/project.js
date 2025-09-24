@@ -195,22 +195,24 @@ async function loadProject() {
         const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
         // Para cada etapa, busca os arquivos e renderiza
-        for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
-          if (typeof getArquivosByEtapa === 'function') {
-            try {
-              const arquivosData = await getArquivosByEtapa(etapa.id);
-              etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
-            } catch (err) {
-              console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
-              etapa.arquivos = [];
-            }
-          } else {
-            etapa.arquivos = [];
-          }
+for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+  try {
+    // Faz a requisição para o endpoint do backend que retorna os arquivos da etapa
+    const res = await fetch(`/api/arquivos/${etapa.id}`);
+    const arquivosData = await res.json();
 
-          const el = renderStep(etapa);
-          etapasContainer.appendChild(el);
-        }
+    // Garante que sempre seja um array
+    etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+  } catch (err) {
+    console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
+    etapa.arquivos = [];
+  }
+
+  // Renderiza a etapa com os arquivos
+  const el = renderStep(etapa);
+  etapasContainer.appendChild(el);
+}
+
 
       } catch (err) {
         console.error('Erro ao carregar etapas:', err);
