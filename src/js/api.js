@@ -273,10 +273,17 @@ export async function getUserProjects(userId) {
 }
 
 // --- Listar etapas de um projeto ---
+
 export async function getEtapasByProjeto(projetoId) {
-  const res = await fetch(`${BACKEND_URL}/etapas/projeto/${projetoId}`);
-  if (!res.ok) throw new Error('Erro ao listar etapas');
-  return await res.json(); // Deve retornar array de etapas
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/etapas/projeto/${projetoId}`);
+    if (!res.ok) throw new Error('Erro ao listar etapas');
+    const data = await res.json();
+    return data; // deve retornar { etapas: [...] }
+  } catch(err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 // --- Editar etapa ---
