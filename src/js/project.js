@@ -129,7 +129,7 @@ function openEditPopup(projeto, membros) {
   const innerHTML = `
     <div class="popup-content">
       <button class="close-popup">&times;</button>
-      <form id="edit-project-form">
+      <form id="edit-project-form" enctype="multipart/form-data">
         <label>Título:</label>
         <input type="text" id="edit-title" value="${projeto.titulo}" required>
 
@@ -142,12 +142,29 @@ function openEditPopup(projeto, membros) {
         <label>Projeto Público:</label>
         <input type="checkbox" id="edit-publico" ${projeto.publico ? "checked" : ""}>
 
+        <label>Imagem do Projeto:</label>
+        <input type="file" id="edit-image" accept="image/*">
+        <img id="image-preview" src="${projeto.imagem || './src/img/icons/project-image2.png'}" style="max-width:100%; margin-top:10px; display:block;" />
+
         <button type="submit">Salvar Alterações</button>
       </form>
     </div>
   `;
   const popup = setupPopup('edit-project-popup', innerHTML);
 
+  // Preview da imagem
+  const imageInput = document.getElementById('edit-image');
+  const imagePreview = document.getElementById('image-preview');
+  imageInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => imagePreview.src = reader.result;
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Submit
   const form = document.getElementById('edit-project-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -156,6 +173,7 @@ function openEditPopup(projeto, membros) {
     formData.append('descricao', document.getElementById('edit-desc').value.trim());
     formData.append('membros', document.getElementById('edit-members').value.trim());
     formData.append('publico', document.getElementById('edit-publico').checked);
+    if (imageInput.files[0]) formData.append('imagem', imageInput.files[0]);
 
     try {
       await updateProject(projetoId, formData);
@@ -163,7 +181,7 @@ function openEditPopup(projeto, membros) {
       popup.classList.add('hidden');
       loadProject();
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao atualizar projeto:', err);
       alert('Erro ao atualizar projeto.');
     }
   });
