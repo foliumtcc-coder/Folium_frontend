@@ -362,5 +362,43 @@ function openDeletePopup(projeto) {
   });
 }
 
+// Pega o projetoId da URL, ex: project.html?id=123
+function getProjetoIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id'); // retorna '123' se a URL for project.html?id=123
+}
+
+document.getElementById('add-step-form').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const projetoId = getProjetoIdFromURL(); // ✅ pega o ID da URL
+  const nome = document.getElementById('step-name').value.trim();
+  const descricao = document.getElementById('step-desc').value.trim();
+  const filesInput = document.getElementById('step-files');
+  const arquivos = Array.from(filesInput.files); // converte FileList em Array
+
+  if (!projetoId) {
+    alert('ID do projeto não encontrado na URL!');
+    return;
+  }
+
+  if (!nome) {
+    alert('O nome da etapa é obrigatório!');
+    return;
+  }
+
+  try {
+    console.log('📦 Criando etapa:', { projetoId, nome, descricao, arquivos });
+    await createEtapa(projetoId, nome, descricao, arquivos);
+    alert('Etapa criada com sucesso!');
+    document.getElementById('add-step-popup').classList.add('hidden'); // fecha popup
+    loadProject(); // recarrega projeto
+  } catch (err) {
+    console.error('Erro ao criar etapa:', err);
+    alert('Erro ao criar etapa: ' + (err.message || err));
+  }
+});
+
+
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);
