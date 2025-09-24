@@ -232,8 +232,7 @@ if (!res.ok) {
 
 // DELETE projeto
 export async function deleteProject(projectId) {
-  const token = localStorage.getItem('token'); // ou de onde você armazena o token
-
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
   const response = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
