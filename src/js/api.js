@@ -354,3 +354,22 @@ export async function deleteArquivoEtapa(arquivoId) {
   if (!res.ok) throw new Error('Erro ao deletar arquivo da etapa');
   return await res.json();
 }
+
+export async function deleteProject(projectId) {
+  if (!projectId) throw new Error('ID do projeto não informado');
+
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não autenticado');
+
+  const res = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Erro ao deletar projeto');
+  }
+
+  return await res.json();
+}
