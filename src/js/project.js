@@ -73,14 +73,14 @@ function renderStep(etapa) {
     <div class="section-line"></div>
     <div class="step-main-content">${etapa.descricao_etapa || 'Espaço para texto.'}</div>
     <div class="section-line"></div>
-<div class="step-footer">
-  ${etapa.arquivos?.map(file => `
-    <div class="step-docs">
-      <span class="fa-solid fa-file file-icon"></span>
-      <a href="${file.caminho_arquivo}" target="_blank" class="file-text">${file.nome_arquivo || 'arquivo.doc'}</a>
+    <div class="step-footer">
+      ${etapa.arquivos?.map(file => `
+        <div class="step-docs">
+          <span class="fa-solid fa-file file-icon"></span>
+          <a href="${file.caminho_arquivo}" target="_blank" class="file-text">${file.nome_arquivo || 'arquivo.doc'}</a>
+        </div>
+      `).join('') || ''}
     </div>
-  `).join('') || ''}
-</div>
   `;
 
   // Botões de ação
@@ -189,14 +189,33 @@ async function loadProject() {
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
 
- const etapasData = await getEtapasByProjeto(projetoId);
-const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
+      try {
+        // Busca todas as etapas do projeto
+        const etapasData = await getEtapasByProjeto(projetoId);
+        const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
-for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
-  const el = renderStep(etapa);
-  etapasContainer.appendChild(el);
-}
+        // Para cada etapa, busca os arquivos e renderiza
+        for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+          if (typeof getArquivosByEtapa === 'function') {
+            try {
+              const arquivosData = await getArquivosByEtapa(etapa.id);
+              etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+            } catch (err) {
+              console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
+              etapa.arquivos = [];
+            }
+          } else {
+            etapa.arquivos = [];
+          }
 
+          const el = renderStep(etapa);
+          etapasContainer.appendChild(el);
+        }
+
+      } catch (err) {
+        console.error('Erro ao carregar etapas:', err);
+        etapasContainer.innerHTML = '<p>Não foi possível carregar as etapas.</p>';
+      }
     }
 
   } catch (err) {
@@ -204,6 +223,7 @@ for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
     alert('Erro ao carregar projeto.');
   }
 }
+
 // --- POPUPS ---
 
 // Editar projeto
