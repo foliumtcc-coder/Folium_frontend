@@ -98,7 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       projectFooter.classList.add('project-footer');
       projectFooter.innerHTML = `
         <h3>${p.titulo ?? 'Projeto sem título'}</h3>
-        <p>${p.descricao ?? ''}</p>
       `;
 
       projectLink.appendChild(projectImgDiv);
