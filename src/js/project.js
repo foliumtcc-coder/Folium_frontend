@@ -8,8 +8,11 @@ import {
   deleteEtapa 
 } from './api.js';
 
-const urlParams = new URLSearchParams(window.location.search);
-const projetoId = urlParams.get('id');
+// --- Função para pegar o projetoId da URL ---
+function getProjetoIdFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('id');
+}
 
 // --- Função genérica para criar e controlar popups ---
 function setupPopup(popupId, innerHTML) {
@@ -50,6 +53,12 @@ function setupPopup(popupId, innerHTML) {
 // --- Carrega projeto ---
 async function loadProject() {
   try {
+    const projetoId = getProjetoIdFromURL();
+    if (!projetoId) {
+      alert('ID do projeto não encontrado na URL.');
+      return;
+    }
+
     const { user } = await getUser();
     if (!user) return window.location.href = '/login.html';
 
@@ -247,7 +256,7 @@ function openEditPopup(projeto, membros) {
     formData.append('publico', document.getElementById('edit-publico').checked);
     if (imageInput.files[0]) formData.append('imagem', imageInput.files[0]);
     try {
-      await updateProject(projeto.id, formData);
+      await updateProject(getProjetoIdFromURL(), formData);
       alert('Projeto atualizado com sucesso!');
       popup.classList.add('hidden');
       loadProject();
@@ -279,6 +288,7 @@ function openAddStepPopup() {
   const form = document.getElementById('add-step-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
+    const projetoId = getProjetoIdFromURL();
     const nome = document.getElementById('step-name').value.trim();
     const descricao = document.getElementById('step-desc').value.trim();
     const filesInput = document.getElementById('step-files');
@@ -358,7 +368,7 @@ function openDeletePopup(projeto) {
       return;
     }
     try {
-      await deleteProject(projetoId);
+      await deleteProject(getProjetoIdFromURL());
       alert('Projeto deletado com sucesso!');
       window.location.href = '/home.html';
     } catch (err) {
@@ -370,3 +380,4 @@ function openDeletePopup(projeto) {
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);
+
