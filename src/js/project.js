@@ -73,14 +73,14 @@ function renderStep(etapa) {
     <div class="section-line"></div>
     <div class="step-main-content">${etapa.descricao_etapa || 'Espaço para texto.'}</div>
     <div class="section-line"></div>
-    <div class="step-footer">
-      ${etapa.arquivos?.map(file => `
-        <div class="step-docs">
-          <span class="fa-solid fa-file file-icon"></span>
-          <span class="file-text" style="cursor:pointer; color:blue; text-decoration:underline;" onclick="window.open('${file.caminho_arquivo}', '_blank')">${file.nome_arquivo || 'arquivo.doc'}</span>
-        </div>
-      `).join('') || ''}
+<div class="step-footer">
+  ${etapa.arquivos?.map(file => `
+    <div class="step-docs">
+      <span class="fa-solid fa-file file-icon"></span>
+      <a href="${file.caminho_arquivo}" target="_blank" class="file-text">${file.nome_arquivo || 'arquivo.doc'}</a>
     </div>
+  `).join('') || ''}
+</div>
   `;
 
   // Botões de ação
