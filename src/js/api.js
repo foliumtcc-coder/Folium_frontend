@@ -236,13 +236,11 @@ export async function createEtapa(projetoId, nome, descricao, arquivos) {
 
   const formData = new FormData();
   formData.append('projeto_id', projetoId);
-  formData.append('nome_etapa', nome);       // ✅ nome correto
-  formData.append('descricao_etapa', descricao); // ✅ nome correto
+  formData.append('nome', nome); // <-- isso precisa ser 'nome', não 'titulo'
+  formData.append('descricao', descricao);
 
   if (arquivos && arquivos.length > 0) {
-    for (const file of arquivos) {
-      formData.append('arquivos', file);
-    }
+    arquivos.forEach(file => formData.append('arquivos', file));
   }
 
   const res = await fetch(`${BACKEND_URL}/api/auth/etapas/create`, {
