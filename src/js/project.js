@@ -50,7 +50,7 @@ function setupPopup(popupId, innerHTML) {
   return popup;
 }
 
-// --- Renderiza uma etapa ---
+// --- Renderiza uma etapa individual ---
 function renderStep(etapa) {
   const div = document.createElement('div');
   div.className = 'step';
@@ -70,18 +70,19 @@ function renderStep(etapa) {
       </div>
     </div>
     <div class="section-line"></div>
-    <div class="step-main-content">${etapa.descricao_etapa || ''}</div>
+    <div class="step-main-content">${etapa.descricao_etapa || 'Espaço para texto.'}</div>
     <div class="section-line"></div>
     <div class="step-footer">
       ${etapa.arquivos?.map(file => `
         <div class="step-docs">
           <span class="fa-solid fa-file file-icon"></span>
-          <span class="file-text">${file.nome_arquivo || 'Arquivo'}</span>
+          <span class="file-text">${file.nome_arquivo || 'arquivo.doc'}</span>
         </div>
       `).join('') || ''}
     </div>
   `;
 
+  // Botões de ação
   div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
   div.querySelector('.delete-step-btn')?.addEventListener('click', async () => {
     if (confirm(`Deseja realmente deletar a etapa "${etapa.nome_etapa}"?`)) {
@@ -98,6 +99,7 @@ function renderStep(etapa) {
 
   return div;
 }
+
 
 // --- Carrega projeto completo ---
 async function loadProject() {
