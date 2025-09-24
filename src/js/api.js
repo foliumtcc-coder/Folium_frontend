@@ -230,27 +230,38 @@ if (!res.ok) {
   return await res.json(); // { message: "...", user: {...} }
 }
 
-// DELETE projeto
-export async function deleteProject(projectId) {
+// Função para deletar projeto
+async function deleteProject(projectId) {
+  if (!projectId) throw new Error('ID do projeto não informado');
+
+  // Pega token do usuário logado
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
-  const response = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projectId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      // Se a resposta não for OK, pega o texto para não tentar parsear JSON inválido
+      const text = await res.text();
+      throw new Error(text || `Erro ao deletar projeto. Status: ${res.status}`);
     }
-  });
 
-  const data = await response.json();
+    // Se OK, retorna o JSON
+    return await res.json(); // { message: "...", projeto: {...} }
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Erro ao deletar projeto');
+  } catch (err) {
+    console.error('Erro ao deletar projeto:', err);
+    throw err; // rethrow para ser tratado onde a função for chamada
   }
-
-  return data;
 }
+
 
 // Buscar projetos de um usuário específico (perfil)
 // Retorna os projetos de um usuário usando getUserProfile
