@@ -245,7 +245,7 @@ export async function createEtapa(projetoId, titulo, descricao, arquivos) {
     }
   }
 
-  const res = await fetch(`${BACKEND_URL}/api/etapas/create`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/etapas/create`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`
