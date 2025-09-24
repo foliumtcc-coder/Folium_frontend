@@ -50,40 +50,57 @@ function setupPopup(popupId, innerHTML) {
   return popup;
 }
 
-// --- Renderiza uma etapa individual ---
+// --- Função para renderizar etapas individualmente (retorna elemento) ---
 function renderStep(etapa) {
-  const etapasContainer = document.querySelector('.etapas-container');
-  if (!etapasContainer) return;
-
-  const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
-
   const div = document.createElement('div');
   div.className = 'step';
   div.dataset.etapaId = etapa.id;
+
+  const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
+
   div.innerHTML = `
     <div class="step-header">
       <div class="step-header-text">
         <span class="step-name">${etapa.nome_etapa || 'Sem nome'}</span>
         <span class="step-date">${stepDate}</span>
       </div>
+      <div class="step-actions">
+        <button class="edit-step-btn">✎</button>
+        <button class="delete-step-btn">🗑️</button>
+      </div>
     </div>
     <div class="section-line"></div>
     <div class="step-main-content">${etapa.descricao_etapa || ''}</div>
     <div class="section-line"></div>
     <div class="step-footer">
-      ${Array.isArray(etapa.arquivos) ? etapa.arquivos.map(file => `
+      ${etapa.arquivos?.map(file => `
         <div class="step-docs">
           <span class="fa-solid fa-file file-icon"></span>
           <span class="file-text">${file.nome || 'Arquivo'}</span>
         </div>
-      `).join('') : ''}
+      `).join('') || ''}
     </div>
   `;
 
-  etapasContainer.appendChild(div);
+  // Ações de editar/deletar etapa
+  div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
+  div.querySelector('.delete-step-btn')?.addEventListener('click', async () => {
+    if (confirm(`Deseja realmente deletar a etapa "${etapa.nome_etapa}"?`)) {
+      try {
+        await deleteEtapa(etapa.id);
+        div.remove();
+        alert('Etapa deletada com sucesso!');
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao deletar etapa.');
+      }
+    }
+  });
+
+  return div; // retorna o elemento sem mexer no DOM
 }
 
-// --- Carrega projeto e renderiza etapas já existentes ---
+// --- Carrega projeto e renderiza tudo ---
 async function loadProject() {
   try {
     const projetoId = getProjetoIdFromURL();
@@ -102,15 +119,58 @@ async function loadProject() {
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
 
-    // Atualiza header
+    // Header
     const headerText = document.querySelector('.main-header-text');
     if (headerText) headerText.textContent = projeto.titulo;
 
-    // Atualiza descrição
+    // Dropdown 3 pontos
+    const header = document.querySelector('.main-header');
+    if (header) {
+      let dropdownBtn = document.getElementById('project-dropdown-btn');
+      if (!dropdownBtn) {
+        dropdownBtn = document.createElement('div');
+        dropdownBtn.id = 'project-dropdown-btn';
+        dropdownBtn.className = 'dropdown';
+        dropdownBtn.innerHTML = `
+          <button class="dropbtn">⋮</button>
+          <div class="dropdown-content">
+            <a href="#" id="edit-project-option">Editar Projeto</a>
+            <a href="#" id="add-step-option">Adicionar Etapa</a>
+            <a href="#" id="delete-project-option">Deletar Projeto</a>
+          </div>
+        `;
+        header.appendChild(dropdownBtn);
+      }
+
+      const editOpt = document.getElementById('edit-project-option');
+      const addStepOpt = document.getElementById('add-step-option');
+      const deleteOpt = document.getElementById('delete-project-option');
+
+      if (editOpt) {
+        editOpt.style.display = isOwner ? 'block' : 'none';
+        if (isOwner) editOpt.onclick = () => openEditPopup(projeto, membros);
+      }
+      if (addStepOpt) {
+        addStepOpt.style.display = (isOwner || isMember) ? 'block' : 'none';
+        if (isOwner || isMember) addStepOpt.onclick = () => openAddStepPopup();
+      }
+      if (deleteOpt) {
+        deleteOpt.style.display = isOwner ? 'block' : 'none';
+        if (isOwner) deleteOpt.onclick = () => openDeletePopup(projeto);
+      }
+    }
+
+    // Datas e descrição
+    const menuDate = document.querySelector('.menu-header-date');
+    if (menuDate) menuDate.innerHTML = `
+      <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
+      <span>Atualizado por último em: ${projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"}</span>
+    `;
+
     const menuDesc = document.querySelector('.menu-desc');
     if (menuDesc) menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
 
-    // Atualiza membros
+    // Membros
     const sideMenu = document.querySelector('.menu-header-people');
     if (sideMenu) {
       sideMenu.innerHTML = `<h2>Membros</h2>`;
@@ -125,13 +185,16 @@ async function loadProject() {
       });
     }
 
-    // Renderiza todas as etapas já existentes, ordenadas pelo número
+    // Renderiza etapas ordenadas
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
       etapas
         .sort((a, b) => a.numero_etapa - b.numero_etapa)
-        .forEach(renderStep); // renderStep já faz o append
+        .forEach(etapa => {
+          const el = renderStep(etapa);
+          etapasContainer.appendChild(el);
+        });
     }
 
   } catch (err) {
@@ -140,8 +203,7 @@ async function loadProject() {
   }
 }
 
-
-// --- Popup Editar Projeto ---
+// --- Popups (editar projeto, adicionar/editar etapa, deletar projeto) ---
 function openEditPopup(projeto, membros) {
   const innerHTML = `
     <div class="popup-content">
@@ -224,7 +286,7 @@ function openEditPopup(projeto, membros) {
   });
 }
 
-// --- Popup Adicionar Etapa ---
+// --- Adicionar Etapa ---
 function openAddStepPopup() {
   const innerHTML = `
     <div class="popup-content">
@@ -258,7 +320,8 @@ function openAddStepPopup() {
 
     try {
       const novaEtapa = await createEtapa(projetoId, nome, descricao, files);
-      renderStep(novaEtapa);
+      const el = renderStep(novaEtapa);
+      document.querySelector('.etapas-container')?.appendChild(el);
       alert('Etapa criada com sucesso!');
       popup.classList.add('hidden');
     } catch(err) {
@@ -268,7 +331,7 @@ function openAddStepPopup() {
   });
 }
 
-// --- Popup Editar Etapa ---
+// --- Editar Etapa ---
 function openEditStepPopup(etapa) {
   const innerHTML = `
     <div class="popup-content">
@@ -301,7 +364,7 @@ function openEditStepPopup(etapa) {
   });
 }
 
-// --- Popup Deletar Projeto ---
+// --- Deletar Projeto ---
 function openDeletePopup(projeto) {
   const innerHTML = `
     <div class="popup-content">
