@@ -19,26 +19,26 @@ function setupPopup(popupId, innerHTML) {
   const content = popup.querySelector('.popup-content');
   if (!content) return;
 
-  // Fecha ao clicar no botão de fechar
-  const closeBtn = popup.querySelector('.close-popup');
-  if (closeBtn) closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-
-  // Fecha ao clicar fora do conteúdo
-// Fecha ao clicar fora do conteúdo
-const onClickOutside = e => {
-  if (!content.contains(e.target)) {
+  const closePopup = () => {
     popup.classList.add('hidden');
     document.removeEventListener('mousedown', onClickOutside);
-  }
-};
+  };
 
-// Adiciona listener após garantir que o popup está visível
-setTimeout(() => {
-  if (!popup.classList.contains('hidden')) {
-    document.addEventListener('mousedown', onClickOutside);
-  }
-}, 0);
+  // Fecha ao clicar no botão de fechar
+  const closeBtn = popup.querySelector('.close-popup');
+  if (closeBtn) closeBtn.addEventListener('click', closePopup);
 
+  // Fecha ao clicar fora do conteúdo
+  const onClickOutside = e => {
+    if (!content.contains(e.target)) closePopup();
+  };
+
+  // Adiciona listener de clique fora
+  setTimeout(() => {
+    if (!popup.classList.contains('hidden')) {
+      document.addEventListener('mousedown', onClickOutside);
+    }
+  }, 0);
 
   popup.classList.remove('hidden');
   return popup;
@@ -161,28 +161,31 @@ function openEditPopup(projeto, membros) {
     }
   });
 
-  // Submit
+  // Submit do formulário
   const form = document.getElementById('edit-project-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const formData = new FormData();
     formData.append('titulo', document.getElementById('edit-title').value.trim());
     formData.append('descricao', document.getElementById('edit-desc').value.trim());
+
+    // Pega membros do input e do projeto original
     const inputMembros = document.getElementById('edit-members').value
-  .split(',')
-  .map(e => e.trim())
-  .filter(Boolean); // remove strings vazias
+      .split(',')
+      .map(e => e.trim())
+      .filter(Boolean);
 
-const membrosExistentes = membros.map(m => m.usuarios?.email).filter(Boolean);
+    const membrosExistentes = membros.map(m => m.usuarios?.email).filter(Boolean);
 
-const todosMembros = Array.from(new Set([...membrosExistentes, ...inputMembros])); // remove duplicados
+    // Junta e remove duplicados
+    const todosMembros = Array.from(new Set([...membrosExistentes, ...inputMembros]));
 
-formData.append('membros', todosMembros.join(','));
+    formData.append('membros', todosMembros.join(','));
     formData.append('publico', document.getElementById('edit-publico').checked);
     if (imageInput.files[0]) formData.append('imagem', imageInput.files[0]);
 
     try {
-      await updateProject(projetoId, formData);
+      await updateProject(projeto.id, formData);
       alert('Projeto atualizado com sucesso!');
       popup.classList.add('hidden');
       loadProject();
