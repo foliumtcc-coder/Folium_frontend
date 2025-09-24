@@ -30,16 +30,13 @@ function setupPopup(popupId, innerHTML) {
     document.removeEventListener('mousedown', onClickOutside);
   };
 
-  // Fecha ao clicar no botão de fechar
   const closeBtn = popup.querySelector('.close-popup');
   if (closeBtn) closeBtn.addEventListener('click', closePopup);
 
-  // Fecha ao clicar fora do conteúdo
   const onClickOutside = e => {
     if (!content.contains(e.target)) closePopup();
   };
 
-  // Adiciona listener de clique fora
   setTimeout(() => {
     if (!popup.classList.contains('hidden')) {
       document.addEventListener('mousedown', onClickOutside);
@@ -71,92 +68,106 @@ async function loadProject() {
 
     // Header
     const header = document.querySelector('.main-header');
-    const headerText = header.querySelector('.main-header-text');
-    headerText.textContent = projeto.titulo;
+    const headerText = header?.querySelector('.main-header-text');
+    if (headerText) headerText.textContent = projeto.titulo;
 
     // Dropdown 3 pontos
-    let dropdownBtn = document.getElementById('project-dropdown-btn');
-    if (!dropdownBtn) {
-      dropdownBtn = document.createElement('div');
-      dropdownBtn.id = 'project-dropdown-btn';
-      dropdownBtn.className = 'dropdown';
-      dropdownBtn.innerHTML = `
-        <button class="dropbtn">⋮</button>
-        <div class="dropdown-content">
-          <a href="#" id="edit-project-option">Editar Projeto</a>
-          <a href="#" id="add-step-option">Adicionar Etapa</a>
-          <a href="#" id="delete-project-option">Deletar Projeto</a>
-        </div>
-      `;
-      header.appendChild(dropdownBtn);
+    if (header) {
+      let dropdownBtn = document.getElementById('project-dropdown-btn');
+      if (!dropdownBtn) {
+        dropdownBtn = document.createElement('div');
+        dropdownBtn.id = 'project-dropdown-btn';
+        dropdownBtn.className = 'dropdown';
+        dropdownBtn.innerHTML = `
+          <button class="dropbtn">⋮</button>
+          <div class="dropdown-content">
+            <a href="#" id="edit-project-option">Editar Projeto</a>
+            <a href="#" id="add-step-option">Adicionar Etapa</a>
+            <a href="#" id="delete-project-option">Deletar Projeto</a>
+          </div>
+        `;
+        header.appendChild(dropdownBtn);
+      }
+
+      const editOpt = document.getElementById('edit-project-option');
+      const addStepOpt = document.getElementById('add-step-option');
+      const deleteOpt = document.getElementById('delete-project-option');
+
+      if (editOpt) {
+        editOpt.style.display = isOwner ? 'block' : 'none';
+        if (isOwner) editOpt.onclick = () => openEditPopup(projeto, membros);
+      }
+      if (addStepOpt) {
+        addStepOpt.style.display = (isOwner || isMember) ? 'block' : 'none';
+        if (isOwner || isMember) addStepOpt.onclick = () => openAddStepPopup();
+      }
+      if (deleteOpt) {
+        deleteOpt.style.display = isOwner ? 'block' : 'none';
+        if (isOwner) deleteOpt.onclick = () => openDeletePopup(projeto);
+      }
     }
 
-    document.getElementById('edit-project-option').style.display = isOwner ? 'block' : 'none';
-    document.getElementById('add-step-option').style.display = (isOwner || isMember) ? 'block' : 'none';
-    document.getElementById('delete-project-option').style.display = isOwner ? 'block' : 'none';
-
-    if (isOwner) document.getElementById('edit-project-option').onclick = () => openEditPopup(projeto, membros);
-    if (isOwner || isMember) document.getElementById('add-step-option').onclick = () => openAddStepPopup();
-    if (isOwner) document.getElementById('delete-project-option').onclick = () => openDeletePopup(projeto);
-
     // Datas e descrição
-    document.querySelector('.menu-header-date').innerHTML = `
+    const menuDate = document.querySelector('.menu-header-date');
+    if (menuDate) menuDate.innerHTML = `
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"}</span>
     `;
+
     const menuDesc = document.querySelector('.menu-desc');
-    menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
+    if (menuDesc) menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
 
     // Membros
     const sideMenu = document.querySelector('.menu-header-people');
-    sideMenu.innerHTML = `<h2>Membros</h2>`;
-    membros.forEach(m => {
-      const userId = m.usuario_id || m.usuarios?.id;
-      const userName = m.usuarios?.name1 || "Sem nome";
-      if (!userId) return;
-      const a = document.createElement('a');
-      a.href = `/profile-page.html?id=${userId}`;
-      a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
-      sideMenu.appendChild(a);
-    });
+    if (sideMenu) {
+      sideMenu.innerHTML = `<h2>Membros</h2>`;
+      membros.forEach(m => {
+        const userId = m.usuario_id || m.usuarios?.id;
+        const userName = m.usuarios?.name1 || "Sem nome";
+        if (!userId) return;
+        const a = document.createElement('a');
+        a.href = `/profile-page.html?id=${userId}`;
+        a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
+        sideMenu.appendChild(a);
+      });
+    }
 
     // Etapas
     const etapasContainer = document.querySelector('.etapas-container');
-    etapasContainer.innerHTML = '';
-    etapas.sort((a,b)=> a.numero_etapa - b.numero_etapa).forEach(etapa => {
-      const div = document.createElement('div');
-      div.className = 'etapa-item';
-      div.dataset.etapaId = etapa.id;
-      div.innerHTML = `
-        <div class="etapa-header">
-          <span>${etapa.numero_etapa}. ${etapa.nome_etapa}</span>
-          <div class="etapa-options">
-            <button class="etapa-dropdown-btn">⋮</button>
-            <div class="etapa-dropdown-content hidden">
-              <a href="#" class="edit-etapa-btn">Editar</a>
-              <a href="#" class="delete-etapa-btn">Deletar</a>
+    if (etapasContainer) {
+      etapasContainer.innerHTML = '';
+      etapas.sort((a,b)=> a.numero_etapa - b.numero_etapa).forEach(etapa => {
+        const div = document.createElement('div');
+        div.className = 'etapa-item';
+        div.dataset.etapaId = etapa.id;
+        div.innerHTML = `
+          <div class="etapa-header">
+            <span>${etapa.numero_etapa}. ${etapa.nome_etapa}</span>
+            <div class="etapa-options">
+              <button class="etapa-dropdown-btn">⋮</button>
+              <div class="etapa-dropdown-content hidden">
+                <a href="#" class="edit-etapa-btn">Editar</a>
+                <a href="#" class="delete-etapa-btn">Deletar</a>
+              </div>
             </div>
           </div>
-        </div>
-        <p>${etapa.descricao_etapa || ''}</p>
-      `;
-      etapasContainer.appendChild(div);
+          <p>${etapa.descricao_etapa || ''}</p>
+        `;
+        etapasContainer.appendChild(div);
 
-      const dropdownBtn = div.querySelector('.etapa-dropdown-btn');
-      const dropdownContent = div.querySelector('.etapa-dropdown-content');
-      dropdownBtn.addEventListener('click', () => dropdownContent.classList.toggle('hidden'));
+        const dropdownBtn = div.querySelector('.etapa-dropdown-btn');
+        const dropdownContent = div.querySelector('.etapa-dropdown-content');
+        dropdownBtn.addEventListener('click', () => dropdownContent.classList.toggle('hidden'));
 
-      // Editar etapa
-      div.querySelector('.edit-etapa-btn').addEventListener('click', () => openEditStepPopup(etapa));
-
-      // Deletar etapa
-      div.querySelector('.delete-etapa-btn').addEventListener('click', async () => {
-        if (confirm('Deseja realmente deletar esta etapa?')) {
-          await deleteEtapa(etapa.id);
-          loadProject();
-        }
+        div.querySelector('.edit-etapa-btn').addEventListener('click', () => openEditStepPopup(etapa));
+        div.querySelector('.delete-etapa-btn').addEventListener('click', async () => {
+          if (confirm('Deseja realmente deletar esta etapa?')) {
+            await deleteEtapa(etapa.id);
+            loadProject();
+          }
+        });
       });
-    });
+    }
 
   } catch (err) {
     console.error('Erro ao carregar projeto:', err);
@@ -172,29 +183,19 @@ function openEditPopup(projeto, membros) {
       <form id="edit-project-form" enctype="multipart/form-data">
         <label>Título:</label>
         <input type="text" id="edit-title" value="${projeto.titulo}" required>
-
         <label>Descrição:</label>
         <textarea id="edit-desc" required>${projeto.descricao || ""}</textarea>
-
         <label>Membros:</label>
         <div id="members-list" style="margin-bottom:10px;">
-          ${membros.map(m => {
-            const email = m.usuarios?.email || "";
-            return email ? `<div class="member-item" data-email="${email}">
-              ${email} <button type="button" class="remove-member-btn">&times;</button>
-            </div>` : '';
-          }).join('')}
+          ${membros.map(m => m.usuarios?.email ? `<div class="member-item" data-email="${m.usuarios.email}">${m.usuarios.email} <button type="button" class="remove-member-btn">&times;</button></div>` : '').join('')}
         </div>
         <input type="text" id="new-member-email" placeholder="Adicionar email" style="width:70%;">
         <button type="button" id="add-member-btn">Adicionar</button>
-
         <label>Projeto Público:</label>
         <input type="checkbox" id="edit-publico" ${projeto.publico ? "checked" : ""}>
-
         <label>Imagem do Projeto:</label>
         <input type="file" id="edit-image" accept="image/*">
         <img id="image-preview" src="${projeto.imagem || './src/img/icons/project-image2.png'}" style="max-width:100%; margin-top:10px; display:block;" />
-
         <button type="submit">Salvar Alterações</button>
       </form>
     </div>
@@ -242,12 +243,9 @@ function openEditPopup(projeto, membros) {
     const formData = new FormData();
     formData.append('titulo', document.getElementById('edit-title').value.trim());
     formData.append('descricao', document.getElementById('edit-desc').value.trim());
-
-    const todosMembros = [...membersList.children].map(c => c.dataset.email);
-    formData.append('membros', todosMembros.join(','));
+    formData.append('membros', [...membersList.children].map(c=>c.dataset.email).join(','));
     formData.append('publico', document.getElementById('edit-publico').checked);
     if (imageInput.files[0]) formData.append('imagem', imageInput.files[0]);
-
     try {
       await updateProject(projeto.id, formData);
       alert('Projeto atualizado com sucesso!');
@@ -265,31 +263,37 @@ function openAddStepPopup() {
   const innerHTML = `
     <div class="popup-content">
       <button class="close-popup">&times;</button>
-      <form id="add-step-form">
+      <form id="add-step-form" enctype="multipart/form-data">
         <label>Nome da Etapa:</label>
         <input type="text" id="step-name" required>
         <label>Descrição:</label>
         <textarea id="step-desc"></textarea>
+        <label>Arquivos (imagens, docs, apresentações):</label>
+        <input type="file" id="step-files" accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple>
         <button type="submit">Adicionar Etapa</button>
       </form>
     </div>
   `;
   const popup = setupPopup('add-step-popup', innerHTML);
 
-  document.getElementById('add-step-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    const nome = document.getElementById('step-name').value.trim();
-    const descricao = document.getElementById('step-desc').value.trim();
-    try {
-      await createEtapa(projetoId, nome, descricao);
-      alert('Etapa criada com sucesso!');
-      popup.classList.add('hidden');
-      loadProject();
-    } catch(err) {
-      console.error(err);
-      alert('Erro ao criar etapa');
-    }
-  });
+document.getElementById('add-step-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nome = document.getElementById('step-name').value.trim();
+  const descricao = document.getElementById('step-desc').value.trim();
+  const filesInput = document.getElementById('step-files');
+  const files = Array.from(filesInput.files); // <-- isso corrige o erro
+
+  try {
+    await createEtapa(projetoId, nome, descricao, files);
+    alert('Etapa criada com sucesso!');
+    popup.classList.add('hidden');
+    loadProject();
+  } catch(err) {
+    console.error(err);
+    alert('Erro ao criar etapa');
+  }
+});
+
 }
 
 // --- Popup Editar Etapa ---
@@ -357,6 +361,44 @@ function openDeletePopup(projeto) {
     }
   });
 }
+
+// Pega o projetoId da URL, ex: project.html?id=123
+function getProjetoIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id'); // retorna '123' se a URL for project.html?id=123
+}
+
+document.getElementById('add-step-form').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const projetoId = getProjetoIdFromURL(); // ✅ pega o ID da URL
+  const nome = document.getElementById('step-name').value.trim();
+  const descricao = document.getElementById('step-desc').value.trim();
+  const filesInput = document.getElementById('step-files');
+  const arquivos = Array.from(filesInput.files); // converte FileList em Array
+
+  if (!projetoId) {
+    alert('ID do projeto não encontrado na URL!');
+    return;
+  }
+
+  if (!nome) {
+    alert('O nome da etapa é obrigatório!');
+    return;
+  }
+
+  try {
+    console.log('📦 Criando etapa:', { projetoId, nome, descricao, arquivos });
+    await createEtapa(projetoId, nome, descricao, arquivos);
+    alert('Etapa criada com sucesso!');
+    document.getElementById('add-step-popup').classList.add('hidden'); // fecha popup
+    loadProject(); // recarrega projeto
+  } catch (err) {
+    console.error('Erro ao criar etapa:', err);
+    alert('Erro ao criar etapa: ' + (err.message || err));
+  }
+});
+
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);

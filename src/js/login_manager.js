@@ -48,7 +48,7 @@ const LoginManager = (() => {
 
     profileMenu.innerHTML = `
       <ul>
-        <li><a href="register-page.html">Registrar</a></li>
+        <li><a href="register.html">Registrar</a></li>
         <li><a href="index.html">Entrar</a></li>
       </ul>
     `;
