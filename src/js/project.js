@@ -76,7 +76,7 @@ function renderStep(etapa) {
       ${etapa.arquivos?.map(file => `
         <div class="step-docs">
           <span class="fa-solid fa-file file-icon"></span>
-          <span class="file-text">${file.nome_arquivo || 'arquivo.doc'}</span>
+          <a href="${file.caminho_arquivo}" download class="file-text">${file.nome_arquivo || 'arquivo.doc'}</a>
         </div>
       `).join('') || ''}
     </div>
@@ -100,7 +100,6 @@ function renderStep(etapa) {
   return div;
 }
 
-
 // --- Carrega projeto completo ---
 async function loadProject() {
   try {
@@ -114,7 +113,7 @@ async function loadProject() {
     if (!data || !data.projeto) return alert('Projeto não encontrado.');
 
     const projeto = data.projeto;
-    const etapas = Array.isArray(data.etapas) ? data.etapas : [];
+    let etapas = Array.isArray(data.etapas) ? data.etapas : [];
     const membros = Array.isArray(data.membros) ? data.membros : [];
 
     const isOwner = Number(user.id) === Number(projeto.criado_por);
@@ -203,7 +202,6 @@ async function loadProject() {
     alert('Erro ao carregar projeto.');
   }
 }
-
 // --- POPUPS ---
 
 // Editar projeto
