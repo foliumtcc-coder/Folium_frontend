@@ -236,8 +236,8 @@ export async function createEtapa(projetoId, nome, descricao, arquivos) {
 
   const formData = new FormData();
   formData.append('projeto_id', projetoId);
-  formData.append('nome', nome); // <-- isso precisa ser 'nome', não 'titulo'
-  formData.append('descricao', descricao);
+  formData.append('nome_etapa', nome); // <-- isso precisa ser 'nome', não 'titulo'
+  formData.append('descricao_etapa', descricao);
 
   if (arquivos && arquivos.length > 0) {
     arquivos.forEach(file => formData.append('arquivos', file));
