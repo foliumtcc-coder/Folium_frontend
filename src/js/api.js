@@ -274,6 +274,7 @@ export async function getUserProjects(userId) {
   }
 }
 
+// --- Criar etapa ---
 export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
   const { user } = await getUser();
   if (!user) throw new Error('Usuário não logado');
@@ -283,11 +284,11 @@ export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
   formData.append('nome_etapa', nome);
   formData.append('descricao_etapa', descricao);
 
-  arquivos.forEach((arquivo, idx) => {
-    formData.append(`arquivos[${idx}]`, arquivo);
+  arquivos.forEach(arquivo => {
+    formData.append('arquivos', arquivo); // <-- todos arquivos usam mesmo nome
   });
 
-  const res = await fetch(`${BACKEND_URL}/etapas`, {
+  const res = await fetch(`${BACKEND_URL}/etapas/create`, { // <-- endpoint correto
     method: 'POST',
     body: formData,
   });
@@ -298,7 +299,7 @@ export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
 
 // --- Listar etapas de um projeto ---
 export async function getEtapasByProjeto(projetoId) {
-  const res = await fetch(`${BACKEND_URL}/etapas?projeto_id=${projetoId}`);
+  const res = await fetch(`${BACKEND_URL}/etapas/projeto/${projetoId}`);
   if (!res.ok) throw new Error('Erro ao listar etapas');
   return await res.json(); // Deve retornar array de etapas
 }
@@ -309,11 +310,11 @@ export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
   formData.append('nome_etapa', nome);
   formData.append('descricao_etapa', descricao);
 
-  arquivos.forEach((arquivo, idx) => {
-    formData.append(`arquivos[${idx}]`, arquivo);
+  arquivos.forEach(arquivo => {
+    formData.append('arquivos', arquivo); // <-- corrigido
   });
 
-  const res = await fetch(`${BACKEND_URL}/etapas/${etapaId}`, {
+  const res = await fetch(`${BACKEND_URL}/etapas/update`, {
     method: 'PUT',
     body: formData,
   });
@@ -324,7 +325,7 @@ export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
 
 // --- Deletar etapa ---
 export async function deleteEtapa(etapaId) {
-  const res = await fetch(`${BACKEND_URL}/etapas/${etapaId}`, {
+  const res = await fetch(`${BACKEND_URL}/etapas/delete/${etapaId}`, {
     method: 'DELETE',
   });
 
@@ -335,8 +336,8 @@ export async function deleteEtapa(etapaId) {
 // --- Adicionar arquivos à etapa existente ---
 export async function addArquivosEtapa(etapaId, arquivos = []) {
   const formData = new FormData();
-  arquivos.forEach((arquivo, idx) => {
-    formData.append(`arquivos[${idx}]`, arquivo);
+  arquivos.forEach(arquivo => {
+    formData.append('arquivos', arquivo); // <-- corrigido
   });
 
   const res = await fetch(`${BACKEND_URL}/etapas/${etapaId}/arquivos`, {
