@@ -11,21 +11,13 @@ function setupPopup(popupId, innerHTML) {
     popup = document.createElement('div');
     popup.id = popupId;
     popup.className = 'popup hidden';
-    popup.style.position = 'fixed';
-    popup.style.top = '0';
-    popup.style.left = '0';
-    popup.style.width = '100%';
-    popup.style.height = '100%';
-    popup.style.background = 'rgba(0,0,0,0.5)';
-    popup.style.display = 'flex';
-    popup.style.justifyContent = 'center';
-    popup.style.alignItems = 'center';
     document.body.appendChild(popup);
   }
 
   popup.innerHTML = innerHTML;
 
   const content = popup.querySelector('.popup-content');
+  if (!content) return;
 
   // Fecha ao clicar no botão de fechar
   const closeBtn = popup.querySelector('.close-popup');
@@ -39,7 +31,7 @@ function setupPopup(popupId, innerHTML) {
     }
   };
 
-  // Delay para não disparar imediatamente
+  // Só adiciona listener quando o popup estiver visível
   setTimeout(() => {
     document.addEventListener('mousedown', onClickOutside);
   }, 0);
