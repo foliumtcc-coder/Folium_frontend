@@ -253,9 +253,6 @@ export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
   return await res.json();
 }
 
-
-
-
 // Buscar projetos de um usuário específico (perfil)
 // Retorna os projetos de um usuário usando getUserProfile
 export async function getUserProjects(userId) {
@@ -268,29 +265,6 @@ export async function getUserProjects(userId) {
     console.error('Erro ao buscar projetos do usuário:', err);
     throw err;
   }
-}
-
-// --- Criar etapa ---
-export async function createEtapa(projetoId, nome, descricao, arquivos = []) {
-  const { user } = await getUser();
-  if (!user) throw new Error('Usuário não logado');
-
-  const formData = new FormData();
-  formData.append('projeto_id', projetoId);
-  formData.append('nome_etapa', nome);
-  formData.append('descricao_etapa', descricao);
-
-  arquivos.forEach(arquivo => {
-    formData.append('arquivos', arquivo); // <-- todos arquivos usam mesmo nome
-  });
-
-  const res = await fetch(`${BACKEND_URL}/etapas/create`, { // <-- endpoint correto
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!res.ok) throw new Error('Erro ao criar etapa');
-  return await res.json();
 }
 
 // --- Listar etapas de um projeto ---
