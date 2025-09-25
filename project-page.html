@@ -72,13 +72,6 @@
     </div>
   </header>
 
-  <section class="dropdown-menu-section">
-    <div class="dropdown-menu hidden" id="notification-dropdown-menu"></div>
-    <div class="dropdown-menu hidden" id="profile-dropdown-menu">
-      <ul id="profile-dropdown-list"></ul>
-    </div>
-  </section>
-
   <main>
     <div class="main-content">
       <!-- ESQUERDA -->
@@ -86,12 +79,12 @@
         <div class="main-header">
           <div class="main-header-content">
             <span class="main-header-text">Carregando...</span>
-            <button><span class="fa-solid fa-ellipsis-vertical"></span></button>
+            <!-- Botão dropdown do projeto será adicionado via JS -->
           </div>
         </div>
 
-        <section class="project-steps" id="project-steps">
-          <!-- Etapas preenchidas dinamicamente -->
+        <section class="etapas-container">
+          <!-- Etapas preenchidas dinamicamente via renderStep() -->
         </section>
       </div>
 
@@ -99,21 +92,21 @@
       <div class="main-right">
         <div class="side-menu">
           <div class="side-menu-content">
-            <div class="side-menu-header">
-              <div class="menu-header-people" id="project-members">
+            <div class="menu-header">
+              <div class="menu-header-people">
                 <!-- Membros do projeto preenchidos pelo JS -->
               </div>
-              <div class="menu-header-date" id="project-dates">
+              <div class="menu-header-date">
                 <!-- Datas do projeto preenchidas pelo JS -->
               </div>
             </div>
 
-            <div class="menu-desc" id="project-description">   
+            <div class="menu-desc">   
               <!-- Descrição do projeto preenchida pelo JS -->
             </div>
 
             <div class="menu-footer">
-              <div class="menu-media-display" id="project-media">
+              <div class="menu-media-display">
                 <!-- Imagens do projeto preenchidas pelo JS -->
               </div>
             </div>
@@ -128,6 +121,7 @@
     <a href="https://linktr.ee/folium_ejs" target="_blank">Siga-nos nas nossas redes sociais</a>
   </footer>
 
+  <!-- Scripts -->
   <script src="./js/script.js"></script>
   <script src="./js/dark-mode.js"></script>
   <script type="module" src="./src/js/login_manager.js"></script>

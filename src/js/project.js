@@ -5,16 +5,17 @@ import {
   deleteProject, 
   createEtapa, 
   updateEtapa, 
-  deleteEtapa 
+  deleteEtapa,
+  getEtapasByProjeto
 } from './api.js';
 
-// --- Função para pegar o projetoId da URL ---
+// --- Pega o projetoId da URL ---
 function getProjetoIdFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('id');
 }
 
-// --- Função genérica para criar e controlar popups ---
+// --- Setup genérico de popup ---
 function setupPopup(popupId, innerHTML) {
   let popup = document.getElementById(popupId);
   if (!popup) {
@@ -50,37 +51,84 @@ function setupPopup(popupId, innerHTML) {
   return popup;
 }
 
-// --- Carrega projeto ---
+// --- Renderiza uma etapa individual ---
+function renderStep(etapa) {
+  const div = document.createElement('div');
+  div.className = 'step';
+  div.dataset.etapaId = etapa.id;
+
+  const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
+
+  div.innerHTML = `
+    <div class="step-header">
+      <div class="step-header-text">
+        <span class="step-name">${etapa.nome_etapa || 'Sem nome'}</span>
+        <span class="step-date">${stepDate}</span>
+      </div>
+      <div class="step-actions">
+        <button class="edit-step-btn">✎</button>
+        <button class="delete-step-btn">🗑️</button>
+      </div>
+    </div>
+    <div class="section-line"></div>
+    <div class="step-main-content">${etapa.descricao_etapa || 'Espaço para texto.'}</div>
+    <div class="section-line"></div>
+<div class="step-footer">
+  ${etapa.arquivos?.map(file => {
+    const url = file.caminho_arquivo || '#';
+    const nome = file.nome_arquivo || 'arquivo.doc';
+    return `
+      <div class="step-docs">
+        <span class="fa-solid fa-file file-icon"></span>
+        <a href="${url}" target="_blank" class="file-text">${nome}</a>
+      </div>
+    `;
+  }).join('') || ''}
+</div>
+
+  `;
+
+  // Botões de ação
+  div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
+  div.querySelector('.delete-step-btn')?.addEventListener('click', async () => {
+    if (confirm(`Deseja realmente deletar a etapa "${etapa.nome_etapa}"?`)) {
+      try {
+        await deleteEtapa(etapa.id);
+        div.remove();
+        alert('Etapa deletada com sucesso!');
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao deletar etapa.');
+      }
+    }
+  });
+
+  return div;
+}
+
+// --- Carrega projeto completo ---
 async function loadProject() {
   try {
     const projetoId = getProjetoIdFromURL();
-    if (!projetoId) {
-      alert('ID do projeto não encontrado na URL.');
-      return;
-    }
+    if (!projetoId) return alert('ID do projeto não encontrado na URL.');
 
     const { user } = await getUser();
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    if (!data || !data.projeto) {
-      alert('Projeto não encontrado.');
-      return;
-    }
+    if (!data || !data.projeto) return alert('Projeto não encontrado.');
 
     const projeto = data.projeto;
-    const etapas = Array.isArray(data.etapas) ? data.etapas : [];
     const membros = Array.isArray(data.membros) ? data.membros : [];
-
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
 
     // Header
-    const header = document.querySelector('.main-header');
-    const headerText = header?.querySelector('.main-header-text');
+    const headerText = document.querySelector('.main-header-text');
     if (headerText) headerText.textContent = projeto.titulo;
 
     // Dropdown 3 pontos
+    const header = document.querySelector('.main-header');
     if (header) {
       let dropdownBtn = document.getElementById('project-dropdown-btn');
       if (!dropdownBtn) {
@@ -141,41 +189,40 @@ async function loadProject() {
       });
     }
 
-    // Etapas
+    // --- Carrega e renderiza etapas com arquivos ---
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
-      etapas.sort((a,b)=> a.numero_etapa - b.numero_etapa).forEach(etapa => {
-        const div = document.createElement('div');
-        div.className = 'etapa-item';
-        div.dataset.etapaId = etapa.id;
-        div.innerHTML = `
-          <div class="etapa-header">
-            <span>${etapa.numero_etapa}. ${etapa.nome_etapa}</span>
-            <div class="etapa-options">
-              <button class="etapa-dropdown-btn">⋮</button>
-              <div class="etapa-dropdown-content hidden">
-                <a href="#" class="edit-etapa-btn">Editar</a>
-                <a href="#" class="delete-etapa-btn">Deletar</a>
-              </div>
-            </div>
-          </div>
-          <p>${etapa.descricao_etapa || ''}</p>
-        `;
-        etapasContainer.appendChild(div);
 
-        const dropdownBtn = div.querySelector('.etapa-dropdown-btn');
-        const dropdownContent = div.querySelector('.etapa-dropdown-content');
-        dropdownBtn.addEventListener('click', () => dropdownContent.classList.toggle('hidden'));
+      try {
+        // Busca todas as etapas do projeto
+        const etapasData = await getEtapasByProjeto(projetoId);
+        const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
-        div.querySelector('.edit-etapa-btn').addEventListener('click', () => openEditStepPopup(etapa));
-        div.querySelector('.delete-etapa-btn').addEventListener('click', async () => {
-          if (confirm('Deseja realmente deletar esta etapa?')) {
-            await deleteEtapa(etapa.id);
-            loadProject();
-          }
-        });
-      });
+        // Para cada etapa, busca os arquivos e renderiza
+for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+  try {
+    // Faz a requisição para o endpoint do backend que retorna os arquivos da etapa
+    const res = await fetch(`/api/arquivos/${etapa.id}`);
+    const arquivosData = await res.json();
+
+    // Garante que sempre seja um array
+    etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+  } catch (err) {
+    console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
+    etapa.arquivos = [];
+  }
+
+  // Renderiza a etapa com os arquivos
+  const el = renderStep(etapa);
+  etapasContainer.appendChild(el);
+}
+
+
+      } catch (err) {
+        console.error('Erro ao carregar etapas:', err);
+        etapasContainer.innerHTML = '<p>Não foi possível carregar as etapas.</p>';
+      }
     }
 
   } catch (err) {
@@ -184,7 +231,9 @@ async function loadProject() {
   }
 }
 
-// --- Popup Editar Projeto ---
+// --- POPUPS ---
+
+// Editar projeto
 function openEditPopup(projeto, membros) {
   const innerHTML = `
     <div class="popup-content">
@@ -267,7 +316,7 @@ function openEditPopup(projeto, membros) {
   });
 }
 
-// --- Popup Adicionar Etapa ---
+// Adicionar etapa
 function openAddStepPopup() {
   const innerHTML = `
     <div class="popup-content">
@@ -300,10 +349,11 @@ function openAddStepPopup() {
     }
 
     try {
-      await createEtapa(projetoId, nome, descricao, files);
+      const novaEtapa = await createEtapa(projetoId, nome, descricao, files);
+      const el = renderStep(novaEtapa);
+      document.querySelector('.etapas-container')?.appendChild(el);
       alert('Etapa criada com sucesso!');
       popup.classList.add('hidden');
-      loadProject();
     } catch(err) {
       console.error(err);
       alert('Erro ao criar etapa');
@@ -311,7 +361,7 @@ function openAddStepPopup() {
   });
 }
 
-// --- Popup Editar Etapa ---
+// Editar etapa
 function openEditStepPopup(etapa) {
   const innerHTML = `
     <div class="popup-content">
@@ -344,7 +394,7 @@ function openEditStepPopup(etapa) {
   });
 }
 
-// --- Popup Deletar Projeto ---
+// Deletar projeto
 function openDeletePopup(projeto) {
   const innerHTML = `
     <div class="popup-content">
@@ -380,4 +430,3 @@ function openDeletePopup(projeto) {
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);
-

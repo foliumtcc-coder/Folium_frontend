@@ -236,8 +236,8 @@ export async function createEtapa(projetoId, nome, descricao, arquivos) {
 
   const formData = new FormData();
   formData.append('projeto_id', projetoId);
-  formData.append('nome', nome); // <-- isso precisa ser 'nome', não 'titulo'
-  formData.append('descricao', descricao);
+  formData.append('nome_etapa', nome); // <-- isso precisa ser 'nome', não 'titulo'
+  formData.append('descricao_etapa', descricao);
 
   if (arquivos && arquivos.length > 0) {
     arquivos.forEach(file => formData.append('arquivos', file));
@@ -273,10 +273,17 @@ export async function getUserProjects(userId) {
 }
 
 // --- Listar etapas de um projeto ---
+
 export async function getEtapasByProjeto(projetoId) {
-  const res = await fetch(`${BACKEND_URL}/etapas/projeto/${projetoId}`);
-  if (!res.ok) throw new Error('Erro ao listar etapas');
-  return await res.json(); // Deve retornar array de etapas
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/etapas/projeto/${projetoId}`);
+    if (!res.ok) throw new Error('Erro ao listar etapas');
+    const data = await res.json();
+    return data; // deve retornar { etapas: [...] }
+  } catch(err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 // --- Editar etapa ---
@@ -300,13 +307,18 @@ export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
 
 // --- Deletar etapa ---
 export async function deleteEtapa(etapaId) {
-  const res = await fetch(`${BACKEND_URL}/etapas/delete/${etapaId}`, {
-    method: 'DELETE',
-  });
-
-  if (!res.ok) throw new Error('Erro ao deletar etapa');
-  return await res.json();
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/etapas/delete/${etapaId}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) throw new Error('Erro ao deletar etapa');
+    return await res.json();
+  } catch(err) {
+    console.error(err);
+    throw err;
+  }
 }
+
 
 // --- Adicionar arquivos à etapa existente ---
 export async function addArquivosEtapa(etapaId, arquivos = []) {
@@ -351,4 +363,56 @@ export async function deleteProject(projectId) {
   }
 
   return await res.json();
+}
+
+function renderStep(etapa) {
+  const div = document.createElement('div');
+  div.className = 'step';
+  div.dataset.etapaId = etapa.id;
+
+  const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
+
+  div.innerHTML = `
+    <div class="step-header">
+      <div class="step-header-text">
+        <span class="step-name">${etapa.nome || 'Sem nome'}</span>
+        <span class="step-date">${stepDate}</span>
+      </div>
+      <div class="step-actions">
+        <button class="edit-step-btn">✎</button>
+        <button class="delete-step-btn">🗑️</button>
+      </div>
+    </div>
+    <div class="section-line"></div>
+    <div class="step-main-content">${etapa.descricao || ''}</div>
+    <div class="section-line"></div>
+    <div class="step-footer">
+      ${etapa.arquivos?.map(file => `
+        <div class="step-docs">
+          <span class="fa-solid fa-file file-icon"></span>
+          <span class="file-text">${file.nome || file.name}</span>
+        </div>
+      `).join('') || ''}
+    </div>
+  `;
+
+  // ações de editar/deletar
+  div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
+  div.querySelector('.delete-step-btn')?.addEventListener('click', async () => {
+    if (confirm(`Deseja realmente deletar a etapa "${etapa.nome || 'Sem nome'}"?`)) {
+      try {
+        await deleteEtapa(etapa.id);
+        div.remove();
+        alert('Etapa deletada com sucesso!');
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao deletar etapa.');
+      }
+    }
+  });
+
+  const etapasContainer = document.querySelector('.etapas-container');
+  if (etapasContainer) etapasContainer.appendChild(div);
+
+  return div;
 }
