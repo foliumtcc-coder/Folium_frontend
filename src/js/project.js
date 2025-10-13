@@ -153,6 +153,20 @@ async function loadProject() {
         headerContent.appendChild(dropdownBtn);
       }
 
+      const dropBtn = dropdownBtn.querySelector('.dropbtn');
+      const dropdownContent = dropdownBtn.querySelector('.dropdown-content');
+
+      dropBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdownBtn.contains(e.target)) {
+          dropdownContent.style.display = 'none';
+        }
+      });
+
       const editOpt = document.getElementById('edit-project-option');
       const addStepOpt = document.getElementById('add-step-option');
       const deleteOpt = document.getElementById('delete-project-option');
