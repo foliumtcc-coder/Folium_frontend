@@ -287,22 +287,25 @@ export async function getEtapasByProjeto(projetoId) {
 }
 
 // --- Editar etapa ---
-export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
-  const formData = new FormData();
-  formData.append('nome_etapa', nome);
-  formData.append('descricao_etapa', descricao);
-
-  arquivos.forEach(arquivo => {
-    formData.append('arquivos', arquivo); // <-- corrigido
-  });
-
-  const res = await fetch(`${BACKEND_URL}/etapas/update`, {
+export async function updateEtapa(etapaId, nome, descricao, numero_etapa) {
+  const token = getToken();
+  const body = {};
+  
+  if (nome !== null && nome !== undefined) body.nome_etapa = nome;
+  if (descricao !== null && descricao !== undefined) body.descricao_etapa = descricao;
+  if (numero_etapa !== null && numero_etapa !== undefined) body.numero_etapa = numero_etapa;
+  
+  const response = await fetch(`/api/etapas/${etapaId}`, {
     method: 'PUT',
-    body: formData,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(body)
   });
-
-  if (!res.ok) throw new Error('Erro ao atualizar etapa');
-  return await res.json();
+  
+  if (!response.ok) throw new Error('Erro ao atualizar etapa');
+  return response.json();
 }
 
 // --- Deletar etapa ---
