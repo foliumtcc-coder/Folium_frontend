@@ -49,6 +49,12 @@ main {
     gap: 10px;
 }
 
+.form-item label {
+    display: inline-block;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
 .form-item .text {
     width: 100%;
     border-radius: 6px;
@@ -61,7 +67,7 @@ main {
 }
 
 .form-item .text::placeholder {
-    color: #888;
+    color: #4b4b4b;
     font-size: 14px;
 }
 
@@ -92,4 +98,80 @@ input.submit {
 input.submit:hover {
     background-color: #5a1faf;
     transform: scale(1.02);
+}
+
+/* Estilo para upload de imagem */
+.image-upload-container {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.image-upload-label {
+    display: block;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.image-preview {
+    width: 100%;
+    min-height: 200px;
+    background-color: #f1f3f6;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-preview:hover {
+    border-color: #7127d8;
+    background-color: #f8f5ff;
+}
+
+.image-preview i {
+    font-size: 48px;
+    color: #7127d8;
+    transition: transform 0.3s ease;
+}
+
+.image-preview:hover i {
+    transform: scale(1.1);
+}
+
+.image-preview span {
+    font-size: 16px;
+    color: #555;
+    font-weight: 500;
+}
+
+.image-preview small {
+    font-size: 13px;
+    color: #888;
+}
+
+/* Quando a imagem for carregada */
+.image-preview.has-image {
+    padding: 0;
+    border: 2px solid #7127d8;
+    min-height: 250px;
+}
+
+.image-preview.has-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-preview.has-image i,
+.image-preview.has-image span,
+.image-preview.has-image small {
+    display: none;
 }

@@ -92,5 +92,22 @@ if (projectForm) {
   });
 }
 
+// Preview da imagem
+document.getElementById('proj-pic').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('image-preview');
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.classList.add('has-image');
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        }
+        
+        reader.readAsDataURL(file);
+    }
+});
+
 // Inicializa ao carregar
 document.addEventListener('DOMContentLoaded', fetchLoggedUser);

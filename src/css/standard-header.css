@@ -16,7 +16,7 @@ header {
   align-items: center;
   padding: 5px;
   position: fixed;
-  background-color: #FFFFF0; /* antes #fff */
+  background-color: #fdfeff; /* antes #fff */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 

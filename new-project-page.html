@@ -79,26 +79,31 @@
         <span>CRIAR NOVO PROJETO</span>
       </div>
       <div class="project-form-box">
-        <form id="form-projeto">
-          <!-- Nome do Projeto -->
           <form id="form-projeto">
             <!-- Nome do Projeto -->
             <div class="form-item">
               <label for="proj-name">Nome do projeto:</label><br>
-              <input type="text" name="proj-name" id="proj-name" class="text" required>
+              <input type="text" name="proj-name" id="proj-name" class="text" placeholder="..." required>
             </div><br>
 
             <!-- Imagem do Projeto -->
             <div class="form-item">
               <label for="proj-pic">Imagem do projeto (capa):</label><br>
-              <input type="file" name="proj-pic" id="proj-pic" class="hidden">
-              <label for="proj-pic" class="fa-solid fa-file-import" style="cursor:pointer;"></label>
-              <span id="file-name" style="margin-left:5px;"></span>
+              <div class="image-upload-container">
+                <input type="file" name="proj-pic" id="proj-pic" accept="image/*" class="hidden">
+                <label for="proj-pic" class="image-upload-label">
+                  <div class="image-preview" id="image-preview">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Clique para selecionar uma imagem</span>
+                    <small>PNG, JPG ou JPEG</small>
+                  </div>
+                </label>
+              </div>
             </div><br>
 
             <!-- Tipo de Projeto -->
             <div class="form-item">
-              <label for="proj-type">Tipo de projeto:</label><br>
+              <label for="proj-type">Privacidade do projeto:</label><br>
               <select name="proj-type" id="proj-type" class="text" required>
                 <option value="publico">Público</option>
                 <option value="privado">Privado</option>
@@ -107,14 +112,14 @@
 
             <!-- Membros do Projeto -->
             <div class="form-item">
-              <label for="proj-members">Membros (emails separados por vírgula):</label><br>
-              <input type="text" name="proj-members" id="proj-members" class="text" placeholder="email1, email2">
+              <label for="proj-members">Participantes do projeto (coloque o e-mail dos participantes separados por vírgula):</label><br>
+              <input type="text" name="proj-members" id="proj-members" class="text" placeholder="Exemplo: e-mail1, e-mail2">
             </div><br>
 
             <!-- Descrição do Projeto -->
             <div class="form-item">
-              <label for="proj-desc">Descrição:</label><br>
-              <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text"></textarea>
+              <label for="proj-desc">Descrição do projeto:</label><br>
+              <textarea name="proj-desc" id="proj-desc" rows="7" cols="50" class="text" placeholder="..."></textarea>
             </div><br>
 
             <!-- Mensagem de feedback -->
@@ -125,7 +130,6 @@
               <input type="submit" value="Criar projeto" class="submit">
             </div>
           </form>
-
       </div>
     </div>
   </main>
