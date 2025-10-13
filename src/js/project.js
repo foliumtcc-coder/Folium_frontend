@@ -135,8 +135,8 @@ async function loadProject() {
     if (headerText) headerText.textContent = projeto.titulo;
 
     // Dropdown 3 pontos
-    const header = document.querySelector('.main-header');
-    if (header) {
+    const headerContent = document.querySelector('.main-header-content');
+    if (headerContent) {
       let dropdownBtn = document.getElementById('project-dropdown-btn');
       if (!dropdownBtn) {
         dropdownBtn = document.createElement('div');
@@ -150,7 +150,7 @@ async function loadProject() {
             <a href="#" id="delete-project-option">Deletar Projeto</a>
           </div>
         `;
-        header.appendChild(dropdownBtn);
+        headerContent.appendChild(dropdownBtn);
       }
 
       const editOpt = document.getElementById('edit-project-option');

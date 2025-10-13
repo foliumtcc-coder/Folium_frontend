@@ -355,7 +355,7 @@ main {
 
 .menu-desc {
   width: 100%;
-  max-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
   margin: 0;
   padding: 15px;
