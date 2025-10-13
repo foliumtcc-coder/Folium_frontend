@@ -139,32 +139,23 @@ function initializeDragAndDrop() {
   }
 
   // Função para salvar a ordem (você deve implementar a lógica de backend)
-async function saveStepOrder() {
-  const stepsContainer = document.querySelector('.etapas-container');
-  const steps = stepsContainer.querySelectorAll('.step');
-  
-  const order = Array.from(steps).map((step, index) => ({
-    etapaId: step.dataset.etapaId,
-    numero_etapa: index + 1
-  }));
-  
-  console.log('Nova ordem das etapas:', order);
-  
-  try {
-    // Importa a função updateEtapa do api.js
-    const { updateEtapa } = await import('./api.js');
+  function saveStepOrder() {
+    const steps = stepsContainer.querySelectorAll('.step');
+    const order = Array.from(steps).map((step, index) => ({
+      stepId: step.dataset.stepId || step.id, // Use o ID real da etapa
+      order: index
+    }));
     
-    // Atualiza cada etapa com o novo número
-    for (const item of order) {
-      await updateEtapa(item.etapaId, null, null, item.numero_etapa);
-    }
+    console.log('Nova ordem das etapas:', order);
     
-    console.log('Ordem das etapas atualizada com sucesso!');
-  } catch (err) {
-    console.error('Erro ao salvar ordem das etapas:', err);
-    alert('Erro ao salvar nova ordem das etapas.');
+    // Aqui você faria a chamada para o backend
+    // Exemplo:
+    // fetch('/api/projects/update-step-order', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ order })
+    // });
   }
-}
 
   // Inicializa os handles
   addDragHandles();
