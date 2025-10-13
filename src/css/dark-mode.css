@@ -441,9 +441,6 @@ body.dark-mode .edit-step-btn,
 body.dark-mode .delete-step-btn {
   background-color: #3a3a3a;
   color: #f0f0f0;
-  border: 1px solid #555;
-  padding: 6px 10px;
-  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
