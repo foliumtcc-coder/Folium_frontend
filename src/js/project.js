@@ -224,7 +224,7 @@ async function loadProject() {
 for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
   try {
     // Faz a requisição para o endpoint do backend que retorna os arquivos da etapa
-    const res = await fetch(`/api/arquivos/${etapa.id}`);
+    const res = await fetch(`/api/etapas/arquivos/${etapa.id}`);
     const arquivosData = await res.json();
 
     // Garante que sempre seja um array
@@ -592,7 +592,7 @@ function initializeDragAndDrop() {
     }));
     
     try {
-      const response = await fetch('/api/etapas/reorder', {
+      const response = await fetch('/api/auth/etapas/reorder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
