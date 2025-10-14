@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
       menuText: '#333',
       menuBorder: '#eee',
       itemBg: '#fff',
-      itemBgUnread: '#f0f8ff',
+      itemBgUnread: '#f0f0f0ff',
       itemHover: '#f5f5f5',
       shadow: '0 2px 6px rgba(0,0,0,0.2)',
       buttonAccept: '#4caf50',
