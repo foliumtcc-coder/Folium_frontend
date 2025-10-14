@@ -461,56 +461,130 @@ body.dark-mode {
   color: #f0f0f0;
 }
 
+body.dark-mode main {
+  background-color: #1f1f1f;
+}
+
+/* Header roxo */
+body.dark-mode .profile-header {
+  background: linear-gradient(135deg, #7127d8 0%, #5a1faf 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Bio Box */
 body.dark-mode .bio-box {
   background-color: #2a2a2a;
   color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .bio-title {
+  color: #cba6f7;
+}
+
+body.dark-mode .bio-text {
+  color: #ddd;
 }
 
 body.dark-mode .bio-links a {
   color: #cba6f7;
 }
 
-body.dark-mode .project-block:hover .project-footer {
-  background-color: #3a3a3a;
+body.dark-mode .bio-links a:hover {
+  color: #b794f6;
+}
+
+/* Projects Section */
+body.dark-mode .projects-section-title {
+  color: #cba6f7;
+}
+
+/* Project Blocks */
+body.dark-mode .project-block {
+  background-color: #2a2a2a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .project-block:hover {
+  box-shadow: 0 12px 24px rgba(113, 39, 216, 0.25);
+}
+
+body.dark-mode .project-img {
+  background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
 }
 
 body.dark-mode .project-footer {
   background-color: #2a2a2a;
+  color: #f0f0f0;
+  border-top-color: #444;
 }
 
-body.dark-mode .project-footer .project-name,
-body.dark-mode .project-footer button span {
-  color: #f0f0f0;
+body.dark-mode .project-block:hover .project-footer {
+  background-color: #333;
+}
+
+/* Popup */
+body.dark-mode .popup {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 body.dark-mode .popup-content {
   background-color: #2a2a2a;
   color: #f0f0f0;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-body.dark-mode .text-input {
-  background-color: #3a3a3a;
+body.dark-mode .popup-title {
+  color: #cba6f7;
+}
+
+body.dark-mode .close-btn {
+  color: #888;
+}
+
+body.dark-mode .close-btn:hover {
+  color: #cba6f7;
+}
+
+/* Form inputs */
+body.dark-mode .edit-profile-form label {
+  color: #ddd;
+}
+
+body.dark-mode .edit-profile-form input,
+body.dark-mode .edit-profile-form textarea {
+  background-color: #333;
   color: #f0f0f0;
+  border-color: #555;
+}
+
+body.dark-mode .edit-profile-form input::placeholder,
+body.dark-mode .edit-profile-form textarea::placeholder {
+  color: #888;
+}
+
+body.dark-mode .edit-profile-form input:focus,
+body.dark-mode .edit-profile-form textarea:focus {
+  border-color: #cba6f7;
+  background-color: #3a3a3a;
+  box-shadow: 0 0 6px rgba(203, 166, 247, 0.3);
 }
 
 body.dark-mode .submit-button {
   background-color: #7127d8;
-  color: #f0f0f0;
+  color: white;
 }
 
-body.dark-mode .popup-header .popup-title {
-  color: #cba6f7;
+body.dark-mode .submit-button:hover {
+  background-color: #5a1faf;
+  box-shadow: 0 4px 12px rgba(113, 39, 216, 0.5);
 }
 
-body.dark-mode .popup-header .close-btn {
-  color: #f0f0f0;
-}
-
-body.dark-mode .projects-section-title,
-body.dark-mode .links-title,
-body.dark-mode .bio-title {
-  color: #cba6f7;
+/* Previews */
+body.dark-mode #popup-avatar,
+body.dark-mode #popup-banner {
+  background-color: #333;
+  border-color: #555;
 }
 
 /* ---------- DARK MODE: CREATE PROJECT PAGE ---------- */

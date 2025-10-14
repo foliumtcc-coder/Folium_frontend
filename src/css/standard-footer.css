@@ -1,6 +1,6 @@
 * {
   font-family: "Ligconsolata", sans-serif;
-  font-weight: bold; /* 'sans-serif' como fallback se a Ligconsolata não funfar */
+  font-weight: bold;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -9,7 +9,7 @@
 /*-----------------FOOTER----------------*/
 
 footer {
-  background-color: #e4e4e4; /* antes #ffffff */
+  background-color: #fdfeff;
   color: #000000;
   display: flex;
   justify-content: center;
