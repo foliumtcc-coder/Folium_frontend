@@ -349,7 +349,7 @@ main {
 .edit-profile-form input,
 .edit-profile-form textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 5px 20px;
   border-radius: 6px;
   border: 1px solid #ddd;
   background-color: #f1f3f6;
