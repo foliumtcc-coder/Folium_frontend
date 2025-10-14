@@ -5,6 +5,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const notificationContainer = notificationButton.parentElement;
   notificationContainer.style.position = 'relative';
 
+  // Detecta se está em dark mode
+  const isDarkMode = () => document.body.classList.contains('dark-mode');
+
+  // Função para obter cores baseado no modo
+  const getColors = () => {
+    if (isDarkMode()) {
+      return {
+        menuBg: '#2a2a2a',
+        menuText: '#f0f0f0',
+        menuBorder: '#444',
+        itemBg: '#333',
+        itemBgUnread: '#3a3a3a',
+        itemHover: '#404040',
+        shadow: '0 2px 6px rgba(0, 0, 0, 0.4)',
+        buttonAccept: '#7127d8',
+        buttonReject: '#d32f2f'
+      };
+    }
+    return {
+      menuBg: '#fff',
+      menuText: '#333',
+      menuBorder: '#eee',
+      itemBg: '#fff',
+      itemBgUnread: '#f0f8ff',
+      itemHover: '#f5f5f5',
+      shadow: '0 2px 6px rgba(0,0,0,0.2)',
+      buttonAccept: '#4caf50',
+      buttonReject: '#f44336'
+    };
+  };
+
   // Estiliza o botão
   notificationButton.style.width = '30px';
   notificationButton.style.height = '30px';
@@ -15,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   notificationButton.style.background = 'none';
   notificationButton.style.border = 'none';
   notificationButton.style.cursor = 'pointer';
+  notificationButton.style.color = isDarkMode() ? '#f0f0f0' : '#666';
 
   // Cria badge
   const badge = document.createElement('span');
@@ -34,14 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Cria menu dropdown
   const notificationMenu = document.createElement('div');
+  let currentColors = getColors();
+  
   notificationMenu.style.position = 'absolute';
   notificationMenu.style.right = '0';
   notificationMenu.style.top = '100%';
   notificationMenu.style.minWidth = '250px';
   notificationMenu.style.maxHeight = '400px';
   notificationMenu.style.overflowY = 'auto';
-  notificationMenu.style.background = '#fff';
-  notificationMenu.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+  notificationMenu.style.background = currentColors.menuBg;
+  notificationMenu.style.color = currentColors.menuText;
+  notificationMenu.style.boxShadow = currentColors.shadow;
   notificationMenu.style.borderRadius = '8px';
   notificationMenu.style.zIndex = '1000';
   notificationMenu.style.display = 'none';
@@ -68,6 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Renderiza notificações
   function renderNotifications() {
     notificationMenu.innerHTML = '';
+    currentColors = getColors();
+    
+    // Atualiza cores do menu
+    notificationMenu.style.background = currentColors.menuBg;
+    notificationMenu.style.color = currentColors.menuText;
+    notificationMenu.style.boxShadow = currentColors.shadow;
 
     const unreadCount = notifications.filter(n => !n.lida).length;
     badge.style.display = unreadCount ? 'inline-block' : 'none';
@@ -77,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const empty = document.createElement('div');
       empty.textContent = 'Nenhuma notificação';
       empty.style.padding = '10px';
+      empty.style.color = currentColors.menuText;
       notificationMenu.appendChild(empty);
       return;
     }
@@ -84,14 +126,15 @@ document.addEventListener('DOMContentLoaded', () => {
     notifications.forEach(n => {
       const item = document.createElement('div');
       item.style.padding = '10px';
-      item.style.borderBottom = '1px solid #eee';
+      item.style.borderBottom = `1px solid ${currentColors.menuBorder}`;
       item.style.display = 'flex';
       item.style.flexDirection = 'column';
       item.style.gap = '5px';
-      item.style.background = n.lida ? '#fff' : '#f0f8ff';
+      item.style.background = n.lida ? currentColors.itemBg : currentColors.itemBgUnread;
+      item.style.color = currentColors.menuText;
       item.style.transition = 'background 0.2s';
-      item.addEventListener('mouseenter', () => item.style.background = '#f5f5f5');
-      item.addEventListener('mouseleave', () => item.style.background = n.lida ? '#fff' : '#f0f8ff');
+      item.addEventListener('mouseenter', () => item.style.background = currentColors.itemHover);
+      item.addEventListener('mouseleave', () => item.style.background = n.lida ? currentColors.itemBg : currentColors.itemBgUnread);
 
       const mensagem = document.createElement('span');
       mensagem.textContent = n.mensagem;
@@ -109,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         aceitarBtn.style.border = 'none';
         aceitarBtn.style.borderRadius = '4px';
         aceitarBtn.style.cursor = 'pointer';
-        aceitarBtn.style.backgroundColor = '#4caf50';
+        aceitarBtn.style.backgroundColor = currentColors.buttonAccept;
         aceitarBtn.style.color = '#fff';
         aceitarBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
@@ -128,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recusarBtn.style.border = 'none';
         recusarBtn.style.borderRadius = '4px';
         recusarBtn.style.cursor = 'pointer';
-        recusarBtn.style.backgroundColor = '#f44336';
+        recusarBtn.style.backgroundColor = currentColors.buttonReject;
         recusarBtn.style.color = '#fff';
         recusarBtn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -157,6 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
       notificationMenu.style.display = 'none';
     }
   });
+
+  // Observa mudanças de dark mode
+  const observer = new MutationObserver(() => {
+    renderNotifications();
+  });
+  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
   // Inicializa
   fetchNotifications();
