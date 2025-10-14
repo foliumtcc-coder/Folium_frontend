@@ -581,3 +581,37 @@ body.dark-mode textarea.text:focus {
     background-color: #444;
     box-shadow: 0 0 6px rgba(203, 166, 247, 0.4);
 }
+
+/* ---------- DARK MODE: NOTIFICATION BUTTON ---------- */
+body.dark-mode #notification-button {
+  color: #f0f0f0;
+}
+
+body.dark-mode #notification-badge {
+  background-color: #ff4444;
+  color: #fff;
+}
+
+body.dark-mode .notification-menu {
+  background-color: #2a2a2a !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  color: #f0f0f0;
+}
+
+body.dark-mode .notification-menu div {
+  color: #f0f0f0 !important;
+  border-bottom-color: #444 !important;
+  background-color: #333 !important;
+}
+
+body.dark-mode .notification-menu div[style*="background: #f0f8ff"] {
+  background-color: #3a3a3a !important;
+}
+
+body.dark-mode .notification-menu button {
+  color: #fff;
+}
+
+body.dark-mode .notification-menu button:hover {
+  opacity: 0.9;
+}
