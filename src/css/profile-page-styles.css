@@ -38,7 +38,7 @@ main {
 /* Avatar agora alinhado à esquerda */
 .profile-pic {
   position: absolute;
-  bottom: -50px;
+  bottom: -60px;
   left: 40px;
   width: 140px;
   height: 140px;
@@ -49,6 +49,7 @@ main {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
 }
 
 .profile-pic:hover {
@@ -69,11 +70,11 @@ main {
 /* Nome do usuário à esquerda embaixo do avatar */
 .profile-info {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 30px;
-  margin-left: 40px;
-  margin-top: 60px;
-  width: calc(100% - 80px);
+  margin-left: 200px;
+  margin-top: -50px;
+  width: calc(100% - 240px);
   position: relative;
 }
 
@@ -87,7 +88,7 @@ main {
 /*-----------------BOTÃO EDITAR PERFIL----------------*/
 #edit-profile-btn {
   position: absolute;
-  top: -250px;
+  top: -240px;
   right: 20px;
   padding: 10px 20px;
   font-size: 14px;
