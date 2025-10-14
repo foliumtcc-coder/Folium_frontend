@@ -15,7 +15,7 @@ main {
 .profile-header {
   width: 100%;
   background: linear-gradient(135deg, #7127d8 0%, #5a1faf 100%);
-  padding: 80px 20px;
+  padding: 60px 20px;
   box-sizing: border-box;
 }
 
@@ -110,7 +110,7 @@ main {
 .bio-box {
   width: 90%;
   max-width: 900px;
-  margin: 0 auto 0;
+  margin: 40px auto 0;
   border-radius: 12px;
   padding: 30px;
   background-color: #fff;
