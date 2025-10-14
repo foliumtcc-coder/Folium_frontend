@@ -341,7 +341,7 @@ main {
   font-size: 13px;
   color: #333;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -349,7 +349,7 @@ main {
 .edit-profile-form input,
 .edit-profile-form textarea {
   width: 100%;
-  padding: 5px 20px;
+  padding: 10px 12px;
   border-radius: 6px;
   border: 1px solid #ddd;
   background-color: #f1f3f6;
@@ -375,7 +375,7 @@ main {
 
 .edit-profile-form textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 200px;
 }
 
 .submit-button {
