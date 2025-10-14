@@ -1,5 +1,5 @@
 body {
-  padding-top: 0;
+  padding-top: 40px;
 }
 
 main {
@@ -20,7 +20,10 @@ main {
 }
 
 .header-image {
-  display: none;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(135deg, #7127d8 0%, #5a1faf 100%);
+  position: relative;
 }
 
 .header-image input {
