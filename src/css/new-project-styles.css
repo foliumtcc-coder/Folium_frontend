@@ -38,7 +38,7 @@ main {
 
 .project-form-box {
     width: 90%;
-    max-width: 900px; /* volta para a largura original */
+    max-width: 800px; /* volta para a largura original */
     padding: 20px;
     height: fit-content;
     background-color: #ffffff;
@@ -115,7 +115,7 @@ input.submit:hover {
 }
 
 .image-preview {
-    width: 100%;
+    width: 200px;
     min-height: 200px;
     background-color: #f1f3f6;
     border: 2px dashed #ccc;
