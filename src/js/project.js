@@ -223,11 +223,9 @@ async function loadProject() {
         // Para cada etapa, busca os arquivos e renderiza
 for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
   try {
-    // Faz a requisição para o endpoint do backend que retorna os arquivos da etapa
     const res = await fetch(`/api/etapas/arquivos/${etapa.id}`);
+    if (!res.ok) throw new Error(`Erro ${res.status}`);
     const arquivosData = await res.json();
-
-    // Garante que sempre seja um array
     etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
   } catch (err) {
     console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
@@ -584,33 +582,50 @@ function initializeDragAndDrop() {
     }
   });
 
-  async function saveStepOrder() {
-    const steps = stepsContainer.querySelectorAll('.step');
-    const order = Array.from(steps).map((step, index) => ({
-      etapaId: step.dataset.etapaId,
-      numero_etapa: index + 1
-    }));
-    
-    try {
-      const response = await fetch('/api/auth/etapas/reorder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          projetoId: getProjetoIdFromURL(),
-          ordem: order 
-        })
-      });
-      
-      if (!response.ok) {
-        console.error('Erro ao salvar ordem das etapas');
-        return;
-      }
-      
-      console.log('Ordem das etapas salva com sucesso!');
-    } catch (err) {
-      console.error('Erro ao fazer requisição:', err);
+async function saveStepOrder() {
+  const stepsContainer = document.querySelector('.etapas-container');
+  if (!stepsContainer) return;
+
+  const steps = stepsContainer.querySelectorAll('.step');
+
+  // Monta o array de ordem para enviar ao backend
+  const order = Array.from(steps).map((step, index) => ({
+    etapaId: Number(step.dataset.etapaId), // garante que seja número
+    numero_etapa: index + 1
+  }));
+
+  try {
+    const projetoId = new URLSearchParams(window.location.search).get('id');
+    if (!projetoId) throw new Error('ID do projeto não encontrado');
+
+    const response = await fetch('/api/auth/etapas/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projetoId: Number(projetoId), ordem: order })
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Erro ao salvar ordem das etapas:', text);
+      alert('Não foi possível salvar a nova ordem das etapas.');
+      return;
     }
+
+    const data = await response.json();
+    console.log('Ordem das etapas salva com sucesso!', data);
+    // Opcional: atualizar a UI com a ordem retornada
+    data.etapas.forEach((etapa, index) => {
+      const el = stepsContainer.querySelector(`.step[data-etapa-id='${etapa.id}']`);
+      if (el) el.dataset.stepIndex = index;
+    });
+  } catch (err) {
+    console.error('Erro ao salvar ordem das etapas:', err);
+    alert('Erro ao salvar ordem das etapas.');
   }
+}
+
+// Chame saveStepOrder() no evento 'drop' do drag-and-drop
+
 
   // Atualiza os índices das etapas após reordenar
   function updateStepIndices() {
