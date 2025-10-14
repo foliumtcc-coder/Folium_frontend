@@ -11,21 +11,21 @@ main {
 
 .main-content {
     display: flex;
-    flex-direction: column; /* volta para coluna */
-    justify-content: center; /* centraliza horizontalmente */
-    align-items: center; /* centraliza os elementos */
-    gap: 25px; /* espaçamento entre os elementos */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
     padding: 20px;
     width: 100%;
-    max-width: 1200px; /* limite para telas grandes */
+    max-width: 1200px;
     margin: auto;
 }
 
 .main-header {
     width: 90%;
-    max-width: 700px; /* mantém a largura original */
+    max-width: 800px;
     height: 50px;
-    margin-bottom: 0; /* remove margin-bottom */
+    margin-bottom: 0;
     border-radius: 15px;
     background-color: #ffffff;
     font-size: 25px;
@@ -38,7 +38,7 @@ main {
 
 .project-form-box {
     width: 90%;
-    max-width: 800px; /* volta para a largura original */
+    max-width: 800px;
     padding: 20px;
     height: fit-content;
     background-color: #ffffff;
@@ -64,6 +64,12 @@ main {
     font-size: 15px;
     transition: all 0.25s ease;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Impede o redimensionamento do campo de descrição */
+textarea.text {
+    resize: none;
+    height: 150px;
 }
 
 .form-item .text::placeholder {
