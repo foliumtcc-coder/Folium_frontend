@@ -38,7 +38,7 @@ main {
 
 .project-form-box {
     width: 90%;
-    max-width: 700px; /* volta para a largura original */
+    max-width: 900px; /* volta para a largura original */
     padding: 20px;
     height: fit-content;
     background-color: #ffffff;

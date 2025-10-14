@@ -587,7 +587,7 @@ body.dark-mode #popup-banner {
   border-color: #555;
 }
 
-/* ---------- DARK MODE: CREATE PROJECT PAGE ---------- */
+/* ---------- DARK MODE: NEW PROJECT PAGE ---------- */
 body.dark-mode {
     background-color: #1f1f1f;
     color: #f0f0f0;
@@ -654,6 +654,46 @@ body.dark-mode textarea.text:focus {
     border-color: #cba6f7;
     background-color: #444;
     box-shadow: 0 0 6px rgba(203, 166, 247, 0.4);
+}
+
+/* Image Upload Container */
+body.dark-mode .image-upload-container {
+  margin-top: 8px;
+}
+
+body.dark-mode .image-preview {
+  background-color: #333;
+  border: 2px dashed #555;
+}
+
+body.dark-mode .image-preview:hover {
+  border-color: #cba6f7;
+  background-color: #3a3a3a;
+}
+
+body.dark-mode .image-preview i {
+  color: #cba6f7;
+}
+
+body.dark-mode .image-preview span {
+  color: #ddd;
+}
+
+body.dark-mode .image-preview small {
+  color: #888;
+}
+
+/* Quando a imagem for carregada */
+body.dark-mode .image-preview.has-image {
+  border: 2px solid #cba6f7;
+  background-color: #2a2a2a;
+}
+
+body.dark-mode .image-preview.has-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* ---------- DARK MODE: NOTIFICATION BUTTON ---------- */
