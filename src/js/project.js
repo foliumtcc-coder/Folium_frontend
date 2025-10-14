@@ -584,31 +584,40 @@ function initializeDragAndDrop() {
     }
   });
 
+  async function saveStepOrder() {
+    const steps = stepsContainer.querySelectorAll('.step');
+    const order = Array.from(steps).map((step, index) => ({
+      etapaId: step.dataset.etapaId,
+      numero_etapa: index + 1
+    }));
+    
+    try {
+      const response = await fetch('/api/etapas/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          projetoId: getProjetoIdFromURL(),
+          ordem: order 
+        })
+      });
+      
+      if (!response.ok) {
+        console.error('Erro ao salvar ordem das etapas');
+        return;
+      }
+      
+      console.log('Ordem das etapas salva com sucesso!');
+    } catch (err) {
+      console.error('Erro ao fazer requisição:', err);
+    }
+  }
+
   // Atualiza os índices das etapas após reordenar
   function updateStepIndices() {
     const steps = stepsContainer.querySelectorAll('.step');
     steps.forEach((step, index) => {
       step.dataset.stepIndex = index;
     });
-  }
-
-  // Função para salvar a ordem (você deve implementar a lógica de backend)
-  function saveStepOrder() {
-    const steps = stepsContainer.querySelectorAll('.step');
-    const order = Array.from(steps).map((step, index) => ({
-      stepId: step.dataset.stepId || step.id, // Use o ID real da etapa
-      order: index
-    }));
-    
-    console.log('Nova ordem das etapas:', order);
-    
-    // Aqui você faria a chamada para o backend
-    // Exemplo:
-    // fetch('/api/projects/update-step-order', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ order })
-    // });
   }
 
   // Inicializa os handles
