@@ -204,8 +204,8 @@ async function loadProject() {
         const userName = m.usuarios?.name1 || "Sem nome";
         if (!userId) return;
         const a = document.createElement('a');
-        a.href = `/profile-page.html?id=${userId}<br>`;
-        a.innerHTML = `${userName}`;
+        a.href = `/profile-page.html?id=${userId}`;
+        a.innerHTML = `${userName}<br>`;
         sideMenu.appendChild(a);
       });
     }
