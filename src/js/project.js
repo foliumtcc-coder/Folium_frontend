@@ -102,10 +102,10 @@ function renderStep(etapa) {
       try {
         await deleteEtapa(etapa.id);
         div.remove();
-        alert('Etapa deletada com sucesso!');
+        showToast('Etapa deletada com sucesso!', 'success');
       } catch(err) {
         console.error(err);
-        alert('Erro ao deletar etapa.');
+        showToast('Erro ao deletar etapa.', 'error');
       }
     }
   });
@@ -117,13 +117,13 @@ function renderStep(etapa) {
 async function loadProject() {
   try {
     const projetoId = getProjetoIdFromURL();
-    if (!projetoId) return alert('ID do projeto não encontrado na URL.');
+    if (!projetoId) return showToast('ID do projeto não encontrado na URL.', 'error');
 
     const { user } = await getUser();
     if (!user) return window.location.href = '/login.html';
 
     const data = await getProjectById(projetoId);
-    if (!data || !data.projeto) return alert('Projeto não encontrado.');
+    if (!data || !data.projeto) return showToast('Projeto não encontrado.', 'error');
 
     const projeto = data.projeto;
     const membros = Array.isArray(data.membros) ? data.membros : [];
@@ -205,7 +205,7 @@ async function loadProject() {
         if (!userId) return;
         const a = document.createElement('a');
         a.href = `/profile-page.html?id=${userId}`;
-        a.innerHTML = `<span class="fa-solid fa-circle-user"></span> ${userName}`;
+        a.innerHTML = `${userName}`;
         sideMenu.appendChild(a);
       });
     }
@@ -246,7 +246,7 @@ for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
 
   } catch (err) {
     console.error('Erro ao carregar projeto:', err);
-    alert('Erro ao carregar projeto.');
+    showToast('Erro ao carregar projeto.', 'error');
   }
 }
 
@@ -296,7 +296,7 @@ function openEditPopup(projeto, membros) {
     const email = newMemberInput.value.trim();
     if (!email) return;
     if ([...membersList.children].some(c => c.dataset.email === email)) {
-      alert('Email já está na lista!');
+      showToast('Email já está na lista!', 'error');
       return;
     }
     membersList.appendChild(createMemberItem(email));
@@ -325,12 +325,12 @@ function openEditPopup(projeto, membros) {
     if (imageInput.files[0]) formData.append('imagem', imageInput.files[0]);
     try {
       await updateProject(getProjetoIdFromURL(), formData);
-      alert('Projeto atualizado com sucesso!');
+      showToast('Projeto atualizado com sucesso!', 'success');
       popup.classList.add('hidden');
       loadProject();
     } catch (err) {
       console.error('Erro ao atualizar projeto:', err);
-      alert('Erro ao atualizar projeto.');
+      showToast('Erro ao atualizar projeto.', 'error');
     }
   });
 }
@@ -363,7 +363,7 @@ function openAddStepPopup() {
     const files = Array.from(filesInput.files);
 
     if (!nome) {
-      alert('O nome da etapa é obrigatório!');
+      showToast('O nome da etapa é obrigatório!', 'error');
       return;
     }
 
@@ -371,11 +371,11 @@ function openAddStepPopup() {
       const novaEtapa = await createEtapa(projetoId, nome, descricao, files);
       const el = renderStep(novaEtapa);
       document.querySelector('.etapas-container')?.appendChild(el);
-      alert('Etapa criada com sucesso!');
+      showToast('Etapa criada com sucesso!', 'success');
       popup.classList.add('hidden');
     } catch(err) {
       console.error(err);
-      alert('Erro ao criar etapa');
+      showToast('Erro ao criar etapa', 'error');
     }
   });
 }
@@ -403,12 +403,12 @@ function openEditStepPopup(etapa) {
     const descricao = document.getElementById('edit-step-desc').value.trim();
     try {
       await updateEtapa(etapa.id, nome, descricao);
-      alert('Etapa atualizada com sucesso!');
+      showToast('Etapa atualizada com sucesso!', 'success');
       popup.classList.add('hidden');
       loadProject();
     } catch(err) {
       console.error(err);
-      alert('Erro ao atualizar etapa');
+      showToast('Erro ao atualizar etapa', 'error');
     }
   });
 }
@@ -433,16 +433,16 @@ function openDeletePopup(projeto) {
     e.preventDefault();
     const confirmName = document.getElementById('confirm-project-name').value.trim();
     if (confirmName !== projeto.titulo) {
-      alert('Nome do projeto não confere!');
+      showToast('Nome do projeto não confere!', 'error');
       return;
     }
     try {
       await deleteProject(getProjetoIdFromURL());
-      alert('Projeto deletado com sucesso!');
+      showToast('Projeto deletado com sucesso!', 'success');
       window.location.href = '/home.html';
     } catch (err) {
       console.error('Erro ao deletar projeto:', err);
-      alert('Erro ao deletar projeto.');
+      showToast('Erro ao deletar projeto.', 'error');
     }
   });
 }
@@ -607,7 +607,7 @@ async function saveStepOrder() {
     if (!response.ok) {
       const text = await response.text();
       console.error('Erro ao salvar ordem das etapas:', text);
-      alert('Não foi possível salvar a nova ordem das etapas.');
+      showToast('Não foi possível salvar a nova ordem das etapas.', 'error');
       return;
     }
 
@@ -620,7 +620,7 @@ async function saveStepOrder() {
     });
   } catch (err) {
     console.error('Erro ao salvar ordem das etapas:', err);
-    alert('Erro ao salvar ordem das etapas.');
+    showToast('Erro ao salvar ordem das etapas.', 'error');
   }
 }
 
@@ -652,4 +652,21 @@ if (document.readyState === 'loading') {
 // Exporta a função se estiver usando modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { initializeDragAndDrop };
+}
+
+// Função para mostrar notificações toast
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  toast.innerHTML = `<span style="font-size: 20px;">${icon}</span> ${message}`;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
