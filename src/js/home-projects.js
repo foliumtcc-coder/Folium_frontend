@@ -1,83 +1,38 @@
-// home-projects.js
-import { getUser, getUserProfile } from './api.js';
+import { apiGet } from './api.js';
 
-// Função para criar HTML de um projeto
-function createProjectHTML(project) {
-  const imageUrl = project.imagem || './src/img/icons/project-image.png';
-  const visualizacoes = project.visualizacoes || 0;
+// Função genérica para renderizar projetos em uma sessão
+const renderProjects = (containerSelector, projects) => {
+  const container = document.querySelector(containerSelector);
+  if (!container) return;
+  container.innerHTML = '';
 
-  return `
-    <a href="project-page.html?id=${project.id}">
+  projects.forEach(project => {
+    const projectLink = document.createElement('a');
+    projectLink.href = `project-page.html?id=${project.id}`;
+    projectLink.innerHTML = `
       <div class="project-block">
         <div class="project-img">
-          <img src="${imageUrl}" alt="${project.titulo}" onerror="this.src='./src/img/icons/project-image.png'">
+          <img src="${project.capa_url || './src/img/icons/project-image.png'}" alt="${project.nome}" onerror="this.src='./src/img/icons/project-image.png'">
         </div>
         <div class="project-footer">
           <div class="project-name">
-            <span>${project.titulo || 'Projeto sem título'}</span>
+            <span>${project.nome || 'Projeto sem título'}</span>
           </div>
-          <div class="project-stats">
-            <span class="visualizacoes">
-              <i class="fa-solid fa-eye"></i> ${visualizacoes}
-            </span>
+          <div class="project-views">
+            <span><i class="fa-solid fa-eye"></i> ${project.visualizacoes || 0}</span>
           </div>
           <button class="project-options" onclick="event.preventDefault(); event.stopPropagation(); showProjectOptions(${project.id})">
             <span class="fa-solid fa-ellipsis-vertical"></span>
           </button>
         </div>
       </div>
-    </a>
-  `;
-}
+    `;
+    container.appendChild(projectLink);
+  });
+};
 
-// Função para preencher uma seção com projetos
-function populateSection(sectionContainer, projects) {
-  if (!sectionContainer) return;
-  const projectsHTML = projects.slice(0, 5).map(createProjectHTML).join('');
-  sectionContainer.innerHTML = projectsHTML;
-}
-
-// Buscar projetos recentes (todos públicos)
-async function fetchRecentProjects() {
-  try {
-    const res = await fetch('/api/projects/recentes');
-    if (!res.ok) throw new Error('Erro ao buscar projetos recentes');
-    const projects = await res.json();
-    return projects;
-  } catch (error) {
-    console.error('Erro ao carregar projetos recentes:', error);
-    return [];
-  }
-}
-
-// Buscar projetos em destaque (todos públicos)
-async function fetchFeaturedProjects() {
-  try {
-    const res = await fetch('/api/projects/destaque');
-    if (!res.ok) throw new Error('Erro ao buscar projetos em destaque');
-    const projects = await res.json();
-    return projects;
-  } catch (error) {
-    console.error('Erro ao carregar projetos em destaque:', error);
-    return [];
-  }
-}
-
-// Buscar projetos populares (todos públicos)
-async function fetchPopularProjects() {
-  try {
-    const res = await fetch('/api/projects/populares');
-    if (!res.ok) throw new Error('Erro ao buscar projetos populares');
-    const projects = await res.json();
-    return projects;
-  } catch (error) {
-    console.error('Erro ao carregar projetos populares:', error);
-    return [];
-  }
-}
-
-// Configura os botões de scroll dos carrosséis
-function setupScrollButtons() {
+// Configura botões de scroll dos carrosséis
+const setupScrollButtons = () => {
   const carousels = document.querySelectorAll('.carousel');
 
   carousels.forEach(carousel => {
@@ -95,64 +50,56 @@ function setupScrollButtons() {
       container.scrollBy({ left: 320, behavior: 'smooth' });
     });
 
-    function updateButtonsVisibility() {
+    const updateButtonsVisibility = () => {
       const isAtStart = container.scrollLeft <= 0;
       const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth;
 
       leftButton.style.opacity = isAtStart ? '0.5' : '1';
       rightButton.style.opacity = isAtEnd ? '0.5' : '1';
-    }
+    };
 
     container.addEventListener('scroll', updateButtonsVisibility);
     updateButtonsVisibility();
   });
-}
-
-// Função para mostrar opções do projeto (placeholder)
-window.showProjectOptions = function(projectId) {
-  console.log('Mostrar opções para projeto:', projectId);
 };
 
-// Carrega todos os projetos nas seções
-async function loadAllProjects() {
+// Função placeholder para mostrar opções do projeto
+window.showProjectOptions = (projectId) => {
+  console.log('Mostrar opções do projeto:', projectId);
+};
+
+// Carregar todas as seções da Home
+const loadHomeProjects = async () => {
   try {
-    const [recentProjects, featuredProjects, popularProjects] = await Promise.all([
-      fetchRecentProjects(),
-      fetchFeaturedProjects(),
-      fetchPopularProjects()
-    ]);
+    const recentes = await apiGet('/home/recentes');
+    renderProjects('.main-sub-section:nth-of-type(1) .section-blocks-container', recentes);
 
-    const recentContainer = document.querySelector('.main-sub-section:nth-child(1) .section-blocks-container');
-    const featuredContainer = document.querySelector('.main-sub-section:nth-child(2) .section-blocks-container');
-    const popularContainer = document.querySelector('.main-sub-section:nth-child(3) .section-blocks-container');
+    const destaques = await apiGet('/home/destaques');
+    renderProjects('.main-sub-section:nth-of-type(2) .section-blocks-container', destaques);
 
-    populateSection(recentContainer, recentProjects);
-    populateSection(featuredContainer, featuredProjects);
-    populateSection(popularContainer, popularProjects);
+    const populares = await apiGet('/home/populares');
+    renderProjects('.main-sub-section:nth-of-type(3) .section-blocks-container', populares);
 
     setupScrollButtons();
 
     console.log('Projetos carregados na home:', {
-      recentes: recentProjects.length,
-      destaque: featuredProjects.length,
-      populares: popularProjects.length
+      recentes: recentes.length,
+      destaques: destaques.length,
+      populares: populares.length
     });
-
-  } catch (error) {
-    console.error('Erro ao carregar projetos na home:', error);
-    setupScrollButtons();
+  } catch (err) {
+    console.error('Erro ao carregar projetos da Home:', err);
+    setupScrollButtons(); // Mantém scroll funcionando mesmo em caso de erro
   }
-}
+};
 
 // Atualiza projetos manualmente
-export function refreshHomeProjects() {
-  loadAllProjects();
-}
+export const refreshHomeProjects = () => {
+  loadHomeProjects();
+};
 
-// Inicializa quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', () => {
-  loadAllProjects();
-});
+// Inicializa quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', loadHomeProjects);
 
-// Atualiza projetos a cada 30 segundos
-setInterval(loadAllProjects, 30000);
+// Atualiza automaticamente a cada 30 segundos
+setInterval(loadHomeProjects, 30000);
