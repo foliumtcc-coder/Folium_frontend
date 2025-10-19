@@ -1,4 +1,4 @@
-// home-projects.js
+// src/js/home-projects.js
 
 // Função genérica para renderizar projetos em uma sessão
 const renderProjects = (containerSelector, projects) => {
@@ -13,18 +13,16 @@ const renderProjects = (containerSelector, projects) => {
     projectLink.innerHTML = `
       <div class="project-block">
         <div class="project-img">
-          <img src="${project.capa_url || './src/img/icons/project-image.png'}" 
-               alt="${project.nome || 'Projeto sem nome'}"
-               onerror="this.src='./src/img/icons/project-image.png'">
+          <img src="${project.capa_url || project.imagem || './src/img/icons/project-image.png'}" alt="${project.nome || project.titulo}" onerror="this.src='./src/img/icons/project-image.png'">
         </div>
         <div class="project-footer">
           <div class="project-name">
-            <span>${project.nome || 'Projeto sem nome'}</span>
+            <span>${project.nome || project.titulo || 'Projeto sem título'}</span>
           </div>
           <div class="project-views">
-            <i class="fa-solid fa-eye"></i> ${project.visualizacoes || 0}
+            <span><i class="fa-solid fa-eye"></i> ${project.visualizacoes || 0}</span>
           </div>
-          <button class="project-options">
+          <button class="project-options" onclick="event.preventDefault(); event.stopPropagation(); showProjectOptions(${project.id})">
             <span class="fa-solid fa-ellipsis-vertical"></span>
           </button>
         </div>
@@ -34,7 +32,7 @@ const renderProjects = (containerSelector, projects) => {
   });
 };
 
-// Função auxiliar para buscar dados da API
+// Função genérica para buscar projetos
 const fetchProjects = async (endpoint) => {
   try {
     const res = await fetch(endpoint);
@@ -46,33 +44,37 @@ const fetchProjects = async (endpoint) => {
   }
 };
 
-// Funções específicas para cada tipo de projeto
-const fetchRecentProjects = () => fetchProjects('/api/auth/home/recentes');
-const fetchFeaturedProjects = () => fetchProjects('/api/auth/home/destaques');
-const fetchPopularProjects = () => fetchProjects('/api/auth/home/populares');
+// Carregar todas as seções da Home
+const loadHomeProjects = async () => {
+  const [recentes, destaques, populares] = await Promise.all([
+    fetchProjects('/api/auth/home/recentes'),
+    fetchProjects('/api/auth/home/destaques'),
+    fetchProjects('/api/auth/home/populares')
+  ]);
+
+  renderProjects('.main-sub-section:nth-of-type(1) .section-blocks-container', recentes);
+  renderProjects('.main-sub-section:nth-of-type(2) .section-blocks-container', destaques);
+  renderProjects('.main-sub-section:nth-of-type(3) .section-blocks-container', populares);
+
+  setupScrollButtons();
+};
 
 // Configura os botões de scroll dos carrosséis
 const setupScrollButtons = () => {
   const carousels = document.querySelectorAll('.carousel');
+
   carousels.forEach(carousel => {
     const container = carousel.querySelector('.section-blocks-container');
     const leftButton = carousel.querySelector('.left-button');
     const rightButton = carousel.querySelector('.right-button');
     if (!container || !leftButton || !rightButton) return;
 
-    leftButton.addEventListener('click', () => {
-      container.scrollBy({ left: -320, behavior: 'smooth' });
-    });
-
-    rightButton.addEventListener('click', () => {
-      container.scrollBy({ left: 320, behavior: 'smooth' });
-    });
+    leftButton.addEventListener('click', () => container.scrollBy({ left: -320, behavior: 'smooth' }));
+    rightButton.addEventListener('click', () => container.scrollBy({ left: 320, behavior: 'smooth' }));
 
     const updateButtonsVisibility = () => {
-      const isAtStart = container.scrollLeft <= 0;
-      const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth;
-      leftButton.style.opacity = isAtStart ? '0.5' : '1';
-      rightButton.style.opacity = isAtEnd ? '0.5' : '1';
+      leftButton.style.opacity = container.scrollLeft <= 0 ? '0.5' : '1';
+      rightButton.style.opacity = container.scrollLeft >= container.scrollWidth - container.clientWidth ? '0.5' : '1';
     };
 
     container.addEventListener('scroll', updateButtonsVisibility);
@@ -80,37 +82,12 @@ const setupScrollButtons = () => {
   });
 };
 
-// Mostrar menu de opções do projeto (placeholder)
+// Placeholder de menu de opções do projeto
 window.showProjectOptions = (projectId) => {
   console.log('Mostrar opções para projeto:', projectId);
 };
 
-// Carregar todos os projetos nas seções
-const loadHomeProjects = async () => {
-  try {
-    const [recentes, destaques, populares] = await Promise.all([
-      fetchRecentProjects(),
-      fetchFeaturedProjects(),
-      fetchPopularProjects()
-    ]);
-
-    renderProjects('.main-sub-section:nth-of-type(1) .section-blocks-container', recentes);
-    renderProjects('.main-sub-section:nth-of-type(2) .section-blocks-container', destaques);
-    renderProjects('.main-sub-section:nth-of-type(3) .section-blocks-container', populares);
-
-    setupScrollButtons();
-
-    console.log('Projetos carregados na home:', {
-      recentes: recentes.length,
-      destaques: destaques.length,
-      populares: populares.length
-    });
-  } catch (err) {
-    console.error('Erro ao carregar projetos da Home:', err);
-  }
-};
-
-// Inicializa quando o DOM estiver carregado
+// Inicializa quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', loadHomeProjects);
 
 // Atualiza projetos a cada 30 segundos
