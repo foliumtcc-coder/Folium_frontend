@@ -555,7 +555,7 @@ main {
 }
 
 .toast.success {
-  background-color: #4caf50;
+  color: #4caf50;
 }
 
 .toast.error {
@@ -563,7 +563,7 @@ main {
 }
 
 .toast.info {
-  background-color: #7127d8;
+  color: #7127d8;
 }
 
 @keyframes slideInUp {
