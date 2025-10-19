@@ -1,4 +1,4 @@
-import { apiGet } from './api.js';
+// home-projects.js
 
 // Função genérica para renderizar projetos em uma sessão
 const renderProjects = (containerSelector, projects) => {
@@ -9,19 +9,22 @@ const renderProjects = (containerSelector, projects) => {
   projects.forEach(project => {
     const projectLink = document.createElement('a');
     projectLink.href = `project-page.html?id=${project.id}`;
+    projectLink.className = 'project-link';
     projectLink.innerHTML = `
       <div class="project-block">
         <div class="project-img">
-          <img src="${project.capa_url || './src/img/icons/project-image.png'}" alt="${project.nome}" onerror="this.src='./src/img/icons/project-image.png'">
+          <img src="${project.capa_url || './src/img/icons/project-image.png'}" 
+               alt="${project.nome || 'Projeto sem nome'}"
+               onerror="this.src='./src/img/icons/project-image.png'">
         </div>
         <div class="project-footer">
           <div class="project-name">
-            <span>${project.nome || 'Projeto sem título'}</span>
+            <span>${project.nome || 'Projeto sem nome'}</span>
           </div>
           <div class="project-views">
-            <span><i class="fa-solid fa-eye"></i> ${project.visualizacoes || 0}</span>
+            <i class="fa-solid fa-eye"></i> ${project.visualizacoes || 0}
           </div>
-          <button class="project-options" onclick="event.preventDefault(); event.stopPropagation(); showProjectOptions(${project.id})">
+          <button class="project-options">
             <span class="fa-solid fa-ellipsis-vertical"></span>
           </button>
         </div>
@@ -31,15 +34,30 @@ const renderProjects = (containerSelector, projects) => {
   });
 };
 
-// Configura botões de scroll dos carrosséis
+// Função auxiliar para buscar dados da API
+const fetchProjects = async (endpoint) => {
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) throw new Error(`Erro ao buscar ${endpoint}`);
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+// Funções específicas para cada tipo de projeto
+const fetchRecentProjects = () => fetchProjects('/api/auth/home/recentes');
+const fetchFeaturedProjects = () => fetchProjects('/api/auth/home/destaques');
+const fetchPopularProjects = () => fetchProjects('/api/auth/home/populares');
+
+// Configura os botões de scroll dos carrosséis
 const setupScrollButtons = () => {
   const carousels = document.querySelectorAll('.carousel');
-
   carousels.forEach(carousel => {
     const container = carousel.querySelector('.section-blocks-container');
     const leftButton = carousel.querySelector('.left-button');
     const rightButton = carousel.querySelector('.right-button');
-
     if (!container || !leftButton || !rightButton) return;
 
     leftButton.addEventListener('click', () => {
@@ -53,7 +71,6 @@ const setupScrollButtons = () => {
     const updateButtonsVisibility = () => {
       const isAtStart = container.scrollLeft <= 0;
       const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth;
-
       leftButton.style.opacity = isAtStart ? '0.5' : '1';
       rightButton.style.opacity = isAtEnd ? '0.5' : '1';
     };
@@ -63,21 +80,22 @@ const setupScrollButtons = () => {
   });
 };
 
-// Função placeholder para mostrar opções do projeto
+// Mostrar menu de opções do projeto (placeholder)
 window.showProjectOptions = (projectId) => {
-  console.log('Mostrar opções do projeto:', projectId);
+  console.log('Mostrar opções para projeto:', projectId);
 };
 
-// Carregar todas as seções da Home
+// Carregar todos os projetos nas seções
 const loadHomeProjects = async () => {
   try {
-    const recentes = await apiGet('/home/recentes');
+    const [recentes, destaques, populares] = await Promise.all([
+      fetchRecentProjects(),
+      fetchFeaturedProjects(),
+      fetchPopularProjects()
+    ]);
+
     renderProjects('.main-sub-section:nth-of-type(1) .section-blocks-container', recentes);
-
-    const destaques = await apiGet('/home/destaques');
     renderProjects('.main-sub-section:nth-of-type(2) .section-blocks-container', destaques);
-
-    const populares = await apiGet('/home/populares');
     renderProjects('.main-sub-section:nth-of-type(3) .section-blocks-container', populares);
 
     setupScrollButtons();
@@ -89,17 +107,11 @@ const loadHomeProjects = async () => {
     });
   } catch (err) {
     console.error('Erro ao carregar projetos da Home:', err);
-    setupScrollButtons(); // Mantém scroll funcionando mesmo em caso de erro
   }
 };
 
-// Atualiza projetos manualmente
-export const refreshHomeProjects = () => {
-  loadHomeProjects();
-};
-
-// Inicializa quando o DOM estiver pronto
+// Inicializa quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', loadHomeProjects);
 
-// Atualiza automaticamente a cada 30 segundos
+// Atualiza projetos a cada 30 segundos
 setInterval(loadHomeProjects, 30000);
