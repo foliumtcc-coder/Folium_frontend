@@ -221,28 +221,30 @@ async function loadProject() {
         const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
         // Para cada etapa, busca os arquivos e renderiza
-for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
-  try {
-    const res = await fetch(`/api/etapas/arquivos/${etapa.id}`);
-    if (!res.ok) throw new Error(`Erro ${res.status}`);
-    const arquivosData = await res.json();
-    etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
-  } catch (err) {
-    console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
-    etapa.arquivos = [];
-  }
+        for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+          try {
+            const res = await fetch(`/api/etapas/arquivos/${etapa.id}`);
+            if (!res.ok) throw new Error(`Erro ${res.status}`);
+            const arquivosData = await res.json();
+            etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+          } catch (err) {
+            console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
+            etapa.arquivos = [];
+          }
 
-  // Renderiza a etapa com os arquivos
-  const el = renderStep(etapa);
-  etapasContainer.appendChild(el);
-}
-
+          // Renderiza a etapa com os arquivos
+          const el = renderStep(etapa);
+          etapasContainer.appendChild(el);
+        }
 
       } catch (err) {
         console.error('Erro ao carregar etapas:', err);
         etapasContainer.innerHTML = '<p>Não foi possível carregar as etapas.</p>';
       }
     }
+
+    // Inicializa os comentários do Disqus
+    initializeDisqus(projetoId, projeto.titulo);
 
   } catch (err) {
     console.error('Erro ao carregar projeto:', err);
@@ -669,4 +671,22 @@ function showToast(message, type = 'info') {
     toast.style.transform = 'translateY(20px)';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+// --- Inicializa Disqus com identificador único por projeto ---
+function initializeDisqus(projetoId, projetoTitulo) {
+  // Configuração do Disqus
+  window.disqus_config = function () {
+    this.page.url = window.location.href; // URL da página atual
+    this.page.identifier = `projeto-${projetoId}`; // Identificador único por projeto
+    this.page.title = projetoTitulo; // Título do projeto
+  };
+
+  // Carrega o script do Disqus
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-folium-netlify-app.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
 }
