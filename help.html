@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ajuda - Folium</title>
     <link rel="stylesheet" href="./src/css/global-styles.css" />
-    <link rel="stylesheet" href="./src/css/help.css" />
+    <link rel="stylesheet" href="./src/css/about-help.css" />
     <link rel="stylesheet" href="./src/css/standard-header.css" />
     <link rel="stylesheet" href="./src/css/standard-footer.css" />
     <link rel="stylesheet" href="./src/css/dark-mode.css" />
@@ -65,6 +65,9 @@
             <button id="profile-button">
               <span class="fa-solid fa-user"></span>
             </button>
+            <div class="dropdown-menu hidden" id="profile-dropdown-menu">
+              <!-- Menu preenchido via JS -->
+            </div>
           </div>
           <!-- BOTÃO NOVO PROJETO -->
           <div class="new-project-button">
@@ -76,12 +79,10 @@
       </div>
     </header>
 
-    <!--MENU DROPDOWN-->
-
-    <main class="container">
-      <section class="secao">
+    <div class="container">
+      <section class="section">
         <h2>Como usar o Folium</h2>
-        <div class="card-ajuda">
+        <div class="card-style">
           <p>
             O Folium é uma plataforma para organizar, visualizar e compartilhar
             seus projetos de forma clara e intuitiva. Veja abaixo os principais
@@ -108,9 +109,9 @@
         </div>
       </section>
 
-      <section class="secao">
+      <section class="section">
         <h2>Dúvidas Frequentes (FAQ)</h2>
-        <div class="card-ajuda">
+        <div class="card-style">
           <div class="faq">
             <h3>📁 Como criar um novo projeto?</h3>
             <p>
@@ -135,9 +136,9 @@
         </div>
       </section>
 
-      <section class="secao">
+      <section class="section">
         <h2>Quer saber mais sobre o nosso projeto?</h2>
-        <div class="card-ajuda">
+        <div class="card-style">
           <p>
             Acesse nosso <a href="about.html">sobre</a> para saber mais sobre
             toda a construção do nosso projeto!
@@ -145,9 +146,9 @@
         </div>
       </section>
 
-      <section class="secao">
+      <section class="section">
         <h2>Ainda com dúvidas?</h2>
-        <div class="card-ajuda">
+        <div class="card-style">
           <p>
             Entre em contato conosco pela nossa DM do instagram:
             <a href="https://linktr.ee/folium_ejs">@folium_ejs</a> ou envie uma
@@ -155,7 +156,7 @@
           </p>
         </div>
       </section>
-    </main>
+    </div>
 
     <footer class="footer">
       <p><strong>Folium</strong> &copy; 2025. Todos os direitos reservados.</p>
