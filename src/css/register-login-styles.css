@@ -160,6 +160,8 @@ main {
   box-shadow: 0 6px 25px rgba(135, 82, 210, 0.4);
   position: relative;
   overflow: hidden;
+  color: #fff;
+  text-decoration: none;
 }
 
 .visit-button::before {
@@ -182,16 +184,12 @@ main {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 10px 35px rgba(135, 82, 210, 0.6);
   cursor: pointer;
+  color: #fff;
 }
 
 .visit-button:active {
   transform: translateY(-1px) scale(0.98);
   box-shadow: 0 4px 15px rgba(135, 82, 210, 0.5);
-}
-
-.visit-button a {
-  color: #fff;
-  text-decoration: none;
 }
 
 .visit-button span {
