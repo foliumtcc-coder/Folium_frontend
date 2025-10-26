@@ -114,11 +114,14 @@ main {
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(135, 82, 210, 0.15);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
 }
 
-.project-block:hover .project-footer {
-  background-color: #e0e0e0;
+.project-block:hover {
+  box-shadow: 0 6px 20px rgba(135, 82, 210, 0.3);
+  transform: translateY(-5px) scale(1.02);
 }
 
 .project-img {
