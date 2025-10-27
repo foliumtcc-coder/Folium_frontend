@@ -311,11 +311,12 @@ export async function getEtapasByProjeto(projetoId) {
 // --- Editar etapa ---
 export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
   const formData = new FormData();
-  formData.append('nome_etapa', nome);
-  formData.append('descricao_etapa', descricao);
+  formData.append('etapa_id', etapaId); // obrigatório
+  formData.append('nome', nome);         // obrigatório
+  formData.append('descricao', descricao || '');
 
   arquivos.forEach(arquivo => {
-    formData.append('arquivos', arquivo); // <-- corrigido
+    formData.append('arquivos', arquivo); // se houver novos arquivos
   });
 
   const res = await fetch(`${BACKEND_URL}/etapas/update`, {
@@ -323,9 +324,14 @@ export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
     body: formData,
   });
 
-  if (!res.ok) throw new Error('Erro ao atualizar etapa');
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Erro ao atualizar etapa: ${text}`);
+  }
+
   return await res.json();
 }
+
 
 // --- Deletar etapa ---
 export async function deleteEtapa(etapaId) {
