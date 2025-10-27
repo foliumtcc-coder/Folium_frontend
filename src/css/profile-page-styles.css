@@ -290,7 +290,7 @@ main {
 
   /* 🔹 centralização garantida */
   position: relative;
-  top: 12vh; /* desce 12% da altura da tela */
+  top: 5vh; /* desce 12% da altura da tela */
   margin-bottom: 8vh; /* permite rolar sem cortar no final */
 }
 
