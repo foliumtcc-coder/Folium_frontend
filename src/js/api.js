@@ -309,19 +309,15 @@ export async function getEtapasByProjeto(projetoId) {
 
 
 // --- Editar etapa ---
-export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
+export async function updateEtapa(etapaId, nome, descricao) {
   const formData = new FormData();
-  formData.append('etapa_id', etapaId); // obrigatório
-  formData.append('nome', nome);         // obrigatório
-  formData.append('descricao', descricao || '');
-
-  arquivos.forEach(arquivo => {
-    formData.append('arquivos', arquivo); // se houver novos arquivos
-  });
+  formData.append('etapa_id', etapaId);
+  formData.append('nome', nome);
+  formData.append('descricao', descricao);
 
   const res = await fetch(`${BACKEND_URL}/api/auth/etapas/update`, {
     method: 'PUT',
-    body: formData,
+    body: formData
   });
 
   if (!res.ok) {
