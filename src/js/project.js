@@ -143,6 +143,10 @@ async function loadProject() {
     if (!data || !data.projeto) return showToast('Projeto não encontrado.', 'error');
 
     const projeto = data.projeto;
+    const visualizacoesEl = document.getElementById('visualizacoes');
+      if (visualizacoesEl) {
+      visualizacoesEl.innerHTML = `<i class="fa-solid fa-eye"></i> ${projeto.visualizacoes || 0}`;
+      }
     const membros = Array.isArray(data.membros) ? data.membros : [];
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
