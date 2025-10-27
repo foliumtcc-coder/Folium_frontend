@@ -70,8 +70,6 @@ function showToast(message, type = 'info') {
 }
 
 // --- Renderiza uma etapa individual ---
-import { downloadFile } from './api.js'; // ajuste o caminho se necessário
-
 function renderStep(etapa) {
   const div = document.createElement('div');
   div.className = 'step';
