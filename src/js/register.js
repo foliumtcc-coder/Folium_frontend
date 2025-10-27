@@ -1,4 +1,20 @@
-import { register } from './api.js';
+import { register, getUser /*, confirmCode */ } from './api.js';
+
+// --- Verifica se o usuário já está logado ---
+async function checkIfLoggedIn() {
+  try {
+    const { user } = await getUser();
+    if (user) {
+      console.log('[AUTO-LOGIN] Usuário já está logado, redirecionando...');
+      window.location.href = 'home.html';
+    }
+  } catch (err) {
+    console.log('[AUTO-LOGIN] Usuário não está logado');
+  }
+}
+
+// Executa verificação ao carregar a página
+checkIfLoggedIn();
 
 // --- Função para mostrar notificações toast ---
 function showToast(message, type = 'info') {
