@@ -290,8 +290,8 @@ main {
 
   /* 🔹 centralização garantida */
   position: relative;
-  top: 5vh; /* desce 5% da altura da tela */
-  margin-bottom: 5vh; /* permite rolar sem cortar no final */
+  top: 12vh; /* desce 12% da altura da tela */
+  margin-bottom: 8vh; /* permite rolar sem cortar no final */
 }
 
 @keyframes popupSlideIn {
