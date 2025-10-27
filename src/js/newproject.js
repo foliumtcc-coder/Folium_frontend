@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .map(m => m.trim())
         .filter(m => m !== '');
 
-      // Remove duplicatas
       currentMembers = [...new Set(currentMembers)];
 
       if (!currentMembers.includes(loggedUserEmail)) {
@@ -73,20 +72,22 @@ document.addEventListener('DOMContentLoaded', () => {
       messageDiv.textContent = 'Criando projeto...';
 
       try {
-        const responseText = await createProject(formData);
+        const createdProject = await createProject(formData);
+
         messageDiv.style.color = 'green';
-        messageDiv.textContent = responseText || 'Projeto criado com sucesso!';
+        messageDiv.textContent = createdProject.message || 'Projeto criado com sucesso!';
+
+        // Redireciona para a página do projeto recém-criado
+        if (createdProject.projeto && createdProject.projeto.id) {
+          window.location.href = `/project.html?id=${createdProject.projeto.id}`;
+        }
+
         projectForm.reset();
         if (imagePreview) {
           imagePreview.innerHTML = '<i class="fa-solid fa-image"></i><span>Selecione uma imagem</span><small>PNG, JPG ou JPEG</small>';
           imagePreview.classList.remove('has-image');
         }
 
-        // ---------------- Redirecionamento ----------------
-        const createdProject = JSON.parse(responseText); // ou adapte para o que o backend retorna
-        window.location.href = `/project.html?id=${createdProject.id}`;
-        // --------------------------------------------------
-        
       } catch (err) {
         console.error(err);
         messageDiv.style.color = 'red';
@@ -108,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsDataURL(file);
       } else {
-        // Reset preview se nenhum arquivo
         imagePreview.innerHTML = '<i class="fa-solid fa-image"></i><span>Selecione uma imagem</span><small>PNG, JPG ou JPEG</small>';
         imagePreview.classList.remove('has-image');
       }
