@@ -8,7 +8,6 @@ loginForm.addEventListener('submit', async (e) => {
 
   const email = e.target.email.value;
   const password = e.target.password.value;
-  const rememberMe = e.target.rememberMe.checked;
 
   messageDiv.textContent = 'Enviando...';
   messageDiv.style.color = 'black';
