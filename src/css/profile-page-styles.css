@@ -266,11 +266,11 @@ main {
   z-index: 2000;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Mudei de center para flex-start */
+  align-items: center; /* 🔹 Centraliza verticalmente */
   pointer-events: auto;
   backdrop-filter: blur(2px);
-  padding: 80px 20px 40px 20px; /* Padding maior no topo */
-  overflow-y: auto; /* Permite scroll se necessário */
+  padding: 60px 20px; /* 🔹 Mantém espaçamento interno */
+  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -280,6 +280,7 @@ main {
 
 .popup-content {
   background: #fff;
+  margin-top: 40px;
   padding: 30px;
   border-radius: 12px;
   max-width: 500px;
