@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const { user } = await getUser();
       if (user && membersInput) {
         loggedUserEmail = user.email;
-        membersInput.value = loggedUserEmail;
       }
     } catch (err) {
       console.error('Erro ao buscar usuário logado:', err);
