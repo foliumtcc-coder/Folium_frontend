@@ -276,16 +276,37 @@ export async function getUserProjects(userId) {
 // --- Listar etapas de um projeto ---
 
 export async function getEtapasByProjeto(projetoId) {
+  if (!projetoId) throw new Error('ID do projeto não informado');
+
   try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/etapas/projeto/${projetoId}`);
-    if (!res.ok) throw new Error('Erro ao listar etapas');
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    // Faz a requisição ao backend
+    const res = await fetch(`${BACKEND_URL}/api/auth/etapas/projeto/${projetoId}`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Erro ao listar etapas');
+    }
+
     const data = await res.json();
-    return data; // deve retornar { etapas: [...] }
-  } catch(err) {
-    console.error(err);
+
+    // Certifica que data.etapas existe e tem arquivos
+    const etapas = Array.isArray(data.etapas) ? data.etapas : [];
+    const etapasCompletas = etapas.map(etapa => ({
+      ...etapa,
+      arquivos: Array.isArray(etapa.arquivos) ? etapa.arquivos : []
+    }));
+
+    return { etapas: etapasCompletas };
+  } catch (err) {
+    console.error('[API] Erro ao buscar etapas:', err);
     throw err;
   }
 }
+
 
 // --- Editar etapa ---
 export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {

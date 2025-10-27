@@ -131,6 +131,7 @@ function renderStep(etapa) {
 }
 
 // --- Carrega projeto completo ---
+// --- Carrega projeto completo ---
 async function loadProject() {
   try {
     const projetoId = getProjetoIdFromURL();
@@ -232,16 +233,14 @@ async function loadProject() {
       });
     }
 
-    // --- Carrega e renderiza etapas com arquivos ---
+    // --- Carrega e renderiza etapas com arquivos via função do api.js ---
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
 
       try {
-        // Busca todas as etapas do projeto junto com os arquivos
-        const res = await fetch(`${BACKEND_URL}/api/auth/etapas/projeto/${projetoId}`);
-        if (!res.ok) throw new Error(`Erro ${res.status}`);
-        const etapasData = await res.json();
+        // Chama função que já retorna etapas com arquivos
+        const etapasData = await getEtapasByProjeto(projetoId);
         const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
         // Renderiza etapas
@@ -249,7 +248,6 @@ async function loadProject() {
           const el = renderStep(etapa);
           etapasContainer.appendChild(el);
         }
-
       } catch (err) {
         console.error('Erro ao carregar etapas:', err);
         etapasContainer.innerHTML = '<p>Não foi possível carregar as etapas.</p>';
@@ -267,6 +265,7 @@ async function loadProject() {
     showToast('Erro ao carregar projeto.', 'error');
   }
 }
+
 
 
 // --- POPUPS ---
