@@ -439,39 +439,23 @@ function renderStep(etapa) {
   return div;
 }
 
-// --- Baixar arquivo via fetch ---
 // Função para baixar arquivo via backend
-export async function downloadFile(fileId, fileName) {
+export async function downloadFile(arquivoId, nomeArquivo) {
   try {
-    // Busca o token do usuário
-    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-    if (!token) throw new Error('Usuário não autenticado');
-
-    // Chama o backend para baixar o arquivo
-    const res = await fetch(`/api/auth/download/${fileId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
+    const res = await fetch(`${BACKEND_URL}/api/auth/download/${arquivoId}`);
     if (!res.ok) throw new Error('Erro ao baixar arquivo');
 
-    // Converte a resposta em blob
     const blob = await res.blob();
-
-    // Cria um link temporário e clica nele para download
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName;
+    a.download = nomeArquivo || 'arquivo';
     document.body.appendChild(a);
     a.click();
     a.remove();
     window.URL.revokeObjectURL(url);
-
-  } catch (err) {
+  } catch(err) {
     console.error('Erro ao baixar arquivo:', err);
-    showToast('Erro ao baixar arquivo', 'error');
+    alert('Erro ao baixar arquivo'); // usar alert se showToast não existe
   }
 }
