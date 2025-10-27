@@ -104,7 +104,7 @@ function renderStep(etapa) {
 
   const footer = div.querySelector('.step-footer');
 
-  // Adiciona arquivos com event listeners para download
+  // Adiciona arquivos com event listeners para download via backend
   (etapa.arquivos || []).forEach(file => {
     const fileDiv = document.createElement('div');
     fileDiv.className = 'step-docs';
@@ -119,7 +119,8 @@ function renderStep(etapa) {
     link.textContent = file.nome_arquivo || 'arquivo.doc';
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      downloadFile(file.caminho_arquivo, file.nome_arquivo);
+      // Aqui passamos o ID do arquivo para o backend
+      downloadFile(file.id, file.nome_arquivo);
     });
 
     fileDiv.appendChild(link);
