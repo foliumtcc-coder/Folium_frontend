@@ -2,6 +2,7 @@ import { register } from './api.js';
 
 // --- Função para mostrar notificações toast ---
 function showToast(message, type = 'info') {
+  console.log('[TOAST]', type, message);
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   
@@ -19,6 +20,8 @@ function showToast(message, type = 'info') {
 
 // --- Função para mostrar popup de sucesso ---
 function showSuccessPopup(message) {
+  console.log('[SUCCESS POPUP]', message);
+  
   // Remove popup existente se houver
   const existingPopup = document.querySelector('.success-popup-overlay');
   if (existingPopup) {
@@ -61,62 +64,81 @@ function showSuccessPopup(message) {
 const registerForm = document.getElementById('registerForm');
 const messageDiv = document.getElementById('message');
 
-registerForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
+console.log('[INIT] Formulário encontrado:', registerForm);
+console.log('[INIT] Message div encontrada:', messageDiv);
 
-  const name = e.target.name.value.trim();
-  const email = e.target.email.value.trim();
-  const password = e.target.password.value;
-  const confipassword = e.target.confipassword.value;
+if (registerForm) {
+  registerForm.addEventListener('submit', async (e) => {
+    console.log('[SUBMIT] Formulário enviado!');
+    e.preventDefault();
 
-  // Limpa mensagens anteriores
-  if (messageDiv) {
-    messageDiv.textContent = '';
-  }
+    const name = e.target.name.value.trim();
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value;
+    const confipassword = e.target.confipassword.value;
 
-  // Validações básicas
-  if (!name || !email || !password || !confipassword) {
-    showToast('Por favor, preencha todos os campos.', 'error');
-    return;
-  }
+    console.log('[FORM DATA]', { name, email, password: '***', confipassword: '***' });
 
-  if (password !== confipassword) {
-    showToast('As senhas não coincidem.', 'error');
-    return;
-  }
-
-  if (password.length < 6) {
-    showToast('A senha deve ter pelo menos 6 caracteres.', 'error');
-    return;
-  }
-
-  // Mostra loading
-  showToast('Registrando...', 'info');
-
-  try {
-    const responseText = await register(name, email, password, confipassword);
-    
-    // Mostra popup de sucesso
-    showSuccessPopup(responseText);
-    
-    // Limpa o formulário
-    registerForm.reset();
-    
-  } catch (err) {
-    console.error('Erro no registro:', err);
-    
-    // Extrai mensagem de erro se vier em JSON
-    let errorMessage = 'Erro ao conectar com o servidor.';
-    
-    if (err.message) {
-      try {
-        const parsed = JSON.parse(err.message);
-        errorMessage = parsed.message || parsed.error || err.message;
-      } catch (e) {
-        errorMessage = err.message;
-      }
+    // Limpa mensagens anteriores
+    if (messageDiv) {
+      messageDiv.textContent = '';
     }
-    
-    showToast(errorMessage, 'error');
-  }
-});
+
+    // Validações básicas
+    if (!name || !email || !password || !confipassword) {
+      console.log('[VALIDATION] Campos vazios');
+      showToast('Por favor, preencha todos os campos.', 'error');
+      return;
+    }
+
+    if (password !== confipassword) {
+      console.log('[VALIDATION] Senhas não coincidem');
+      showToast('As senhas não coincidem.', 'error');
+      return;
+    }
+
+    if (password.length < 6) {
+      console.log('[VALIDATION] Senha muito curta');
+      showToast('A senha deve ter pelo menos 6 caracteres.', 'error');
+      return;
+    }
+
+    // Mostra loading
+    console.log('[REGISTER] Iniciando registro...');
+    showToast('Registrando...', 'info');
+
+    try {
+      console.log('[API] Chamando função register...');
+      const responseText = await register(name, email, password, confipassword);
+      console.log('[API] Resposta recebida:', responseText);
+      
+      // Mostra popup de sucesso
+      showSuccessPopup(responseText);
+      
+      // Limpa o formulário
+      registerForm.reset();
+      
+    } catch (err) {
+      console.error('[ERROR] Erro no registro:', err);
+      
+      // Extrai mensagem de erro se vier em JSON
+      let errorMessage = 'Erro ao conectar com o servidor.';
+      
+      if (err.message) {
+        try {
+          const parsed = JSON.parse(err.message);
+          errorMessage = parsed.message || parsed.error || err.message;
+        } catch (e) {
+          errorMessage = err.message;
+        }
+      }
+      
+      console.log('[ERROR MESSAGE]', errorMessage);
+      showToast(errorMessage, 'error');
+    }
+  });
+  
+  console.log('[INIT] Event listener adicionado ao formulário');
+} else {
+  console.error('[INIT] ERRO: Formulário não encontrado!');
+}
