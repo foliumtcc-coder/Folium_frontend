@@ -314,13 +314,10 @@ export async function getEtapasByProjeto(projetoId) {
 
 // --- Editar etapa ---
 export async function updateEtapa(etapaId, nome, descricao) {
-  const formData = new FormData();
-  formData.append('nome', nome);
-  formData.append('descricao', descricao);
-
   const res = await fetch(`${BACKEND_URL}/api/auth/etapas/update/${etapaId}`, {
     method: 'PUT',
-    body: formData
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome, descricao })
   });
 
   if (!res.ok) {
@@ -330,6 +327,7 @@ export async function updateEtapa(etapaId, nome, descricao) {
 
   return await res.json();
 }
+
 
 
 // --- Deletar etapa ---
