@@ -319,7 +319,7 @@ export async function updateEtapa(etapaId, nome, descricao, arquivos = []) {
     formData.append('arquivos', arquivo); // se houver novos arquivos
   });
 
-  const res = await fetch(`${BACKEND_URL}/etapas/update`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/etapas/update`, {
     method: 'PUT',
     body: formData,
   });
