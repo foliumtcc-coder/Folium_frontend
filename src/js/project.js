@@ -479,6 +479,12 @@ function initializeDisqus(projetoId, projetoTitulo) {
     this.page.url = window.location.href;
     this.page.identifier = `projeto-${projetoId}`;
     this.page.title = projetoTitulo;
+
+    // Customização de cor
+    this.styling = {
+      primaryColor: '#7127d8',
+      linkColor: '#563ab1'
+    };
     
     // Define o tema baseado no modo atual
     this.callbacks.onReady = [function() {

@@ -760,3 +760,24 @@ body.dark-mode .toast {
 #disqus_thread {
   min-height: 400px;
 }
+
+/* Customização do Disqus */
+#disqus_thread {
+  --disqus-primary-color: #7127d8 !important;
+  --disqus-link-color: #563ab1 !important;
+}
+
+/* Tenta sobrescrever os links do iframe */
+#disqus_thread a {
+  color: #7127d8 !important;
+}
+
+/* Customização adicional (nem sempre funciona devido ao iframe) */
+#disqus_thread iframe {
+  color-scheme: light dark;
+}
+
+/* Botões e elementos do Disqus */
+#disqus_thread .publisher-anchor-color {
+  background-color: #7127d8 !important;
+}
