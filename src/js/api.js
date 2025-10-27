@@ -311,11 +311,10 @@ export async function getEtapasByProjeto(projetoId) {
 // --- Editar etapa ---
 export async function updateEtapa(etapaId, nome, descricao) {
   const formData = new FormData();
-  formData.append('etapa_id', etapaId);
   formData.append('nome', nome);
   formData.append('descricao', descricao);
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/etapas/update`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/etapas/update/${etapaId}`, {
     method: 'PUT',
     body: formData
   });
