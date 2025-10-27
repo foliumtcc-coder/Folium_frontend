@@ -411,7 +411,7 @@ function openAddStepPopup() {
       files.forEach(file => formData.append('arquivos', file));
 
       // Faz a requisição POST para o backend
-      const response = await fetch('/api/etapas', {
+      const response = await fetch('/api/auth/etapas', {
         method: 'POST',
         body: formData
       });
