@@ -382,6 +382,7 @@ function openAddStepPopup() {
   const form = document.getElementById('add-step-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
+
     const projetoId = getProjetoIdFromURL();
     const nome = document.getElementById('step-name').value.trim();
     const descricao = document.getElementById('step-desc').value.trim();
@@ -393,18 +394,44 @@ function openAddStepPopup() {
       return;
     }
 
+    if (!projetoId) {
+      showToast('ID do projeto não encontrado!', 'error');
+      return;
+    }
+
     try {
-      const novaEtapa = await createEtapa(projetoId, nome, descricao, files);
+      // Cria FormData para enviar arquivos
+      const formData = new FormData();
+      formData.append('projeto_id', projetoId);
+      formData.append('nome', nome);
+      formData.append('descricao', descricao);
+      files.forEach(file => formData.append('arquivos', file));
+
+      // Faz a requisição POST para o backend
+      const response = await fetch('/api/etapas', {
+        method: 'POST',
+        body: formData
+      });
+
+      const novaEtapa = await response.json();
+
+      if (!response.ok) {
+        throw new Error(novaEtapa.error || 'Erro ao criar etapa');
+      }
+
+      // Renderiza a nova etapa na tela
       const el = renderStep(novaEtapa);
       document.querySelector('.etapas-container')?.appendChild(el);
       showToast('Etapa criada com sucesso!', 'success');
       popup.classList.add('hidden');
-    } catch(err) {
+
+    } catch (err) {
       console.error(err);
-      showToast('Erro ao criar etapa', 'error');
+      showToast(err.message || 'Erro ao criar etapa', 'error');
     }
   });
 }
+
 
 // Editar etapa
 function openEditStepPopup(etapa) {
@@ -457,21 +484,41 @@ function openDeletePopup(projeto) {
   const form = document.getElementById('delete-project-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
+
     const confirmName = document.getElementById('confirm-project-name').value.trim();
     if (confirmName !== projeto.titulo) {
       showToast('Nome do projeto não confere!', 'error');
       return;
     }
+
+    const projetoId = getProjetoIdFromURL();
+    if (!projetoId) {
+      showToast('ID do projeto não encontrado!', 'error');
+      return;
+    }
+
     try {
-      await deleteProject(getProjetoIdFromURL());
+      // Requisição DELETE para o backend
+      const response = await fetch(`/api/auth/projects/${projetoId}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao deletar projeto');
+      }
+
       showToast('Projeto deletado com sucesso!', 'success');
       window.location.href = '/home.html';
+
     } catch (err) {
       console.error('Erro ao deletar projeto:', err);
-      showToast('Erro ao deletar projeto.', 'error');
+      showToast(err.message || 'Erro ao deletar projeto.', 'error');
     }
   });
 }
+
 
 // --- Inicializa Disqus com identificador único por projeto ---
 function initializeDisqus(projetoId, projetoTitulo) {
