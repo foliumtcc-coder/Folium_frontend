@@ -729,3 +729,17 @@ body.dark-mode .notification-menu button {
 body.dark-mode .notification-menu button:hover {
   opacity: 0.9;
 }
+
+/* Dark mode para comentários */
+body.dark-mode .comments-container {
+  background-color: #2c2c2c;
+}
+
+body.dark-mode .comments-title {
+  color: #f0f0f0;
+  border-bottom-color: #444;
+}
+
+body.dark-mode #disqus_thread {
+  color-scheme: dark;
+}
