@@ -353,7 +353,7 @@ export async function deleteProject(projectId) {
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
-  const res = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projectId}`, {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${token}` }
   });
