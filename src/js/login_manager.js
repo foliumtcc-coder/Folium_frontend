@@ -1,96 +1,116 @@
-import { getUser, logout } from './api.js';
+import { login /*, confirmCode */ } from './api.js';
 
-const LoginManager = (() => {
-  const profileMenuId = 'profile-dropdown-menu';
-  const profileButtonId = 'profile-button';
+// --- Função para mostrar notificações toast ---
+function showToast(message, type = 'info') {
+  console.log('[TOAST]', type, message);
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  toast.innerHTML = `<span style="font-size: 20px;">${icon}</span> ${message}`;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
 
-      // 🔠 Função para capitalizar cada palavra do nome
-    function capitalizeName(name) {
-      if (!name) return 'Usuário';
-      return name
-        .toLowerCase()
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+const loginForm = document.getElementById('loginForm');
+const messageDiv = document.getElementById('message');
+
+console.log('[INIT] Formulário de login encontrado:', loginForm);
+
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    console.log('[SUBMIT] Formulário de login enviado!');
+    e.preventDefault();
+
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value;
+
+    console.log('[FORM DATA]', { email, password: '***' });
+
+    // Limpa mensagens anteriores
+    if (messageDiv) {
+      messageDiv.textContent = '';
     }
 
-  async function fetchUser() {
-    const profileMenu = document.getElementById(profileMenuId);
-    if (!profileMenu) return;
+    // Validações básicas
+    if (!email || !password) {
+      console.log('[VALIDATION] Campos vazios');
+      showToast('Por favor, preencha todos os campos.', 'error');
+      return;
+    }
+
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      console.log('[VALIDATION] Email inválido');
+      showToast('Por favor, insira um email válido.', 'error');
+      return;
+    }
+
+    // Mostra loading
+    console.log('[LOGIN] Iniciando login...');
+    showToast('Entrando...', 'info');
 
     try {
-      const { user } = await getUser();
+      console.log('[API] Chamando função login...');
+      const res = await login(email, password, false);
+      console.log('[API] Resposta recebida:', res);
 
-      if (user) {
-        // Certifique-se de usar o campo correto do usuário
-        const formattedName = capitalizeName(user.name1 || 'Usuário');
-        
-        profileMenu.innerHTML = `
-          <ul>
-            <li><a href="profile-page.html?id=${user.id}"><strong>${formattedName}</strong></a></li>
-            <li><a href="#" id="logout-link">Sair</a></li>
-          </ul>
-        `;
+      const message = res.message || 'Login realizado com sucesso!';
+      
+      showToast(message, 'success');
 
-        // Configura logout
-        const logoutLink = document.getElementById('logout-link');
-        if (logoutLink) {
-          logoutLink.addEventListener('click', async e => {
-            e.preventDefault();
-            try {
-              await logout(); // remove token
-            } catch (err) {
-              console.error('Erro no logout:', err);
-            }
-            updateMenuAfterLogout();
-          });
-        }
-      } else {
-        updateMenuAfterLogout();
-      }
+      // Limpa o formulário
+      loginForm.reset();
+
+      // Redireciona para a home
+      console.log('[REDIRECT] Redirecionando para home...');
+      setTimeout(() => {
+        window.location.href = 'home.html';
+      }, 1000);
+
     } catch (err) {
-      console.error('Erro ao buscar usuário:', err);
-      updateMenuAfterLogout();
-    }
-  }
+      console.error('[ERROR] Erro no login:', err);
 
-  function updateMenuAfterLogout() {
-    const profileMenu = document.getElementById(profileMenuId);
-    if (!profileMenu) return;
+      // Extrai mensagem de erro
+      let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
 
-    profileMenu.innerHTML = `
-      <ul>
-        <li><a href="register.html">Registrar</a></li>
-        <li><a href="index.html">Entrar</a></li>
-      </ul>
-    `;
-  }
-
-  function setupDropdown() {
-    const profileBtn = document.getElementById(profileButtonId);
-    const profileMenu = document.getElementById(profileMenuId);
-    if (!profileBtn || !profileMenu) return;
-
-    profileBtn.addEventListener('click', e => {
-      e.stopPropagation(); // evita fechar imediatamente
-      profileMenu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', e => {
-      if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-        profileMenu.classList.add('hidden');
+      if (err.message) {
+        try {
+          const parsed = JSON.parse(err.message);
+          errorMessage = parsed.message || parsed.error || err.message;
+        } catch (e) {
+          errorMessage = err.message;
+        }
       }
-    });
-  }
 
-  function init() {
-    fetchUser();
-    setupDropdown();
-  }
+      console.log('[ERROR MESSAGE]', errorMessage);
+      showToast(errorMessage, 'error');
+    }
+  });
 
-  return { init };
-})();
+  console.log('[INIT] Event listener adicionado ao formulário de login');
+} else {
+  console.error('[INIT] ERRO: Formulário de login não encontrado!');
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-  LoginManager.init();
-});
+// --- Mantido de canto, mas não usado ---
+// confirmBtn.addEventListener('click', async () => {
+//   const code = document.getElementById('confirmCode').value;
+//   showToast('Validando...', 'info');
+//   try {
+//     const msg = await confirmCode(code);
+//     showToast(msg, 'success');
+//     setTimeout(() => {
+//       window.location.href = 'home.html';
+//     }, 1500);
+//   } catch (err) {
+//     showToast(err.message || 'Erro ao validar código', 'error');
+//   }
+// });
