@@ -50,7 +50,7 @@ document.addEventListener("click", () => {
 });
 
 //MENU DROPDOWN NOTIFICATION
-const notifcationButton = document.getElementById("notification-button");
+const notificationButton = document.getElementById("notification-button");
 const notificationDropdown = document.getElementById(
   "notification-dropdown-menu"
 );
