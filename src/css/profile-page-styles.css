@@ -92,6 +92,7 @@ main {
   color: #fff;
   margin: 0;
   line-height: 1.1;
+  text-transform: capitalize;
 }
 
 #edit-profile-btn {

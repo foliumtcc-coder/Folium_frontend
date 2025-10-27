@@ -4,6 +4,16 @@ const LoginManager = (() => {
   const profileMenuId = 'profile-dropdown-menu';
   const profileButtonId = 'profile-button';
 
+      // 🔠 Função para capitalizar cada palavra do nome
+    function capitalizeName(name) {
+      if (!name) return 'Usuário';
+      return name
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
   async function fetchUser() {
     const profileMenu = document.getElementById(profileMenuId);
     if (!profileMenu) return;
@@ -13,9 +23,11 @@ const LoginManager = (() => {
 
       if (user) {
         // Certifique-se de usar o campo correto do usuário
+        const formattedName = capitalizeName(user.name1 || 'Usuário');
+        
         profileMenu.innerHTML = `
           <ul>
-            <li><a href="profile-page.html?id=${user.id}"><strong>${user.name1 || 'Usuário'}</strong></a></li>
+            <li><a href="profile-page.html?id=${user.id}"><strong>${formattedName}</strong></a></li>
             <li><a href="#" id="logout-link">Sair</a></li>
           </ul>
         `;
