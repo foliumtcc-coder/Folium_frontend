@@ -417,8 +417,6 @@ function openAddStepPopup() {
 }
 
 
-
-
 // Editar etapa
 function openEditStepPopup(etapa) {
   const innerHTML = `
@@ -484,26 +482,18 @@ function openDeletePopup(projeto) {
     }
 
     try {
-      // Requisição DELETE para o backend
-      const response = await fetch(`/api/auth/projects/${projetoId}`, {
-        method: 'DELETE'
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao deletar projeto');
-      }
+      // Chama a função deleteProject do api.js
+      await deleteProject(projetoId);
 
       showToast('Projeto deletado com sucesso!', 'success');
       window.location.href = '/home.html';
-
     } catch (err) {
-      console.error('Erro ao deletar projeto:', err);
+      console.error('[FRONT] Erro ao deletar projeto:', err);
       showToast(err.message || 'Erro ao deletar projeto.', 'error');
     }
   });
 }
+
 
 
 // --- Inicializa Disqus com identificador único por projeto ---
