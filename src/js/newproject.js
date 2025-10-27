@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Redireciona para a página do projeto recém-criado
         if (createdProject.projeto && createdProject.projeto.id) {
-          window.location.href = `/project.html?id=${createdProject.projeto.id}`;
+          window.location.href = `/project-page.html?id=${createdProject.projeto.id}`;
         }
 
         projectForm.reset();
