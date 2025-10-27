@@ -144,9 +144,10 @@ async function loadProject() {
 
     const projeto = data.projeto;
     const visualizacoesEl = document.getElementById('visualizacoes');
-      if (visualizacoesEl) {
+    if (visualizacoesEl) {
       visualizacoesEl.innerHTML = `<i class="fa-solid fa-eye"></i> ${projeto.visualizacoes || 0}`;
-      }
+    }
+
     const membros = Array.isArray(data.membros) ? data.membros : [];
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
@@ -237,23 +238,14 @@ async function loadProject() {
       etapasContainer.innerHTML = '';
 
       try {
-        // Busca todas as etapas do projeto
-        const etapasData = await getEtapasByProjeto(projetoId);
+        // Busca todas as etapas do projeto junto com os arquivos
+        const res = await fetch(`${BACKEND_URL}/api/auth/etapas/projeto/${projetoId}`);
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+        const etapasData = await res.json();
         const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
-        // Para cada etapa, busca os arquivos e renderiza
+        // Renderiza etapas
         for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
-          try {
-            const res = await fetch(`/api/etapas/arquivos/${etapa.id}`);
-            if (!res.ok) throw new Error(`Erro ${res.status}`);
-            const arquivosData = await res.json();
-            etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
-          } catch (err) {
-            console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
-            etapa.arquivos = [];
-          }
-
-          // Renderiza a etapa com os arquivos
           const el = renderStep(etapa);
           etapasContainer.appendChild(el);
         }
@@ -275,6 +267,7 @@ async function loadProject() {
     showToast('Erro ao carregar projeto.', 'error');
   }
 }
+
 
 // --- POPUPS ---
 
