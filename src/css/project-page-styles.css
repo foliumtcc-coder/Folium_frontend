@@ -785,3 +785,232 @@ body.dark-mode .toast {
 #disqus_thread .publisher-anchor-color {
   background-color: #5a1faf !important;
 }
+
+/* ===== PREVIEW DE ARQUIVOS NAS ETAPAS ===== */
+
+.step-footer {
+  width: 100%;
+  height: auto;
+  padding: 15px 20px;
+  background-color: #fafafa;
+  border-top: 1px solid #e8e8e8;
+}
+
+.step-files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.step-file-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.step-file-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(113, 39, 216, 0.3);
+}
+
+/* Preview de Imagem */
+.file-preview-image {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  background: #f5f5f5;
+}
+
+/* Preview de Documento */
+.file-preview-doc {
+  width: 100%;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.file-preview-doc .file-icon {
+  font-size: 40px;
+  color: white;
+}
+
+.file-preview-doc .file-extension {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #764ba2;
+  text-transform: uppercase;
+}
+
+/* Nome do arquivo */
+.file-name {
+  padding: 6px 8px;
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: white;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Hover overlay */
+.file-hover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(113, 39, 216, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-size: 24px;
+}
+
+.step-file-item:hover .file-hover-overlay {
+  opacity: 1;
+}
+
+/* Modal Lightbox para Preview */
+.file-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.file-lightbox.active {
+  display: flex;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  animation: lightboxZoom 0.3s ease;
+}
+
+@keyframes lightboxZoom {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-file-info {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  text-align: center;
+}
+
+.lightbox-file-info h3 {
+  margin-bottom: 15px;
+  color: #2c2c54;
+}
+
+.lightbox-download-btn {
+  background-color: #7127d8;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lightbox-download-btn:hover {
+  background-color: #5a1faf;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(113, 39, 216, 0.4);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.lightbox-close:hover {
+  background: #7127d8;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Dark Mode Support */
+body.dark-mode .step-file-item {
+  background: #2a2a2a;
+}
+
+body.dark-mode .file-name {
+  background: #2a2a2a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .lightbox-file-info {
+  background: #2a2a2a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .lightbox-file-info h3 {
+  color: #e0e0e0;
+}
+

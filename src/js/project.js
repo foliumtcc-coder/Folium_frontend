@@ -104,28 +104,18 @@ function renderStep(etapa) {
 
   const footer = div.querySelector('.step-footer');
 
-  // Adiciona arquivos com event listeners para download via backend
-  (etapa.arquivos || []).forEach(file => {
-    const fileDiv = document.createElement('div');
-    fileDiv.className = 'step-docs';
+  // Cria grid de arquivos se houver arquivos
+  if (etapa.arquivos && etapa.arquivos.length > 0) {
+    const filesGrid = document.createElement('div');
+    filesGrid.className = 'step-files-grid';
 
-    const icon = document.createElement('span');
-    icon.className = 'fa-solid fa-file file-icon';
-    fileDiv.appendChild(icon);
-
-    const link = document.createElement('a');
-    link.href = '#';
-    link.className = 'file-text';
-    link.textContent = file.nome_arquivo || 'arquivo.doc';
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      // Aqui passamos o ID do arquivo para o backend
-      downloadFile(file.id, file.nome_arquivo);
+    etapa.arquivos.forEach(file => {
+      const fileItem = createFilePreview(file);
+      filesGrid.appendChild(fileItem);
     });
 
-    fileDiv.appendChild(link);
-    footer.appendChild(fileDiv);
-  });
+    footer.appendChild(filesGrid);
+  }
 
   // Botões de ação
   div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
@@ -769,3 +759,152 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', loadProject);
+
+// ===== NOVA FUNÇÃO: Criar preview de arquivo =====
+
+function createFilePreview(file) {
+  const fileItem = document.createElement('div');
+  fileItem.className = 'step-file-item';
+  
+  const fileName = file.nome_arquivo || 'arquivo';
+  const fileExt = fileName.split('.').pop().toLowerCase();
+  
+  // Determina se é imagem
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  const isImage = imageExtensions.includes(fileExt);
+  
+  if (isImage && file.url_arquivo) {
+    // Preview de imagem
+    fileItem.innerHTML = `
+      <img src="${file.url_arquivo}" alt="${fileName}" class="file-preview-image">
+      <div class="file-name" title="${fileName}">${fileName}</div>
+      <div class="file-hover-overlay">
+        <i class="fas fa-search-plus"></i>
+      </div>
+    `;
+  } else {
+    // Preview de documento
+    const icon = getFileIcon(fileExt);
+    fileItem.innerHTML = `
+      <div class="file-preview-doc">
+        <i class="${icon} file-icon"></i>
+        <span class="file-extension">${fileExt}</span>
+      </div>
+      <div class="file-name" title="${fileName}">${fileName}</div>
+      <div class="file-hover-overlay">
+        <i class="fas fa-download"></i>
+      </div>
+    `;
+  }
+  
+  // Adiciona evento de clique
+  fileItem.addEventListener('click', () => {
+    if (isImage && file.url_arquivo) {
+      openImageLightbox(file);
+    } else {
+      downloadFile(file.id, fileName);
+    }
+  });
+  
+  return fileItem;
+}
+
+
+// ===== Retorna ícone baseado no tipo de arquivo =====
+
+function getFileIcon(extension) {
+  const iconMap = {
+    // Documentos
+    'pdf': 'fas fa-file-pdf',
+    'doc': 'fas fa-file-word',
+    'docx': 'fas fa-file-word',
+    'txt': 'fas fa-file-alt',
+    
+    // Planilhas
+    'xls': 'fas fa-file-excel',
+    'xlsx': 'fas fa-file-excel',
+    'csv': 'fas fa-file-excel',
+    
+    // Apresentações
+    'ppt': 'fas fa-file-powerpoint',
+    'pptx': 'fas fa-file-powerpoint',
+    
+    // Arquivos compactados
+    'zip': 'fas fa-file-archive',
+    'rar': 'fas fa-file-archive',
+    '7z': 'fas fa-file-archive',
+    
+    // Código
+    'html': 'fas fa-file-code',
+    'css': 'fas fa-file-code',
+    'js': 'fas fa-file-code',
+    'json': 'fas fa-file-code',
+    
+    // Padrão
+    'default': 'fas fa-file'
+  };
+  
+  return iconMap[extension] || iconMap['default'];
+}
+
+
+// ===== Abre lightbox para imagens =====
+
+function openImageLightbox(file) {
+  // Remove lightbox existente
+  const existingLightbox = document.querySelector('.file-lightbox');
+  if (existingLightbox) {
+    existingLightbox.remove();
+  }
+  
+  // Cria novo lightbox
+  const lightbox = document.createElement('div');
+  lightbox.className = 'file-lightbox';
+  
+  lightbox.innerHTML = `
+    <div class="lightbox-content">
+      <button class="lightbox-close">&times;</button>
+      <img src="${file.url_arquivo}" alt="${file.nome_arquivo}" class="lightbox-image">
+      <div style="text-align: center; margin-top: 15px;">
+        <button class="lightbox-download-btn">
+          <i class="fas fa-download"></i>
+          Baixar ${file.nome_arquivo}
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(lightbox);
+  
+  // Ativa o lightbox
+  setTimeout(() => lightbox.classList.add('active'), 10);
+  
+  // Eventos de fechar
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  const downloadBtn = lightbox.querySelector('.lightbox-download-btn');
+  
+  const closeLightbox = () => {
+    lightbox.classList.remove('active');
+    setTimeout(() => lightbox.remove(), 300);
+  };
+  
+  closeBtn.addEventListener('click', closeLightbox);
+  
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      closeLightbox();
+    }
+  });
+  
+  downloadBtn.addEventListener('click', () => {
+    downloadFile(file.id, file.nome_arquivo);
+  });
+  
+  // Fechar com ESC
+  document.addEventListener('keydown', function escHandler(e) {
+    if (e.key === 'Escape') {
+      closeLightbox();
+      document.removeEventListener('keydown', escHandler);
+    }
+  });
+}
