@@ -13,7 +13,7 @@ loginForm.addEventListener('submit', async (e) => {
   messageDiv.style.color = 'black';
 
   try {
-    const res = await login(email, password, rememberMe); // res é objeto JSON
+    const res = await login(email, password, false); // res é objeto JSON
     messageDiv.style.color = 'green';
     messageDiv.textContent = res.message || 'Login realizado com sucesso!';
 
