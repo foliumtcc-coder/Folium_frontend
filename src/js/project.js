@@ -6,7 +6,8 @@ import {
   createEtapa, 
   updateEtapa, 
   deleteEtapa,
-  getEtapasByProjeto
+  getEtapasByProjeto,
+  downloadFile
 } from './api.js';
 
 // --- Pega o projetoId da URL ---
@@ -69,6 +70,8 @@ function showToast(message, type = 'info') {
 }
 
 // --- Renderiza uma etapa individual ---
+import { downloadFile } from './api.js'; // ajuste o caminho se necessário
+
 function renderStep(etapa) {
   const div = document.createElement('div');
   div.className = 'step';
@@ -98,19 +101,32 @@ function renderStep(etapa) {
     <div class="section-line"></div>
     <div class="step-main-content">${etapa.descricao_etapa || 'Espaço para texto.'}</div>
     <div class="section-line"></div>
-    <div class="step-footer">
-      ${etapa.arquivos?.map(file => {
-        const url = file.caminho_arquivo || '#';
-        const nome = file.nome_arquivo || 'arquivo.doc';
-        return `
-          <div class="step-docs">
-            <span class="fa-solid fa-file file-icon"></span>
-            <a href="${url}" target="_blank" class="file-text">${nome}</a>
-          </div>
-        `;
-      }).join('') || ''}
-    </div>
+    <div class="step-footer"></div>
   `;
+
+  const footer = div.querySelector('.step-footer');
+
+  // Adiciona arquivos com event listeners para download
+  (etapa.arquivos || []).forEach(file => {
+    const fileDiv = document.createElement('div');
+    fileDiv.className = 'step-docs';
+
+    const icon = document.createElement('span');
+    icon.className = 'fa-solid fa-file file-icon';
+    fileDiv.appendChild(icon);
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.className = 'file-text';
+    link.textContent = file.nome_arquivo || 'arquivo.doc';
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      downloadFile(file.caminho_arquivo, file.nome_arquivo);
+    });
+
+    fileDiv.appendChild(link);
+    footer.appendChild(fileDiv);
+  });
 
   // Botões de ação
   div.querySelector('.edit-step-btn')?.addEventListener('click', () => openEditStepPopup(etapa));
@@ -130,7 +146,7 @@ function renderStep(etapa) {
   return div;
 }
 
-// --- Carrega projeto completo ---
+
 // --- Carrega projeto completo ---
 async function loadProject() {
   try {

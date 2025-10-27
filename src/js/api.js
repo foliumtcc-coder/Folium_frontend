@@ -438,3 +438,25 @@ function renderStep(etapa) {
 
   return div;
 }
+
+// --- Baixar arquivo via fetch ---
+export async function downloadFile(url, filename) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Erro ao baixar arquivo');
+    const blob = await res.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (err) {
+    console.error('Erro ao baixar arquivo:', err);
+    // Aqui você pode chamar showToast se quiser alertar o usuário
+    if (typeof showToast === 'function') {
+      showToast('Erro ao baixar arquivo.', 'error');
+    }
+    throw err;
+  }
+}
