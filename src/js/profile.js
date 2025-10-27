@@ -1,5 +1,22 @@
 import { getUser, updateUserProfile, getUserProfile } from './api.js';
 
+// --- Função para mostrar notificações toast ---
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  toast.innerHTML = `<span style="font-size: 20px;">${icon}</span> ${message}`;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 function normalizeUser(u) {
   if (!u) return null;
   return {
@@ -46,6 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loggedUser = res.user || null;
   } catch (err) {
     console.error('Erro ao buscar usuário logado:', err);
+    showToast('Erro ao carregar usuário logado.', 'error');
     loggedUser = null;
   }
 
@@ -102,7 +120,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadProfile() {
     try {
       const idToFetch = profileId ? profileId : (loggedUser?.id ?? null);
-      if (!idToFetch) return;
+      if (!idToFetch) {
+        showToast('ID do usuário não encontrado.', 'error');
+        return;
+      }
 
       const data = await getUserProfile(idToFetch);
       profileUser = normalizeUser(data.user ?? data);
@@ -118,6 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } catch (err) {
       console.error('Erro ao carregar perfil:', err);
+      showToast('Erro ao carregar perfil do usuário.', 'error');
     }
   }
 
@@ -147,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
 
     if (!profileUser || !loggedUser || Number(profileUser.id) !== Number(loggedUser.id)) {
-      alert('Você não tem permissão para editar este perfil.');
+      showToast('Você não tem permissão para editar este perfil.', 'error');
       return;
     }
 
@@ -163,10 +185,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       profileUser = normalizeUser(result.user ?? result);
       fillProfileUI(profileUser);
       popup.classList.add('hidden');
-      alert('Perfil atualizado com sucesso!');
+      showToast('Perfil atualizado com sucesso!', 'success');
     } catch (err) {
       console.error('Erro ao atualizar perfil:', err);
-      alert('Erro ao atualizar perfil.');
+      showToast('Erro ao atualizar perfil.', 'error');
     }
   });
 });
