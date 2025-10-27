@@ -158,8 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
           e.stopPropagation();
           try {
             await acceptInvite(n.projeto_id);
-            n.lida = true;
-            renderNotifications();
+            // Remove o convite da lista local
+            notifications = notifications.filter(notif => notif.id !== n.id);
+            renderNotifications(); // Atualiza o menu sem o convite
           } catch (err) {
             console.error('Erro ao aceitar convite:', err);
           }
@@ -175,8 +176,9 @@ document.addEventListener('DOMContentLoaded', () => {
         recusarBtn.style.color = '#fff';
         recusarBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          n.lida = true;
-          renderNotifications();
+          // Remove o convite da lista local
+          notifications = notifications.filter(notif => notif.id !== n.id);
+          renderNotifications(); // Atualiza o menu sem o convite
         });
 
         btnContainer.appendChild(aceitarBtn);
@@ -184,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.appendChild(btnContainer);
       }
 
+      // Marca como lida ao clicar
       notificationMenu.appendChild(item);
     });
   }
