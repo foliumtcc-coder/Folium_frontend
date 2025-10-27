@@ -440,16 +440,29 @@ function renderStep(etapa) {
 }
 
 // Função para baixar arquivo via backend
+// api.js
 export async function downloadFile(arquivoId, nomeArquivo) {
   try {
-    const token = localStorage.getItem('token'); // ou onde você guarda o JWT
+    // Pega o token JWT do localStorage ou onde você armazenou
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Usuário não autenticado');
+
+    // Chama a rota de download no backend
     const res = await fetch(`${BACKEND_URL}/api/auth/download/${arquivoId}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
 
-    if (!res.ok) throw new Error(`Erro ao baixar arquivo: ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`Erro ao baixar arquivo: ${res.status}`);
+    }
 
+    // Recebe o arquivo como blob
     const blob = await res.blob();
+
+    // Cria um link temporário para download
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -459,8 +472,8 @@ export async function downloadFile(arquivoId, nomeArquivo) {
     a.remove();
     window.URL.revokeObjectURL(url);
 
-  } catch(err) {
+  } catch (err) {
     console.error('Erro ao baixar arquivo:', err);
-    alert('Erro ao baixar arquivo');
+    alert('Erro ao baixar arquivo. Verifique se está logado ou se o arquivo existe.');
   }
 }
