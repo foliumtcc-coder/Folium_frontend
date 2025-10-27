@@ -377,6 +377,7 @@ function openAddStepPopup() {
       </form>
     </div>
   `;
+
   const popup = setupPopup('add-step-popup', innerHTML);
 
   const form = document.getElementById('add-step-form');
@@ -400,11 +401,13 @@ function openAddStepPopup() {
     }
 
     try {
-      // Cria FormData para enviar arquivos
+      // Cria FormData para enviar dados e arquivos
       const formData = new FormData();
       formData.append('projeto_id', projetoId);
       formData.append('nome', nome);
       formData.append('descricao', descricao);
+
+      // O nome 'arquivos' precisa bater com req.files no backend
       files.forEach(file => formData.append('arquivos', file));
 
       // Faz a requisição POST para o backend
@@ -413,7 +416,13 @@ function openAddStepPopup() {
         body: formData
       });
 
-      const novaEtapa = await response.json();
+      // Tenta transformar a resposta em JSON
+      let novaEtapa;
+      try {
+        novaEtapa = await response.json();
+      } catch {
+        throw new Error('Resposta do servidor não é JSON.');
+      }
 
       if (!response.ok) {
         throw new Error(novaEtapa.error || 'Erro ao criar etapa');
@@ -426,11 +435,12 @@ function openAddStepPopup() {
       popup.classList.add('hidden');
 
     } catch (err) {
-      console.error(err);
+      console.error('[FRONT] Erro ao criar etapa:', err);
       showToast(err.message || 'Erro ao criar etapa', 'error');
     }
   });
 }
+
 
 
 // Editar etapa
