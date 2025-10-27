@@ -143,10 +143,6 @@ async function loadProject() {
     if (!data || !data.projeto) return showToast('Projeto não encontrado.', 'error');
 
     const projeto = data.projeto;
-    const visualizacoesEl = document.getElementById('visualizacoes');
-      if (visualizacoesEl) {
-      visualizacoesEl.innerHTML = `<i class="fa-solid fa-eye"></i> ${projeto.visualizacoes || 0}`;
-      }
     const membros = Array.isArray(data.membros) ? data.membros : [];
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
@@ -156,55 +152,7 @@ async function loadProject() {
     if (headerText) headerText.textContent = projeto.titulo;
 
     // Dropdown 3 pontos
-    const headerContent = document.querySelector('.main-header-content');
-    if (headerContent) {
-      let dropdownBtn = document.getElementById('project-dropdown-btn');
-      if (!dropdownBtn) {
-        dropdownBtn = document.createElement('div');
-        dropdownBtn.id = 'project-dropdown-btn';
-        dropdownBtn.className = 'dropdown';
-        dropdownBtn.innerHTML = `
-          <button class="dropbtn">⋮</button>
-          <div class="dropdown-content">
-            <a href="#" id="edit-project-option">Editar Projeto</a>
-            <a href="#" id="add-step-option">Adicionar Etapa</a>
-            <a href="#" id="delete-project-option">Deletar Projeto</a>
-          </div>
-        `;
-        headerContent.appendChild(dropdownBtn);
-      }
-
-      const dropBtn = dropdownBtn.querySelector('.dropbtn');
-      const dropdownContent = dropdownBtn.querySelector('.dropdown-content');
-
-      dropBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!dropdownBtn.contains(e.target)) {
-          dropdownContent.style.display = 'none';
-        }
-      });
-
-      const editOpt = document.getElementById('edit-project-option');
-      const addStepOpt = document.getElementById('add-step-option');
-      const deleteOpt = document.getElementById('delete-project-option');
-
-      if (editOpt) {
-        editOpt.style.display = isOwner ? 'block' : 'none';
-        if (isOwner) editOpt.onclick = () => openEditPopup(projeto, membros);
-      }
-      if (addStepOpt) {
-        addStepOpt.style.display = (isOwner || isMember) ? 'block' : 'none';
-        if (isOwner || isMember) addStepOpt.onclick = () => openAddStepPopup();
-      }
-      if (deleteOpt) {
-        deleteOpt.style.display = isOwner ? 'block' : 'none';
-        if (isOwner) deleteOpt.onclick = () => openDeletePopup(projeto);
-      }
-    }
+    setupProjectDropdown(projeto, isOwner, isMember, membros);
 
     // Datas e descrição
     const menuDate = document.querySelector('.menu-header-date');
@@ -212,7 +160,6 @@ async function loadProject() {
       <span>Publicado em: ${new Date(projeto.criado_em).toLocaleDateString()}</span><br>
       <span>Atualizado por último em: ${projeto.atualizado_em ? new Date(projeto.atualizado_em).toLocaleDateString() : "Nunca"}</span>
     `;
-
     const menuDesc = document.querySelector('.menu-desc');
     if (menuDesc) menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
 
@@ -231,29 +178,28 @@ async function loadProject() {
       });
     }
 
-    // --- Carrega e renderiza etapas com arquivos ---
+    // --- Carrega etapas com arquivos ---
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
-
       try {
-        // Busca todas as etapas do projeto
         const etapasData = await getEtapasByProjeto(projetoId);
         const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
 
-        // Para cada etapa, busca os arquivos e renderiza
-        for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
+        for (const etapa of etapas.sort((a,b) => a.numero_etapa - b.numero_etapa)) {
+          etapa.arquivos = []; // inicializa para evitar undefined
           try {
-            const res = await fetch(`/api/etapas/arquivos/${etapa.id}`);
-            if (!res.ok) throw new Error(`Erro ${res.status}`);
-            const arquivosData = await res.json();
-            etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+            const res = await fetch(`/api/auth/etapas/arquivos/${etapa.id}`);
+            if (res.ok) {
+              const arquivosData = await res.json();
+              etapa.arquivos = Array.isArray(arquivosData.arquivos) ? arquivosData.arquivos : [];
+            } else {
+              console.warn(`Arquivos da etapa ${etapa.id} não encontrados (404)`);
+            }
           } catch (err) {
             console.error(`Erro ao buscar arquivos da etapa ${etapa.id}:`, err);
-            etapa.arquivos = [];
           }
 
-          // Renderiza a etapa com os arquivos
           const el = renderStep(etapa);
           etapasContainer.appendChild(el);
         }
@@ -264,10 +210,8 @@ async function loadProject() {
       }
     }
 
-    // Inicializa os comentários do Disqus
+    // Comentários Disqus
     initializeDisqus(projetoId, projeto.titulo);
-    
-    // Sincroniza tema do Disqus com dark mode
     setupDisqusThemeSync();
 
   } catch (err) {
@@ -275,6 +219,7 @@ async function loadProject() {
     showToast('Erro ao carregar projeto.', 'error');
   }
 }
+
 
 // --- POPUPS ---
 
