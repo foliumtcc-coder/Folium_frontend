@@ -211,6 +211,8 @@ main {
   height: 100%;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: inherit;
 }
 
 .project-block:hover {
