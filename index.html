@@ -103,7 +103,7 @@
             <span>Entre para explorar projetos, ou use o modo visitante</span>
           </div>
           <a href="./home.html" class="visit-button">
-              <span>Entrar como visitante</span>
+            <span>Entrar como visitante</span>
           </a>
         </div>
 
@@ -143,7 +143,7 @@
               </div>
             </form>
 
-            <div id="message" style="color: red; margin-top: 10px;"></div>
+            <div id="message" style="color: red; margin-top: 10px"></div>
 
             <span class="terms">
               Ao continuar, você concorda com os
@@ -179,53 +179,63 @@
     </div>
 
     <script type="module">
-  import { postData } from './src/js/api.js';
+      import { postData } from "./src/js/api.js";
 
-  // Enviar login
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+      // Enviar login
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const rememberMe = document.getElementById("rememberMe").checked;
-    const messageDiv = document.getElementById("message");
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const rememberMe = document.getElementById("rememberMe").checked;
+          const messageDiv = document.getElementById("message");
 
-    try {
-      const text = await postData("/api/auth/login", { email, password, rememberMe });
+          try {
+            const text = await postData("/api/auth/login", {
+              email,
+              password,
+              rememberMe,
+            });
 
-      messageDiv.style.color = "green";
-      messageDiv.textContent = text;
+            messageDiv.style.color = "green";
+            messageDiv.textContent = text;
 
-      // Mostrar popup de código
-      document.getElementById("confirmPopup").style.display = "flex";
-    } catch (error) {
-      console.error("Erro:", error);
-      messageDiv.style.color = "red";
-      messageDiv.textContent = error.message || "Erro ao conectar com o servidor.";
-    }
-  });
+            // Mostrar popup de código
+            document.getElementById("confirmPopup").style.display = "flex";
+          } catch (error) {
+            console.error("Erro:", error);
+            messageDiv.style.color = "red";
+            messageDiv.textContent =
+              error.message || "Erro ao conectar com o servidor.";
+          }
+        });
 
-  // Enviar código de confirmação
-  document.getElementById("confirmBtn").addEventListener("click", async () => {
-    const code = document.getElementById("confirmCode").value;
-    const popupMsg = document.getElementById("popupMessage");
+      // Enviar código de confirmação
+      document
+        .getElementById("confirmBtn")
+        .addEventListener("click", async () => {
+          const code = document.getElementById("confirmCode").value;
+          const popupMsg = document.getElementById("popupMessage");
 
-    try {
-      const text = await postData("/api/auth/confirm", { code });
+          try {
+            const text = await postData("/api/auth/confirm", { code });
 
-      popupMsg.style.color = "green";
-      popupMsg.textContent = text;
+            popupMsg.style.color = "green";
+            popupMsg.textContent = text;
 
-      // Redirecionar após 1.5 segundos
-      setTimeout(() => {
-        window.location.href = "home.html";
-      }, 1500);
-    } catch (error) {
-      console.error("Erro:", error);
-      popupMsg.style.color = "red";
-      popupMsg.textContent = error.message || "Erro ao conectar com o servidor.";
-    }
-  });
-</script>
+            // Redirecionar após 1.5 segundos
+            setTimeout(() => {
+              window.location.href = "home.html";
+            }, 1500);
+          } catch (error) {
+            console.error("Erro:", error);
+            popupMsg.style.color = "red";
+            popupMsg.textContent =
+              error.message || "Erro ao conectar com o servidor.";
+          }
+        });
+    </script>
   </body>
 </html>

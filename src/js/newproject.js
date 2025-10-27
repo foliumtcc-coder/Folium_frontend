@@ -1,5 +1,23 @@
 import { getUser, createProject } from './api.js';
 
+// --- Função para mostrar notificações toast ---
+function showToast(message, type = 'info') {
+  console.log('[TOAST]', type, message);
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  toast.innerHTML = `<span style="font-size: 20px;">${icon}</span> ${message}`;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const projectForm = document.getElementById('form-projeto');
   const messageDiv = document.getElementById('message');
@@ -20,13 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Erro ao buscar usuário logado:', err);
+      showToast('Erro ao carregar informações do usuário.', 'error');
     }
   }
 
   fetchLoggedUser();
 
   // Submit do formulário
-  if (projectForm && messageDiv && fileInput && typeSelect && membersInput) {
+  if (projectForm && fileInput && typeSelect && membersInput) {
     projectForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -35,9 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const imageFile = fileInput.files[0];
       const tipo = typeSelect.value;
 
+      // Limpa mensagem antiga
+      if (messageDiv) {
+        messageDiv.textContent = '';
+      }
+
+      // Validações
       if (!title || !description || !imageFile || !tipo) {
-        messageDiv.style.color = 'red';
-        messageDiv.textContent = 'Preencha todos os campos e selecione uma imagem.';
+        showToast('Preencha todos os campos e selecione uma imagem.', 'error');
         return;
       }
 
@@ -49,8 +73,21 @@ document.addEventListener('DOMContentLoaded', () => {
       currentMembers = [...new Set(currentMembers)];
 
       if (currentMembers.length > 10) {
-        messageDiv.style.color = 'red';
-        messageDiv.textContent = 'O projeto pode ter no máximo 10 membros.';
+        showToast('O projeto pode ter no máximo 10 membros.', 'error');
+        return;
+      }
+
+      // Validação de formato de imagem
+      const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!validImageTypes.includes(imageFile.type)) {
+        showToast('Por favor, selecione uma imagem válida (PNG, JPG ou JPEG).', 'error');
+        return;
+      }
+
+      // Validação de tamanho (opcional - 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (imageFile.size > maxSize) {
+        showToast('A imagem deve ter no máximo 5MB.', 'error');
         return;
       }
 
@@ -64,18 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
       formData.append('criado_por', loggedUserEmail);
       formData.append('tipo', tipo);
 
-      messageDiv.style.color = 'black';
-      messageDiv.textContent = 'Criando projeto...';
+      showToast('Criando projeto...', 'info');
 
       try {
         const createdProject = await createProject(formData);
 
-        messageDiv.style.color = 'green';
-        messageDiv.textContent = createdProject.message || 'Projeto criado com sucesso!';
+        const message = createdProject.message || 'Projeto criado com sucesso!';
+        showToast(message, 'success');
 
         // Redireciona para a página do projeto recém-criado
         if (createdProject.projeto && createdProject.projeto.id) {
-          window.location.href = `/project-page.html?id=${createdProject.projeto.id}`;
+          setTimeout(() => {
+            window.location.href = `/project-page.html?id=${createdProject.projeto.id}`;
+          }, 1000);
         }
 
         projectForm.reset();
@@ -85,9 +123,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
       } catch (err) {
-        console.error(err);
-        messageDiv.style.color = 'red';
-        messageDiv.textContent = err.message || 'Erro ao criar projeto.';
+        console.error('Erro ao criar projeto:', err);
+        
+        // Extrai mensagem de erro
+        let errorMessage = 'Erro ao criar projeto.';
+        
+        if (err.message) {
+          try {
+            const parsed = JSON.parse(err.message);
+            errorMessage = parsed.message || parsed.error || err.message;
+          } catch (e) {
+            errorMessage = err.message;
+          }
+        }
+        
+        showToast(errorMessage, 'error');
       }
     });
   }
@@ -98,6 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const file = e.target.files[0];
 
       if (file) {
+        // Validação de formato
+        const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+        if (!validImageTypes.includes(file.type)) {
+          showToast('Por favor, selecione uma imagem válida (PNG, JPG ou JPEG).', 'error');
+          fileInput.value = '';
+          return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
           imagePreview.classList.add('has-image');
