@@ -1,3 +1,4 @@
+// ===================== CAROUSELS =====================
 const carousels = document.querySelectorAll(".carousel");
 
 carousels.forEach((carousel) => {
@@ -5,6 +6,8 @@ carousels.forEach((carousel) => {
   const leftBtn = carousel.querySelector(".scroll-button.left-button");
   const rightBtn = carousel.querySelector(".scroll-button.right-button");
   const scrollAmount = 800;
+
+  if (!blockContainer) return; // se não existir, pula este carousel
 
   const originalItems = [...blockContainer.children]; // salve os originais
 
@@ -21,46 +24,52 @@ carousels.forEach((carousel) => {
     }
   }
 
-  // Botões de scroll
-  leftBtn.addEventListener("click", () => {
-    blockContainer.scrollLeft -= scrollAmount;
-  });
+  // Botões de scroll, se existirem
+  if (leftBtn) {
+    leftBtn.addEventListener("click", () => {
+      blockContainer.scrollLeft -= scrollAmount;
+    });
+  }
 
-  rightBtn.addEventListener("click", () => {
-    blockContainer.scrollLeft += scrollAmount;
-    cloneMoreIfNeeded();
-  });
+  if (rightBtn) {
+    rightBtn.addEventListener("click", () => {
+      blockContainer.scrollLeft += scrollAmount;
+      cloneMoreIfNeeded();
+    });
+  }
 
   // Também verifica ao scrollar manualmente
   blockContainer.addEventListener("scroll", cloneMoreIfNeeded);
 });
 
-//MENU DROPDOWN PROFILE
+// ===================== MENU DROPDOWN PROFILE =====================
 const profileButton = document.getElementById("profile-button");
 const profileDropdown = document.getElementById("profile-dropdown-menu");
 
-profileButton.addEventListener("click", (e) => {
-  e.stopPropagation(); // evita que o clique feche imediatamente o menu
-  profileDropdown.style.display =
-    profileDropdown.style.display === "block" ? "none" : "block";
-});
+if (profileButton && profileDropdown) {
+  profileButton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileDropdown.style.display =
+      profileDropdown.style.display === "block" ? "none" : "block";
+  });
 
-document.addEventListener("click", () => {
-  profileDropdown.style.display = "none";
-});
+  document.addEventListener("click", () => {
+    profileDropdown.style.display = "none";
+  });
+}
 
-//MENU DROPDOWN NOTIFICATION
+// ===================== MENU DROPDOWN NOTIFICATION =====================
 const notificationButton = document.getElementById("notification-button");
-const notificationDropdown = document.getElementById(
-  "notification-dropdown-menu"
-);
+const notificationDropdown = document.getElementById("notification-dropdown-menu");
 
-notificationButton.addEventListener("click", (e) => {
-  e.stopPropagation(); // evita que o clique feche imediatamente o menu
-  notificationDropdown.style.display =
-    notificationDropdown.style.display === "block" ? "none" : "block";
-});
+if (notificationButton && notificationDropdown) {
+  notificationButton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    notificationDropdown.style.display =
+      notificationDropdown.style.display === "block" ? "none" : "block";
+  });
 
-document.addEventListener("click", () => {
-  notificationDropdown.style.display = "none";
-});
+  document.addEventListener("click", () => {
+    notificationDropdown.style.display = "none";
+  });
+}
