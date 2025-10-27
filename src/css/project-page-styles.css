@@ -539,34 +539,26 @@ main {
 /* Toast Notifications */
 .toast {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: #2a2a2a;
-  color: #fff;
+  bottom: 20px;
+  right: 20px;
+  background: #333;
+  color: white;
   padding: 16px 24px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
-  animation: slideInUp 0.3s ease-out;
-  max-width: 350px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   gap: 12px;
+  font-size: 14px;
+  z-index: 10000;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  max-width: 400px;
+  animation: slideIn 0.3s ease;
 }
 
-.toast.success {
-  color: #4caf50;
-}
-
-.toast.error {
-  color: #f44336;
-}
-
-.toast.info {
-  color: #7127d8;
-}
-
-@keyframes slideInUp {
+@keyframes slideIn {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -577,9 +569,36 @@ main {
   }
 }
 
+.toast.success {
+  background: #10b981;
+  color: white;
+}
+
+.toast.error {
+  background: #ef4444;
+  color: white;
+}
+
+.toast.info {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Dark mode compatibility */
 body.dark-mode .toast {
-  background-color: #333;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  background: #1f2937;
+}
+
+body.dark-mode .toast.success {
+  background: #059669;
+}
+
+body.dark-mode .toast.error {
+  background: #dc2626;
+}
+
+body.dark-mode .toast.info {
+  background: #2563eb;
 }
 
 /* --- Popups --- */
