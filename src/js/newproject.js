@@ -48,10 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       currentMembers = [...new Set(currentMembers)];
 
-      if (!currentMembers.includes(loggedUserEmail)) {
-        currentMembers.push(loggedUserEmail);
-      }
-
       if (currentMembers.length > 10) {
         messageDiv.style.color = 'red';
         messageDiv.textContent = 'O projeto pode ter no máximo 10 membros.';
