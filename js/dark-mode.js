@@ -1,22 +1,28 @@
+// Função para alternar o modo escuro
 function toggleDarkMode() {
   const body = document.body;
   const isDark = body.classList.toggle("dark-mode");
 
+  // Salva no localStorage
   localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
 
-  const icon = document.querySelector("#dark-mode-toggle span");
-  icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  // Atualiza o ícone do botão, se existir
+  const icon = document.querySelector("#dark-mode-toggle span, .dark-mode-toggle span");
+  if (icon) {
+    icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  }
 }
 
 // Mantém o modo noturno ao recarregar a página
-window.onload = function () {
+window.addEventListener("DOMContentLoaded", () => {
   const darkMode = localStorage.getItem("darkMode");
-  const icon = document.querySelector("#dark-mode-toggle span");
+  const icon = document.querySelector("#dark-mode-toggle span, .dark-mode-toggle span");
+  const body = document.body;
 
   if (darkMode === "enabled") {
-    document.body.classList.add("dark-mode");
-    icon.className = "fa-solid fa-sun";
+    body.classList.add("dark-mode");
+    if (icon) icon.className = "fa-solid fa-sun";
   } else {
-    icon.className = "fa-solid fa-moon";
+    if (icon) icon.className = "fa-solid fa-moon";
   }
-};
+});
