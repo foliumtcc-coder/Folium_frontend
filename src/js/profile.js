@@ -7,7 +7,6 @@ function normalizeUser(u) {
     name1: u.name1 ?? u.name ?? '',
     descricao: u.descricao ?? u.bio ?? '',
     imagem_perfil: u.imagem_perfil ?? u.avatarUrl ?? '',
-    banner_fundo: u.banner_fundo ?? u.bannerUrl ?? '',
     instagram: u.instagram ?? '',
     linkedin: u.linkedin ?? '',
     github: u.github ?? ''
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const projectsContainer = document.getElementById('projects');
 
   const avatarElem = document.getElementById('avatar');
-  const bannerElem = document.getElementById('banner');
 
   const descricaoInput = document.getElementById('descricao');
   const instagramInput = document.getElementById('instagram');
@@ -34,9 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const githubInput = document.getElementById('github');
 
   const popupAvatar = document.getElementById('popup-avatar');
-  const popupBanner = document.getElementById('popup-banner');
   const avatarInputPopup = document.getElementById('popup-avatar-input');
-  const bannerInputPopup = document.getElementById('popup-banner-input');
 
   let loggedUser = null;
   let profileUser = null;
@@ -58,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     nameElem.textContent = u.name1 || 'Usuário';
     bioElem.textContent = u.descricao || '';
     avatarElem.src = u.imagem_perfil || './src/img/icons/profile-icon.jpg';
-    bannerElem.src = u.banner_fundo || './src/img/standard-img.jpg';
 
     linksElem.innerHTML = '';
     const links = { instagram: u.instagram, linkedin: u.linkedin, github: u.github };
@@ -96,9 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const projectFooter = document.createElement('div');
       projectFooter.classList.add('project-footer');
-      projectFooter.innerHTML = `
-        <h3>${p.titulo ?? 'Projeto sem título'}</h3>
-      `;
+      projectFooter.innerHTML = `<h3>${p.titulo ?? 'Projeto sem título'}</h3>`;
 
       projectLink.appendChild(projectImgDiv);
       projectLink.appendChild(projectFooter);
@@ -138,9 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     instagramInput.value = profileUser.instagram || '';
     linkedinInput.value = profileUser.linkedin || '';
     githubInput.value = profileUser.github || '';
-
     popupAvatar.src = profileUser.imagem_perfil || './src/img/icons/profile-icon.jpg';
-    popupBanner.src = profileUser.banner_fundo || './src/img/standard-img.jpg';
   });
 
   closePopupBtn.addEventListener('click', () => popup.classList.add('hidden'));
@@ -150,12 +141,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const file = avatarInputPopup.files[0];
     if (!file) return;
     popupAvatar.src = URL.createObjectURL(file);
-  });
-
-  bannerInputPopup.addEventListener('change', () => {
-    const file = bannerInputPopup.files[0];
-    if (!file) return;
-    popupBanner.src = URL.createObjectURL(file);
   });
 
   editForm.addEventListener('submit', async e => {
@@ -172,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     formData.append('linkedin', linkedinInput.value.trim() || '');
     formData.append('github', githubInput.value.trim() || '');
     if (avatarInputPopup.files[0]) formData.append('imagem_perfil', avatarInputPopup.files[0]);
-    if (bannerInputPopup.files[0]) formData.append('banner_fundo', bannerInputPopup.files[0]);
 
     try {
       const result = await updateUserProfile(formData);
