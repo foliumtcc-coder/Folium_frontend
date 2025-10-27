@@ -763,13 +763,13 @@ body.dark-mode .toast {
 
 /* Customização do Disqus */
 #disqus_thread {
-  --disqus-primary-color: #7127d8 !important;
+  --disqus-primary-color: #5a1faf !important;
   --disqus-link-color: #563ab1 !important;
 }
 
 /* Tenta sobrescrever os links do iframe */
 #disqus_thread a {
-  color: #7127d8 !important;
+  color: #5a1faf !important;
 }
 
 /* Customização adicional (nem sempre funciona devido ao iframe) */
@@ -779,5 +779,5 @@ body.dark-mode .toast {
 
 /* Botões e elementos do Disqus */
 #disqus_thread .publisher-anchor-color {
-  background-color: #7127d8 !important;
+  background-color: #5a1faf !important;
 }
