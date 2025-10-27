@@ -443,19 +443,26 @@ function openEditStepPopup(etapa) {
   const form = document.getElementById('edit-step-form');
   form.addEventListener('submit', async e => {
     e.preventDefault();
+
     const nome = document.getElementById('edit-step-name').value.trim();
     const descricao = document.getElementById('edit-step-desc').value.trim();
+
     try {
+      // chama a função que envia JSON para atualizar a etapa
       await updateEtapa(etapa.id, nome, descricao);
+
       showToast('Etapa atualizada com sucesso!', 'success');
+
+      // fecha o popup e recarrega as etapas
       popup.classList.add('hidden');
       loadProject();
-    } catch(err) {
-      console.error(err);
+    } catch (err) {
+      console.error('[UPDATE STEP ERROR]', err);
       showToast('Erro ao atualizar etapa', 'error');
     }
   });
 }
+
 
 // Deletar projeto
 function openDeletePopup(projeto) {
