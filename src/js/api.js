@@ -79,9 +79,13 @@ export async function createProject(formData) {
     body: formData
   });
 
-  const text = await res.text();
-  if (!res.ok) throw new Error(text);
-  return text;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+
+  const data = await res.json(); // <-- transforma a resposta em JSON
+  return data; // agora retorna { id: ..., titulo: ..., ... }
 }
 
 // Aceitar convite

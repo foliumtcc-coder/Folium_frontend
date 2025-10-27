@@ -81,6 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
           imagePreview.innerHTML = '<i class="fa-solid fa-image"></i><span>Selecione uma imagem</span><small>PNG, JPG ou JPEG</small>';
           imagePreview.classList.remove('has-image');
         }
+
+        // ---------------- Redirecionamento ----------------
+        const createdProject = JSON.parse(responseText); // ou adapte para o que o backend retorna
+        window.location.href = `/project.html?id=${createdProject.id}`;
+        // --------------------------------------------------
+        
       } catch (err) {
         console.error(err);
         messageDiv.style.color = 'red';

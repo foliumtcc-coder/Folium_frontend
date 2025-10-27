@@ -713,6 +713,10 @@ body.dark-mode .toast {
   box-shadow: none;
 }
 
+.popup-content img {
+  margin-bottom: 15px; /* aumenta ou diminui conforme necessário */
+}
+
 /* Responsividade */
 @media (max-width: 1024px) {
   .main-content {
