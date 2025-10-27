@@ -51,12 +51,29 @@ function setupPopup(popupId, innerHTML) {
   return popup;
 }
 
+// --- Função para mostrar notificações toast ---
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  toast.innerHTML = `<span style="font-size: 20px;">${icon}</span> ${message}`;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 // --- Renderiza uma etapa individual ---
 function renderStep(etapa) {
   const div = document.createElement('div');
   div.className = 'step';
   div.dataset.etapaId = etapa.id;
-  div.setAttribute('draggable', 'true'); // ← ADICIONA ESTA LINHA
+  div.setAttribute('draggable', 'true');
 
   const stepDate = new Date(etapa.criado_em || Date.now()).toLocaleDateString();
 
@@ -245,6 +262,9 @@ async function loadProject() {
 
     // Inicializa os comentários do Disqus
     initializeDisqus(projetoId, projeto.titulo);
+    
+    // Sincroniza tema do Disqus com dark mode
+    setupDisqusThemeSync();
 
   } catch (err) {
     console.error('Erro ao carregar projeto:', err);
@@ -449,10 +469,61 @@ function openDeletePopup(projeto) {
   });
 }
 
-// --- Inicialização ---
-document.addEventListener('DOMContentLoaded', loadProject);
+// --- Inicializa Disqus com identificador único por projeto ---
+function initializeDisqus(projetoId, projetoTitulo) {
+  // Detecta se está em dark mode
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  
+  // Configuração do Disqus
+  window.disqus_config = function () {
+    this.page.url = window.location.href;
+    this.page.identifier = `projeto-${projetoId}`;
+    this.page.title = projetoTitulo;
+    
+    // Define o tema baseado no modo atual
+    this.callbacks.onReady = [function() {
+      const iframe = document.getElementById('dsq-app-iframe') || 
+                     document.querySelector('#disqus_thread iframe');
+      if (iframe && isDarkMode) {
+        // Tenta aplicar dark mode (nem sempre funciona perfeitamente)
+        iframe.contentWindow.postMessage({
+          name: 'dark',
+          data: true
+        }, '*');
+      }
+    }];
+  };
 
-// Adicione este código ao seu arquivo project.js ou crie um novo arquivo drag-drop.js
+  // Carrega o script do Disqus
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://https-folium-netlify-app.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+}
+
+// --- Recarrega Disqus quando o tema muda ---
+function setupDisqusThemeSync() {
+  const darkModeButton = document.getElementById('dark-mode-button');
+  
+  if (darkModeButton) {
+    darkModeButton.addEventListener('click', () => {
+      // Aguarda o toggle do dark mode
+      setTimeout(() => {
+        // Recarrega o Disqus com o novo tema
+        if (window.DISQUS) {
+          window.DISQUS.reset({
+            reload: true,
+            config: window.disqus_config
+          });
+        }
+      }, 100);
+    });
+  }
+}
+
+// --- DRAG AND DROP DAS ETAPAS ---
 
 function initializeDragAndDrop() {
   const stepsContainer = document.querySelector('.etapas-container, .project-steps');
@@ -584,50 +655,46 @@ function initializeDragAndDrop() {
     }
   });
 
-async function saveStepOrder() {
-  const stepsContainer = document.querySelector('.etapas-container');
-  if (!stepsContainer) return;
+  async function saveStepOrder() {
+    const stepsContainer = document.querySelector('.etapas-container');
+    if (!stepsContainer) return;
 
-  const steps = stepsContainer.querySelectorAll('.step');
+    const steps = stepsContainer.querySelectorAll('.step');
 
-  // Monta o array de ordem para enviar ao backend
-  const order = Array.from(steps).map((step, index) => ({
-    etapaId: Number(step.dataset.etapaId), // garante que seja número
-    numero_etapa: index + 1
-  }));
+    // Monta o array de ordem para enviar ao backend
+    const order = Array.from(steps).map((step, index) => ({
+      etapaId: Number(step.dataset.etapaId),
+      numero_etapa: index + 1
+    }));
 
-  try {
-    const projetoId = new URLSearchParams(window.location.search).get('id');
-    if (!projetoId) throw new Error('ID do projeto não encontrado');
+    try {
+      const projetoId = new URLSearchParams(window.location.search).get('id');
+      if (!projetoId) throw new Error('ID do projeto não encontrado');
 
-    const response = await fetch('/api/auth/etapas/reorder', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projetoId: Number(projetoId), ordem: order })
-    });
+      const response = await fetch('/api/auth/etapas/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projetoId: Number(projetoId), ordem: order })
+      });
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error('Erro ao salvar ordem das etapas:', text);
-      showToast('Não foi possível salvar a nova ordem das etapas.', 'error');
-      return;
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Erro ao salvar ordem das etapas:', text);
+        showToast('Não foi possível salvar a nova ordem das etapas.', 'error');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Ordem das etapas salva com sucesso!', data);
+      data.etapas.forEach((etapa, index) => {
+        const el = stepsContainer.querySelector(`.step[data-etapa-id='${etapa.id}']`);
+        if (el) el.dataset.stepIndex = index;
+      });
+    } catch (err) {
+      console.error('Erro ao salvar ordem das etapas:', err);
+      showToast('Erro ao salvar ordem das etapas.', 'error');
     }
-
-    const data = await response.json();
-    console.log('Ordem das etapas salva com sucesso!', data);
-    // Opcional: atualizar a UI com a ordem retornada
-    data.etapas.forEach((etapa, index) => {
-      const el = stepsContainer.querySelector(`.step[data-etapa-id='${etapa.id}']`);
-      if (el) el.dataset.stepIndex = index;
-    });
-  } catch (err) {
-    console.error('Erro ao salvar ordem das etapas:', err);
-    showToast('Erro ao salvar ordem das etapas.', 'error');
   }
-}
-
-// Chame saveStepOrder() no evento 'drop' do drag-and-drop
-
 
   // Atualiza os índices das etapas após reordenar
   function updateStepIndices() {
@@ -639,9 +706,6 @@ async function saveStepOrder() {
 
   // Inicializa os handles
   addDragHandles();
-  
-  // Se você adicionar etapas dinamicamente, chame addDragHandles() novamente
-  // Exemplo: depois de carregar as etapas via AJAX
 }
 
 // Chama a função quando o DOM estiver pronto
@@ -656,37 +720,5 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { initializeDragAndDrop };
 }
 
-// Função para mostrar notificações toast
-function showToast(message, type = 'info') {
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  
-  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
-  toast.innerHTML = `<span style="font-size: 20px;">${icon}</span> ${message}`;
-  
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(20px)';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// --- Inicializa Disqus com identificador único por projeto ---
-function initializeDisqus(projetoId, projetoTitulo) {
-  // Configuração do Disqus
-  window.disqus_config = function () {
-    this.page.url = window.location.href; // URL da página atual
-    this.page.identifier = `projeto-${projetoId}`; // Identificador único por projeto
-    this.page.title = projetoTitulo; // Título do projeto
-  };
-
-  // Carrega o script do Disqus
-  (function() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://https-folium-netlify-app.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-  })();
-}
+// --- Inicialização ---
+document.addEventListener('DOMContentLoaded', loadProject);
