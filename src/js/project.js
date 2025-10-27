@@ -377,7 +377,6 @@ function openAddStepPopup() {
       </form>
     </div>
   `;
-
   const popup = setupPopup('add-step-popup', innerHTML);
 
   const form = document.getElementById('add-step-form');
@@ -388,7 +387,7 @@ function openAddStepPopup() {
     const nome = document.getElementById('step-name').value.trim();
     const descricao = document.getElementById('step-desc').value.trim();
     const filesInput = document.getElementById('step-files');
-    const files = Array.from(filesInput.files);
+    const arquivos = Array.from(filesInput.files);
 
     if (!nome) {
       showToast('O nome da etapa é obrigatório!', 'error');
@@ -401,45 +400,22 @@ function openAddStepPopup() {
     }
 
     try {
-      // Cria FormData para enviar dados e arquivos
-      const formData = new FormData();
-      formData.append('projeto_id', projetoId);
-      formData.append('nome', nome);
-      formData.append('descricao', descricao);
+      // Chama a função createEtapa do api.js
+      const novaEtapa = await createEtapa(projetoId, nome, descricao, arquivos);
 
-      // O nome 'arquivos' precisa bater com req.files no backend
-      files.forEach(file => formData.append('arquivos', file));
-
-      // Faz a requisição POST para o backend
-      const response = await fetch('/api/auth/etapas', {
-        method: 'POST',
-        body: formData
-      });
-
-      // Tenta transformar a resposta em JSON
-      let novaEtapa;
-      try {
-        novaEtapa = await response.json();
-      } catch {
-        throw new Error('Resposta do servidor não é JSON.');
-      }
-
-      if (!response.ok) {
-        throw new Error(novaEtapa.error || 'Erro ao criar etapa');
-      }
-
-      // Renderiza a nova etapa na tela
+      // Renderiza a etapa na tela
       const el = renderStep(novaEtapa);
       document.querySelector('.etapas-container')?.appendChild(el);
+
       showToast('Etapa criada com sucesso!', 'success');
       popup.classList.add('hidden');
-
     } catch (err) {
       console.error('[FRONT] Erro ao criar etapa:', err);
       showToast(err.message || 'Erro ao criar etapa', 'error');
     }
   });
 }
+
 
 
 
