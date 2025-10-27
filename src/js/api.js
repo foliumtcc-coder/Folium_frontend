@@ -441,7 +441,7 @@ function renderStep(etapa) {
 
 // --- Baixar arquivo via fetch ---
 // Função para baixar arquivo via backend
-async function downloadFile(fileId, fileName) {
+export async function downloadFile(fileId, fileName) {
   try {
     // Busca o token do usuário
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
