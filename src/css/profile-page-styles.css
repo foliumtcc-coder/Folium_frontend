@@ -255,7 +255,7 @@ main {
   background-color: #f8f5ff;
 }
 
-/*-------------------------POP UP EDIÇÃO---------------------------*/
+/*-------------------------POP UP EDIÇÃO CORRIGIDO---------------------------*/
 .popup {
   position: fixed;
   top: 0;
@@ -266,10 +266,12 @@ main {
   z-index: 2000;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Mudei de center para flex-start */
   pointer-events: auto;
   backdrop-filter: blur(2px);
-  padding: 20px; /* Mantém apenas padding lateral para mobile */
+  padding: 80px 20px 40px 20px; /* Padding maior no topo */
+  overflow-y: auto; /* Permite scroll se necessário */
+  box-sizing: border-box;
 }
 
 .popup.hidden {
@@ -286,6 +288,7 @@ main {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   pointer-events: auto;
   animation: popupSlideIn 0.3s ease-out;
+  margin: 20px 0; /* Margem para não colar nas bordas */
 }
 
 @keyframes popupSlideIn {
@@ -451,5 +454,25 @@ main {
   .bio-box {
     margin: 30px auto 0;
     padding: 20px;
+  }
+  
+  /* Ajustes específicos para o popup em mobile */
+  .popup {
+    padding: 60px 15px 20px 15px; /* Padding menor em mobile */
+    align-items: flex-start;
+  }
+  
+  .popup-content {
+    width: 95%;
+    padding: 20px;
+    margin: 10px 0;
+  }
+}
+
+/* Para desktop - centraliza verticalmente */
+@media (min-width: 1024px) {
+  .popup {
+    align-items: center; /* Centraliza no desktop */
+    padding: 40px 20px; /* Padding menor no desktop */
   }
 }
