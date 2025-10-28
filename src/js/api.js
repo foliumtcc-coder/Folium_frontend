@@ -94,7 +94,7 @@ export async function acceptInvite(projetoId) {
   if (!token) throw new Error('Usuário não logado');
 
   const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/accept`, {
-    method: 'PATCH',
+    method: 'PATCH', // ou POST se você preferir
     headers: { 
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -106,7 +106,28 @@ export async function acceptInvite(projetoId) {
     throw new Error(text || 'Erro ao aceitar convite');
   }
 
-  return res.json();
+  return res.json(); // retorna { message: 'Convite aceito e notificação removida.' } do backend
+}
+
+// Recusar convite
+export async function rejectInvite(projetoId) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/reject`, {
+    method: 'PATCH', // ou POST
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Erro ao recusar convite');
+  }
+
+  return res.json(); // retorna { message: 'Convite recusado e notificação removida.' }
 }
 
 // Buscar notificações

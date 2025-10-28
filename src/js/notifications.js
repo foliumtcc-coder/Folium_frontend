@@ -1,14 +1,12 @@
-import { getUser, fetchNotifications as apiFetchNotifications, markNotificationAsRead, acceptInvite } from './api.js';
+import { getUser, fetchNotifications as apiFetchNotifications, markNotificationAsRead, acceptInvite, rejectInvite } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const notificationButton = document.getElementById('notification-button');
   const notificationContainer = notificationButton.parentElement;
   notificationContainer.style.position = 'relative';
 
-  // Detecta se está em dark mode
   const isDarkMode = () => document.body.classList.contains('dark-mode');
 
-  // Função para obter cores baseado no modo
   const getColors = () => {
     if (isDarkMode()) {
       return {
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   };
 
-  // Estiliza o botão
   notificationButton.style.width = '30px';
   notificationButton.style.height = '30px';
   notificationButton.style.borderRadius = '50%';
@@ -48,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
   notificationButton.style.cursor = 'pointer';
   notificationButton.style.color = isDarkMode() ? '#f0f0f0' : '#666';
 
-  // Cria badge
   const badge = document.createElement('span');
   badge.id = 'notification-badge';
   badge.style.position = 'absolute';
@@ -64,10 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
   badge.style.pointerEvents = 'none';
   notificationContainer.appendChild(badge);
 
-  // Cria menu dropdown
   const notificationMenu = document.createElement('div');
   let currentColors = getColors();
-  
+
   notificationMenu.style.position = 'absolute';
   notificationMenu.style.right = '0';
   notificationMenu.style.top = '100%';
@@ -85,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let notifications = [];
 
-  // Buscar notificações
   async function fetchNotifications() {
     try {
       const { user } = await getUser();
@@ -100,12 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Renderiza notificações
   function renderNotifications() {
     notificationMenu.innerHTML = '';
     currentColors = getColors();
-    
-    // Atualiza cores do menu
+
     notificationMenu.style.background = currentColors.menuBg;
     notificationMenu.style.color = currentColors.menuText;
     notificationMenu.style.boxShadow = currentColors.shadow;
@@ -140,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
       mensagem.textContent = n.mensagem;
       item.appendChild(mensagem);
 
-      // Botões de convite
       if (n.tipo === 'convite') {
         const btnContainer = document.createElement('div');
         btnContainer.style.display = 'flex';
@@ -158,9 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
           e.stopPropagation();
           try {
             await acceptInvite(n.projeto_id);
-            // Remove o convite da lista local
             notifications = notifications.filter(notif => notif.id !== n.id);
-            renderNotifications(); // Atualiza o menu sem o convite
+            renderNotifications();
           } catch (err) {
             console.error('Erro ao aceitar convite:', err);
           }
@@ -174,11 +164,15 @@ document.addEventListener('DOMContentLoaded', () => {
         recusarBtn.style.cursor = 'pointer';
         recusarBtn.style.backgroundColor = currentColors.buttonReject;
         recusarBtn.style.color = '#fff';
-        recusarBtn.addEventListener('click', (e) => {
+        recusarBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
-          // Remove o convite da lista local
-          notifications = notifications.filter(notif => notif.id !== n.id);
-          renderNotifications(); // Atualiza o menu sem o convite
+          try {
+            await rejectInvite(n.projeto_id);
+            notifications = notifications.filter(notif => notif.id !== n.id);
+            renderNotifications();
+          } catch (err) {
+            console.error('Erro ao recusar convite:', err);
+          }
         });
 
         btnContainer.appendChild(aceitarBtn);
@@ -186,31 +180,26 @@ document.addEventListener('DOMContentLoaded', () => {
         item.appendChild(btnContainer);
       }
 
-      // Marca como lida ao clicar
       notificationMenu.appendChild(item);
     });
   }
 
-  // Toggle do dropdown
   notificationButton.addEventListener('click', (e) => {
     e.stopPropagation();
     notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
   });
 
-  // Fecha dropdown ao clicar fora
   document.addEventListener('click', (e) => {
     if (!notificationContainer.contains(e.target)) {
       notificationMenu.style.display = 'none';
     }
   });
 
-  // Observa mudanças de dark mode
   const observer = new MutationObserver(() => {
     renderNotifications();
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-  // Inicializa
   fetchNotifications();
   setInterval(fetchNotifications, 5000);
 });
