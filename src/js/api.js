@@ -107,38 +107,24 @@ export async function fetchNotifications() {
 // Aceitar convite
 export async function acceptInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não logado');
-
-  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/accept`, {
-    method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  const res = await fetch(`${BACKEND_URL}/api/auth/notifications/accept/${projetoId}`, {
+    method: 'POST', // <-- POST agora
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Erro ao aceitar convite');
-  }
-
+  if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 
-// Recusar convite
 export async function rejectInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Usuário não logado');
-
-  fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/reject`, {
-    method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  const res = await fetch(`${BACKEND_URL}/api/auth/notifications/reject/${projetoId}`, {
+    method: 'POST', // <-- POST agora
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || 'Erro ao recusar convite');
-  }
-
+  if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
 
 // Buscar perfil de usuário por id
 export async function getUserProfile(id) {
