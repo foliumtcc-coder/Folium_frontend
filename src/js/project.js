@@ -255,8 +255,9 @@ async function loadProject() {
 
       async function refreshLikes() {
         try {
-          const likes = await getLikes(projetoId); // função do api.js
-          likeCount.textContent = likes.length;
+          const data = await getLikes(projetoId); // retorna { count, likes }
+          const likes = data.likes || [];
+          likeCount.textContent = data.count || likes.length;
           const userLiked = likes.some(like => like.usuario_id === user.id);
           likeBtn.textContent = userLiked ? 'Descurtir' : 'Curtir';
           likeBtn.dataset.liked = userLiked;
@@ -264,6 +265,7 @@ async function loadProject() {
           console.error('Erro ao carregar likes:', err);
         }
       }
+
 
       likeBtn.addEventListener('click', async () => {
         try {
@@ -322,8 +324,6 @@ async function loadProject() {
     showToast('Erro ao carregar projeto.', 'error');
   }
 }
-
-
 
 // --- POPUPS ---
 
