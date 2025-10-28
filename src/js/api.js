@@ -498,3 +498,4 @@ export async function unlikeProject(projetoId) {
   if (!res.ok) throw new Error('Erro ao descurtir projeto');
   return res.json();
 }
+
