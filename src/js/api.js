@@ -105,23 +105,55 @@ export async function fetchNotifications() {
 }
 
 // Aceitar convite
+// Buscar notificações
+export async function fetchNotifications() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return [];
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/notifications/me`, {
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) throw new Error('Erro ao buscar notificações');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+// Aceitar convite
 export async function acceptInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
   const res = await fetch(`${BACKEND_URL}/api/auth/notifications/accept/${projetoId}`, {
-    method: 'POST', // <-- POST agora
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    method: 'POST', // POST, não PATCH
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
-  if (!res.ok) throw new Error(await res.text());
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Erro ao aceitar convite');
+  }
+
   return res.json();
 }
 
+// Recusar convite
 export async function rejectInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+
   const res = await fetch(`${BACKEND_URL}/api/auth/notifications/reject/${projetoId}`, {
-    method: 'POST', // <-- POST agora
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    method: 'POST', // POST, não PATCH
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
-  if (!res.ok) throw new Error(await res.text());
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Erro ao recusar convite');
+  }
+
   return res.json();
 }
 
