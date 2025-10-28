@@ -88,24 +88,6 @@ export async function createProject(formData) {
   return data; // agora retorna { id: ..., titulo: ..., ... }
 }
 
-// Aceitar convite
-export async function fetchNotifications() {
-  const token = localStorage.getItem('accessToken');
-  if (!token) return [];
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/notifications/me`, {
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) throw new Error('Erro ao buscar notificações');
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
-}
-
-// Aceitar convite
-// Buscar notificações
 export async function fetchNotifications() {
   const token = localStorage.getItem('accessToken');
   if (!token) return [];
