@@ -464,7 +464,7 @@ export async function getLikes(projetoId) {
   const token = localStorage.getItem('accessToken');
   if (!token) return [];
   try {
-    const res = await fetch(`${BACKEND_URL}/api/likes/project/${projetoId}`, {
+    const res = await fetch(`${BACKEND_URL}/api/auth/likes/project/${projetoId}`, {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
     });
     if (!res.ok) throw new Error('Erro ao buscar likes');
@@ -479,7 +479,7 @@ export async function getLikes(projetoId) {
 export async function likeProject(projetoId) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
-  const res = await fetch(`${BACKEND_URL}/api/likes/project/${projetoId}`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/likes/project/${projetoId}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
@@ -491,7 +491,7 @@ export async function likeProject(projetoId) {
 export async function unlikeProject(projetoId) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
-  const res = await fetch(`${BACKEND_URL}/api/likes/project/${projetoId}`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/likes/project/${projetoId}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
