@@ -1,4 +1,4 @@
-import { getUser, fetchNotifications as apiFetchNotifications, markNotificationAsRead, acceptInvite, rejectInvite } from './api.js';
+import { getUser, fetchNotifications as apiFetchNotifications, acceptInvite, rejectInvite } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const notificationButton = document.getElementById('notification-button');
@@ -34,17 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   };
 
-  notificationButton.style.width = '30px';
-  notificationButton.style.height = '30px';
-  notificationButton.style.borderRadius = '50%';
-  notificationButton.style.display = 'inline-flex';
-  notificationButton.style.justifyContent = 'center';
-  notificationButton.style.alignItems = 'center';
-  notificationButton.style.background = 'none';
-  notificationButton.style.border = 'none';
-  notificationButton.style.cursor = 'pointer';
-  notificationButton.style.color = isDarkMode() ? '#f0f0f0' : '#666';
-
   const badge = document.createElement('span');
   badge.id = 'notification-badge';
   badge.style.position = 'absolute';
@@ -62,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const notificationMenu = document.createElement('div');
   let currentColors = getColors();
-
   notificationMenu.style.position = 'absolute';
   notificationMenu.style.right = '0';
   notificationMenu.style.top = '100%';
@@ -84,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const { user } = await getUser();
       if (!user) return;
-
       notifications = await apiFetchNotifications();
       renderNotifications();
     } catch (err) {
@@ -97,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderNotifications() {
     notificationMenu.innerHTML = '';
     currentColors = getColors();
-
     notificationMenu.style.background = currentColors.menuBg;
     notificationMenu.style.color = currentColors.menuText;
     notificationMenu.style.boxShadow = currentColors.shadow;
@@ -148,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         aceitarBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
           try {
-            await acceptInvite(n.projeto_id);
-            notifications = notifications.filter(notif => notif.id !== n.id);
+            await acceptInvite(n.projeto_id); // chama backend
+            notifications = notifications.filter(notif => notif.id !== n.id); // remove local
             renderNotifications();
           } catch (err) {
             console.error('Erro ao aceitar convite:', err);
@@ -167,8 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
         recusarBtn.addEventListener('click', async (e) => {
           e.stopPropagation();
           try {
-            await rejectInvite(n.projeto_id);
-            notifications = notifications.filter(notif => notif.id !== n.id);
+            await rejectInvite(n.projeto_id); // chama backend
+            notifications = notifications.filter(notif => notif.id !== n.id); // remove local
             renderNotifications();
           } catch (err) {
             console.error('Erro ao recusar convite:', err);

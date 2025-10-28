@@ -115,7 +115,7 @@ export async function rejectInvite(projetoId) {
   if (!token) throw new Error('Usuário não logado');
 
   const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/reject`, {
-    method: 'PATCH', // ou POST
+    method: 'PATCH',
     headers: { 
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ export async function rejectInvite(projetoId) {
     throw new Error(text || 'Erro ao recusar convite');
   }
 
-  return res.json(); // retorna { message: 'Convite recusado e notificação removida.' }
+  return res.json();
 }
 
 // Buscar notificações
