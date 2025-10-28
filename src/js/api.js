@@ -459,3 +459,42 @@ export async function downloadFile(arquivoId, nomeArquivo) {
     alert(err.message);
   }
 }
+
+export async function getLikes(projetoId) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return [];
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/likes/project/${projetoId}`, {
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) throw new Error('Erro ao buscar likes');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+// Curte um projeto
+export async function likeProject(projetoId) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+  const res = await fetch(`${BACKEND_URL}/api/likes/project/${projetoId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  });
+  if (!res.ok) throw new Error('Erro ao curtir projeto');
+  return res.json();
+}
+
+// Descurte um projeto
+export async function unlikeProject(projetoId) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('Usuário não logado');
+  const res = await fetch(`${BACKEND_URL}/api/likes/project/${projetoId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  });
+  if (!res.ok) throw new Error('Erro ao descurtir projeto');
+  return res.json();
+}
