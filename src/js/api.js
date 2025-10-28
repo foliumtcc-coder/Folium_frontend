@@ -109,7 +109,7 @@ export async function acceptInvite(projetoId) {
   if (!token) throw new Error('Usuário não logado');
 
   const res = await fetch(`${BACKEND_URL}/api/auth/notifications/accept/${projetoId}`, {
-    method: 'POST', // POST, não PATCH
+    method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
 
@@ -121,13 +121,12 @@ export async function acceptInvite(projetoId) {
   return res.json();
 }
 
-// Recusar convite
 export async function rejectInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
   const res = await fetch(`${BACKEND_URL}/api/auth/notifications/reject/${projetoId}`, {
-    method: 'POST', // POST, não PATCH
+    method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
 
