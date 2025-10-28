@@ -7,7 +7,10 @@ import {
   updateEtapa, 
   deleteEtapa,
   getEtapasByProjeto,
-  downloadFile
+  downloadFile,
+  getLikes,
+  likeProject,
+  unlikeProject
 } from './api.js';
 
 // --- Pega o projetoId da URL ---
@@ -149,9 +152,50 @@ async function loadProject() {
     if (!data || !data.projeto) return showToast('Projeto não encontrado.', 'error');
 
     const projeto = data.projeto;
+
+    // Visualizações
     const visualizacoesEl = document.getElementById('visualizacoes');
     if (visualizacoesEl) {
       visualizacoesEl.innerHTML = `<i class="fa-solid fa-eye"></i> ${projeto.visualizacoes || 0}`;
+    }
+
+    // --- Likes ---
+    const likesContainer = document.getElementById('likes-container'); // crie essa div no HTML
+    if (likesContainer) {
+      likesContainer.innerHTML = '';
+      const likeBtn = document.createElement('button');
+      const likeCount = document.createElement('span');
+      likeBtn.className = 'like-btn';
+      likeCount.className = 'like-count';
+      likesContainer.appendChild(likeBtn);
+      likesContainer.appendChild(likeCount);
+
+      async function refreshLikes() {
+        try {
+          const likes = await getLikes(projetoId);
+          likeCount.textContent = likes.length;
+          const userLiked = likes.some(like => like.usuario_id === user.id);
+          likeBtn.textContent = userLiked ? 'Descurtir' : 'Curtir';
+          likeBtn.dataset.liked = userLiked;
+        } catch (err) {
+          console.error('Erro ao carregar likes:', err);
+        }
+      }
+
+      likeBtn.addEventListener('click', async () => {
+        try {
+          if (likeBtn.dataset.liked === 'true') {
+            await unlikeProject(projetoId);
+          } else {
+            await likeProject(projetoId);
+          }
+          await refreshLikes();
+        } catch (err) {
+          console.error('Erro ao atualizar like:', err);
+        }
+      });
+
+      await refreshLikes();
     }
 
     const membros = Array.isArray(data.membros) ? data.membros : [];
