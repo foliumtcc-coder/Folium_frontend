@@ -109,7 +109,7 @@ export async function acceptInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/notifications/accept/${projetoId}`, {
+  const res = await fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/accept`, {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
@@ -127,7 +127,7 @@ export async function rejectInvite(projetoId) {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não logado');
 
-  const res = await fetch(`${BACKEND_URL}/api/auth/notifications/reject/${projetoId}`, {
+  fetch(`${BACKEND_URL}/api/auth/projects/${projetoId}/reject`, {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   });
