@@ -159,45 +159,6 @@ async function loadProject() {
       visualizacoesEl.innerHTML = `<i class="fa-solid fa-eye"></i> ${projeto.visualizacoes || 0}`;
     }
 
-    // --- Likes ---
-    const likesContainer = document.getElementById('likes-container'); // crie essa div no HTML
-    if (likesContainer) {
-      likesContainer.innerHTML = '';
-      const likeBtn = document.createElement('button');
-      const likeCount = document.createElement('span');
-      likeBtn.className = 'like-btn';
-      likeCount.className = 'like-count';
-      likesContainer.appendChild(likeBtn);
-      likesContainer.appendChild(likeCount);
-
-      async function refreshLikes() {
-        try {
-          const likes = await getLikes(projetoId);
-          likeCount.textContent = likes.length;
-          const userLiked = likes.some(like => like.usuario_id === user.id);
-          likeBtn.textContent = userLiked ? 'Descurtir' : 'Curtir';
-          likeBtn.dataset.liked = userLiked;
-        } catch (err) {
-          console.error('Erro ao carregar likes:', err);
-        }
-      }
-
-      likeBtn.addEventListener('click', async () => {
-        try {
-          if (likeBtn.dataset.liked === 'true') {
-            await unlikeProject(projetoId);
-          } else {
-            await likeProject(projetoId);
-          }
-          await refreshLikes();
-        } catch (err) {
-          console.error('Erro ao atualizar like:', err);
-        }
-      });
-
-      await refreshLikes();
-    }
-
     const membros = Array.isArray(data.membros) ? data.membros : [];
     const isOwner = Number(user.id) === Number(projeto.criado_por);
     const isMember = membros.some(m => m.usuario_id === user.id || m.usuarios?.id === user.id);
@@ -265,7 +226,60 @@ async function loadProject() {
     `;
 
     const menuDesc = document.querySelector('.menu-desc');
-    if (menuDesc) menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
+    if (menuDesc) {
+      menuDesc.innerHTML = `<h2>Descrição</h2><p>${projeto.descricao || 'Sem descrição'}</p>`;
+
+      // --- Likes logo abaixo da descrição ---
+      const likesContainer = document.createElement('div');
+      likesContainer.id = 'likes-container';
+      likesContainer.style.marginTop = '10px';
+      likesContainer.style.display = 'flex';
+      likesContainer.style.alignItems = 'center';
+      likesContainer.style.gap = '10px';
+      menuDesc.appendChild(likesContainer);
+
+      const likeBtn = document.createElement('button');
+      const likeCount = document.createElement('span');
+      likeBtn.className = 'like-btn';
+      likeBtn.style.padding = '5px 10px';
+      likeBtn.style.border = 'none';
+      likeBtn.style.borderRadius = '5px';
+      likeBtn.style.cursor = 'pointer';
+      likeBtn.style.backgroundColor = '#4caf50';
+      likeBtn.style.color = '#fff';
+      likeCount.className = 'like-count';
+      likeCount.style.fontWeight = 'bold';
+
+      likesContainer.appendChild(likeBtn);
+      likesContainer.appendChild(likeCount);
+
+      async function refreshLikes() {
+        try {
+          const likes = await getLikes(projetoId); // função do api.js
+          likeCount.textContent = likes.length;
+          const userLiked = likes.some(like => like.usuario_id === user.id);
+          likeBtn.textContent = userLiked ? 'Descurtir' : 'Curtir';
+          likeBtn.dataset.liked = userLiked;
+        } catch (err) {
+          console.error('Erro ao carregar likes:', err);
+        }
+      }
+
+      likeBtn.addEventListener('click', async () => {
+        try {
+          if (likeBtn.dataset.liked === 'true') {
+            await unlikeProject(projetoId);
+          } else {
+            await likeProject(projetoId);
+          }
+          await refreshLikes();
+        } catch (err) {
+          console.error('Erro ao atualizar like:', err);
+        }
+      });
+
+      await refreshLikes();
+    }
 
     // Membros
     const sideMenu = document.querySelector('.menu-header-people');
@@ -282,17 +296,13 @@ async function loadProject() {
       });
     }
 
-    // --- Carrega e renderiza etapas com arquivos via função do api.js ---
+    // Etapas
     const etapasContainer = document.querySelector('.etapas-container');
     if (etapasContainer) {
       etapasContainer.innerHTML = '';
-
       try {
-        // Chama função que já retorna etapas com arquivos
         const etapasData = await getEtapasByProjeto(projetoId);
         const etapas = Array.isArray(etapasData.etapas) ? etapasData.etapas : [];
-
-        // Renderiza etapas
         for (const etapa of etapas.sort((a, b) => a.numero_etapa - b.numero_etapa)) {
           const el = renderStep(etapa);
           etapasContainer.appendChild(el);
@@ -303,10 +313,8 @@ async function loadProject() {
       }
     }
 
-    // Inicializa os comentários do Disqus
+    // Disqus
     initializeDisqus(projetoId, projeto.titulo);
-    
-    // Sincroniza tema do Disqus com dark mode
     setupDisqusThemeSync();
 
   } catch (err) {
