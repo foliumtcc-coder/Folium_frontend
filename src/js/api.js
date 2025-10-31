@@ -227,7 +227,7 @@ if (!res.ok) {
   return await res.json(); // { message: "...", user: {...} }
 }
 
-export async function createEtapa(projetoId, nome, descricao, arquivos) {
+export async function createEtapa(projetoId, nome = 'Nova Etapa', descricao = '', arquivos = []) {
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (!token) throw new Error('Usuário não autenticado');
 
