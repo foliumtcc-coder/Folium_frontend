@@ -106,8 +106,8 @@ main {
 
 /*-------------------------BLOCOS DE PROJETO---------------------------*/
 .project-block {
-  width: 330px;
-  height: 180px;
+  width: 300px;
+  height: 150px;
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
