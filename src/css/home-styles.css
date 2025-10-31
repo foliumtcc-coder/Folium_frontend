@@ -106,7 +106,7 @@ main {
 
 /*-------------------------BLOCOS DE PROJETO---------------------------*/
 .project-block {
-  width: 300px;
+  width: 100px;
   height: 150px;
   border-radius: 12px;
   overflow: hidden;
