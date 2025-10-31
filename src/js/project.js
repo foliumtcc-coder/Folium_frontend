@@ -420,8 +420,8 @@ async function openAddStepPopup() {
   }
 
   try {
-    // Chama a função createEtapa do api.js sem nome, descrição ou arquivos
-    const novaEtapa = await createEtapa(projetoId, '', '', []);
+    // Envia "Nova Etapa" como nome padrão ao invés de string vazia
+    const novaEtapa = await createEtapa(projetoId, 'Nova Etapa', '', []);
 
     // Renderiza a etapa na tela
     const el = renderStep(novaEtapa);
