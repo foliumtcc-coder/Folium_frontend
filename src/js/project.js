@@ -411,58 +411,27 @@ function openEditPopup(projeto, membros) {
 }
 
 // Adicionar etapa
-function openAddStepPopup() {
-  const innerHTML = `
-    <div class="popup-content">
-      <button class="close-popup">&times;</button>
-      <form id="add-step-form" enctype="multipart/form-data">
-        <label>Nome da Etapa:</label>
-        <input type="text" id="step-name" required>
-        <label>Descrição:</label>
-        <textarea id="step-desc"></textarea>
-        <label>Arquivos (imagens, docs, apresentações):</label>
-        <input type="file" id="step-files" accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple>
-        <button type="submit">Adicionar Etapa</button>
-      </form>
-    </div>
-  `;
-  const popup = setupPopup('add-step-popup', innerHTML);
+async function openAddStepPopup() {
+  const projetoId = getProjetoIdFromURL();
 
-  const form = document.getElementById('add-step-form');
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
+  if (!projetoId) {
+    showToast('ID do projeto não encontrado!', 'error');
+    return;
+  }
 
-    const projetoId = getProjetoIdFromURL();
-    const nome = document.getElementById('step-name').value.trim();
-    const descricao = document.getElementById('step-desc').value.trim();
-    const filesInput = document.getElementById('step-files');
-    const arquivos = Array.from(filesInput.files);
+  try {
+    // Chama a função createEtapa do api.js sem nome, descrição ou arquivos
+    const novaEtapa = await createEtapa(projetoId, '', '', []);
 
-    if (!nome) {
-      showToast('O nome da etapa é obrigatório!', 'error');
-      return;
-    }
+    // Renderiza a etapa na tela
+    const el = renderStep(novaEtapa);
+    document.querySelector('.etapas-container')?.appendChild(el);
 
-    if (!projetoId) {
-      showToast('ID do projeto não encontrado!', 'error');
-      return;
-    }
-
-    try {
-      // Chama a função createEtapa do api.js
-      const novaEtapa = await createEtapa(projetoId, nome, descricao, arquivos);
-
-      // Renderiza a etapa na tela
-      const el = renderStep(novaEtapa);
-      document.querySelector('.etapas-container')?.appendChild(el);
-
-      showToast('Etapa criada com sucesso!', 'success');
-      popup.classList.add('hidden');
-    } catch (err) {
-      console.error('[FRONT] Erro ao criar etapa:', err);
-      showToast(err.message || 'Erro ao criar etapa', 'error');
-    }
-  });
+    showToast('Etapa criada com sucesso!', 'success');
+  } catch (err) {
+    console.error('[FRONT] Erro ao criar etapa:', err);
+    showToast(err.message || 'Erro ao criar etapa', 'error');
+  }
 }
 
 
