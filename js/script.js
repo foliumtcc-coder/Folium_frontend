@@ -22,41 +22,51 @@ function initInfiniteCarousels() {
       const items = Array.from(container.children);
       const itemWidth = items[0]?.offsetWidth + 20 || 300; // 20 = gap
 
-      // Duplica os itens (1x antes, 1x depois)
+      // Clona apenas uma vez (no final), mantendo a ordem correta
       items.forEach(item => {
         container.appendChild(item.cloneNode(true));
       });
-      items.forEach(item => {
-        container.insertBefore(item.cloneNode(true), container.firstChild);
-      });
 
-      // Centraliza na lista original
-      const middle = container.scrollWidth / 3;
-      container.scrollLeft = middle;
+      // Define o ponto inicial no começo da lista original
+      container.scrollLeft = 0;
 
       let isTeleporting = false;
 
+      // Checa e faz o loop quando atinge o fim
       function loopCheck() {
         if (isTeleporting) return;
 
+        const totalWidth = itemWidth * items.length;
         const maxScroll = container.scrollWidth;
-        const tolerance = 5; // pequena margem pra evitar triggers falsos
+        const tolerance = 5;
 
-        if (container.scrollLeft <= itemWidth + tolerance) {
+        if (container.scrollLeft >= totalWidth - tolerance) {
+          // voltou pro início suavemente
           isTeleporting = true;
-          const newPos = container.scrollLeft + items.length * itemWidth;
-          container.scrollTo({ left: newPos, behavior: "auto" });
-          requestAnimationFrame(() => (isTeleporting = false));
-        } else if (container.scrollLeft + container.clientWidth >= maxScroll - itemWidth - tolerance) {
-          isTeleporting = true;
-          const newPos = container.scrollLeft - items.length * itemWidth;
+          const newPos = container.scrollLeft - totalWidth;
           container.scrollTo({ left: newPos, behavior: "auto" });
           requestAnimationFrame(() => (isTeleporting = false));
         }
       }
+
+      // Aplica o loop ao rolar manualmente
+      container.addEventListener("scroll", loopCheck);
+
+      // Botões de navegação (opcional)
+      if (leftBtn) {
+        leftBtn.addEventListener("click", () => {
+          container.scrollBy({ left: -itemWidth * 2, behavior: "smooth" });
+        });
+      }
+      if (rightBtn) {
+        rightBtn.addEventListener("click", () => {
+          container.scrollBy({ left: itemWidth * 2, behavior: "smooth" });
+        });
+      }
     }
   });
 }
+
 
 // Executa quando o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", initInfiniteCarousels);
