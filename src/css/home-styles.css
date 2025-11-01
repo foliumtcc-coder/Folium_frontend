@@ -93,6 +93,7 @@ main {
   padding: 10px;
   scroll-behavior: smooth;
   overflow-x: auto;
+  scroll-snap-type: x proximity;
 }
 
 .section-blocks-container::-webkit-scrollbar {
@@ -119,6 +120,7 @@ main {
   text-decoration: none;
   color: inherit;
   flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 .project-block:hover {
