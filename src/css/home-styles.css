@@ -86,7 +86,7 @@ main {
 
 .section-blocks-container {
   display: flex;
-  gap: 50px;
+  gap: 25px;
   flex-direction: row;
   width: fit-content;
   height: fit-content;
