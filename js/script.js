@@ -1,60 +1,65 @@
-// ===================== CAROUSELS (INFINITE NETFLIX STYLE) =====================
-const carousels = document.querySelectorAll(".carousel");
+// ===================== CAROUSELS — LOOP INFINITO ESTILO NETFLIX =====================
+function initInfiniteCarousels() {
+  const carousels = document.querySelectorAll(".carousel");
 
-carousels.forEach((carousel) => {
-  const container = carousel.querySelector(".section-blocks-container");
-  const leftBtn = carousel.querySelector(".scroll-button.left-button");
-  const rightBtn = carousel.querySelector(".scroll-button.right-button");
-  if (!container) return;
+  carousels.forEach((carousel) => {
+    const container = carousel.querySelector(".section-blocks-container");
+    const leftBtn = carousel.querySelector(".scroll-button.left-button");
+    const rightBtn = carousel.querySelector(".scroll-button.right-button");
+    if (!container) return;
 
-  const scrollStep = 800;
-  const items = [...container.children];
+    // Espera os itens carregarem antes de configurar
+    const observer = new MutationObserver(() => {
+      if (container.children.length > 0) {
+        setupCarousel();
+        observer.disconnect();
+      }
+    });
 
-  // DUPLICA os itens antes e depois para simular loop infinito
-  const prependClone = items.map(item => {
-    const clone = item.cloneNode(true);
-    container.insertBefore(clone, container.firstChild);
-    return clone;
-  });
-  const appendClone = items.map(item => {
-    const clone = item.cloneNode(true);
-    container.appendChild(clone);
-    return clone;
-  });
+    observer.observe(container, { childList: true });
 
-  // Centraliza o scroll no conjunto original (entre os clones)
-  const startPosition = container.scrollWidth / 3;
-  container.scrollLeft = startPosition;
+    function setupCarousel() {
+      const items = Array.from(container.children);
+      const itemWidth = items[0]?.offsetWidth + 20 || 300; // 20 = gap
 
-  // Função de rolagem
-  function scrollByAmount(amount) {
-    container.scrollBy({ left: amount, behavior: 'smooth' });
-  }
+      // Duplica os itens (1x antes, 1x depois)
+      items.forEach(item => {
+        container.appendChild(item.cloneNode(true));
+      });
+      items.forEach(item => {
+        container.insertBefore(item.cloneNode(true), container.firstChild);
+      });
 
-  // Corrige posição quando chega muito perto das extremidades
-  function checkLoop() {
-    const maxScroll = container.scrollWidth;
-    if (container.scrollLeft <= items.length * 300) {
-      // muito à esquerda → reposiciona para o meio
-      container.scrollLeft += items.length * 300;
-    } else if (container.scrollLeft + container.clientWidth >= maxScroll - items.length * 300) {
-      // muito à direita → reposiciona para o meio
-      container.scrollLeft -= items.length * 300;
+      // Centraliza na lista original
+      const middle = container.scrollWidth / 3;
+      container.scrollLeft = middle;
+
+      function loopCheck() {
+        const maxScroll = container.scrollWidth;
+        if (container.scrollLeft <= itemWidth) {
+          container.scrollLeft += items.length * itemWidth;
+        } else if (container.scrollLeft + container.clientWidth >= maxScroll - itemWidth) {
+          container.scrollLeft -= items.length * itemWidth;
+        }
+      }
+
+      // Botões
+      leftBtn?.addEventListener("click", () => {
+        container.scrollBy({ left: -itemWidth * 2, behavior: "smooth" });
+      });
+
+      rightBtn?.addEventListener("click", () => {
+        container.scrollBy({ left: itemWidth * 2, behavior: "smooth" });
+      });
+
+      // Scroll manual contínuo
+      container.addEventListener("scroll", loopCheck);
     }
-  }
-
-  // Botões de rolagem
-  rightBtn?.addEventListener("click", () => {
-    scrollByAmount(scrollStep);
   });
+}
 
-  leftBtn?.addEventListener("click", () => {
-    scrollByAmount(-scrollStep);
-  });
-
-  // Verifica constantemente se precisa reposicionar
-  container.addEventListener("scroll", checkLoop);
-});
+// Executa quando o DOM estiver pronto
+document.addEventListener("DOMContentLoaded", initInfiniteCarousels);
 
 // ===================== MENU DROPDOWN PROFILE =====================
 const profileButton = document.getElementById("profile-button");
