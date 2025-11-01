@@ -91,7 +91,6 @@ main {
   width: fit-content;
   height: fit-content;
   padding: 10px;
-  scroll-behavior: smooth;
   overflow-x: auto;
 }
 
