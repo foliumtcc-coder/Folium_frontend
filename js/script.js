@@ -34,26 +34,26 @@ function initInfiniteCarousels() {
       const middle = container.scrollWidth / 3;
       container.scrollLeft = middle;
 
+      let isTeleporting = false;
+
       function loopCheck() {
+        if (isTeleporting) return;
+
         const maxScroll = container.scrollWidth;
-        if (container.scrollLeft <= itemWidth) {
-          container.scrollLeft += items.length * itemWidth;
-        } else if (container.scrollLeft + container.clientWidth >= maxScroll - itemWidth) {
-          container.scrollLeft -= items.length * itemWidth;
+        const tolerance = 5; // pequena margem pra evitar triggers falsos
+
+        if (container.scrollLeft <= itemWidth + tolerance) {
+          isTeleporting = true;
+          const newPos = container.scrollLeft + items.length * itemWidth;
+          container.scrollTo({ left: newPos, behavior: "auto" });
+          requestAnimationFrame(() => (isTeleporting = false));
+        } else if (container.scrollLeft + container.clientWidth >= maxScroll - itemWidth - tolerance) {
+          isTeleporting = true;
+          const newPos = container.scrollLeft - items.length * itemWidth;
+          container.scrollTo({ left: newPos, behavior: "auto" });
+          requestAnimationFrame(() => (isTeleporting = false));
         }
       }
-
-      // Botões
-      leftBtn?.addEventListener("click", () => {
-        container.scrollBy({ left: -itemWidth * 2, behavior: "smooth" });
-      });
-
-      rightBtn?.addEventListener("click", () => {
-        container.scrollBy({ left: itemWidth * 2, behavior: "smooth" });
-      });
-
-      // Scroll manual contínuo
-      container.addEventListener("scroll", loopCheck);
     }
   });
 }
