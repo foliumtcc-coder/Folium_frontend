@@ -1,106 +1,59 @@
-// ===================== CAROUSELS =====================
+// ===================== CAROUSELS (INFINITE NETFLIX STYLE) =====================
 const carousels = document.querySelectorAll(".carousel");
 
 carousels.forEach((carousel) => {
-  const blockContainer = carousel.querySelector(".section-blocks-container");
+  const container = carousel.querySelector(".section-blocks-container");
   const leftBtn = carousel.querySelector(".scroll-button.left-button");
   const rightBtn = carousel.querySelector(".scroll-button.right-button");
-  const scrollAmount = 800;
+  if (!container) return;
 
-  if (!blockContainer) return; // se não existir, pula este carousel
+  const scrollStep = 800;
+  const items = [...container.children];
 
-  const originalItems = [...blockContainer.children]; // salve os originais
+  // DUPLICA os itens antes e depois para simular loop infinito
+  const prependClone = items.map(item => {
+    const clone = item.cloneNode(true);
+    container.insertBefore(clone, container.firstChild);
+    return clone;
+  });
+  const appendClone = items.map(item => {
+    const clone = item.cloneNode(true);
+    container.appendChild(clone);
+    return clone;
+  });
 
-  function cloneMoreIfNeeded() {
-    const nearEnd =
-      blockContainer.scrollLeft + blockContainer.clientWidth >=
-      blockContainer.scrollWidth - 50;
+  // Centraliza o scroll no conjunto original (entre os clones)
+  const startPosition = container.scrollWidth / 3;
+  container.scrollLeft = startPosition;
 
-    if (nearEnd) {
-      originalItems.forEach((item) => {
-        const clone = item.cloneNode(true);
-        blockContainer.appendChild(clone);
-      });
+  // Função de rolagem
+  function scrollByAmount(amount) {
+    container.scrollBy({ left: amount, behavior: 'smooth' });
+  }
+
+  // Corrige posição quando chega muito perto das extremidades
+  function checkLoop() {
+    const maxScroll = container.scrollWidth;
+    if (container.scrollLeft <= items.length * 300) {
+      // muito à esquerda → reposiciona para o meio
+      container.scrollLeft += items.length * 300;
+    } else if (container.scrollLeft + container.clientWidth >= maxScroll - items.length * 300) {
+      // muito à direita → reposiciona para o meio
+      container.scrollLeft -= items.length * 300;
     }
   }
 
-  // Botões de scroll, se existirem
-  if (leftBtn) {
-    leftBtn.addEventListener("click", () => {
-      blockContainer.scrollLeft -= scrollAmount;
-    });
-  }
-
-  if (rightBtn) {
-    rightBtn.addEventListener("click", () => {
-      blockContainer.scrollLeft += scrollAmount;
-      cloneMoreIfNeeded();
-    });
-  }
-
-  // Também verifica ao scrollar manualmente
-  blockContainer.addEventListener("scroll", cloneMoreIfNeeded);
-});
-
-// Adicione este código no seu arquivo JavaScript principal (ex: home.js)
-function initInfiniteCarousel() {
-  const carousels = document.querySelectorAll('.carousel');
-  
-  carousels.forEach(carousel => {
-    const container = carousel.querySelector('.section-blocks-container');
-    if (!container) return;
-    
-    const blocks = Array.from(container.children);
-    if (blocks.length === 0) return;
-    
-    // Duplica os blocos para criar o efeito infinito
-    blocks.forEach(block => {
-      const clone = block.cloneNode(true);
-      container.appendChild(clone);
-    });
-    
-    // Adiciona duplicatas extras para scroll suave
-    blocks.forEach(block => {
-      const clone = block.cloneNode(true);
-      container.appendChild(clone);
-    });
-    
-    let isScrolling = false;
-    
-    container.addEventListener('scroll', () => {
-      if (isScrolling) return;
-      
-      const scrollLeft = container.scrollLeft;
-      const scrollWidth = container.scrollWidth;
-      const clientWidth = container.clientWidth;
-      
-      // Calcula o tamanho de um conjunto completo
-      const oneSetWidth = scrollWidth / 3;
-      
-      // Se chegou ao final, volta pro começo
-      if (scrollLeft + clientWidth >= scrollWidth - 10) {
-        isScrolling = true;
-        container.scrollLeft = oneSetWidth;
-        setTimeout(() => { isScrolling = false; }, 50);
-      }
-      
-      // Se voltou muito pro início, pula pro final do primeiro set
-      if (scrollLeft <= 10) {
-        isScrolling = true;
-        container.scrollLeft = oneSetWidth;
-        setTimeout(() => { isScrolling = false; }, 50);
-      }
-    });
-    
-    // Inicia no meio
-    container.scrollLeft = container.scrollWidth / 3;
+  // Botões de rolagem
+  rightBtn?.addEventListener("click", () => {
+    scrollByAmount(scrollStep);
   });
-}
 
-// Chama a função quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-  // Aguarda um pouco para garantir que os projetos foram carregados
-  setTimeout(initInfiniteCarousel, 500);
+  leftBtn?.addEventListener("click", () => {
+    scrollByAmount(-scrollStep);
+  });
+
+  // Verifica constantemente se precisa reposicionar
+  container.addEventListener("scroll", checkLoop);
 });
 
 // ===================== MENU DROPDOWN PROFILE =====================
