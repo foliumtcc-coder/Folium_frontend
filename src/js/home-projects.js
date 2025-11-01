@@ -18,8 +18,12 @@ function renderProjects(containerId, projects) {
         </div>
         <div class="project-footer">
           <div class="project-name"><span>${proj.titulo}</span></div>
-          <div class="project-views"><span><i class="fa-solid fa-eye"></i> ${proj.visualizacoes || 0}</span></div>
-          <button class="project-options"><span class="fa-solid fa-ellipsis-vertical"></span></button>
+          <div class="project-views">
+            <span><i class="fa-solid fa-eye"></i> ${proj.visualizacoes || 0}</span>
+          </div>
+          <button class="project-options">
+            <span class="fa-solid fa-ellipsis-vertical"></span>
+          </button>
         </div>
       </div>
     `;
@@ -41,29 +45,38 @@ async function fetchProjects(endpoint) {
 
 // Carrega todas as seções
 async function loadHomeProjects() {
-  const [recentes, destaques, populares] = await Promise.all([
-    fetchProjects('/api/auth/home/recentes'),
-    fetchProjects('/api/auth/home/destaques'),
-    fetchProjects('/api/auth/home/populares')
-  ]);
+  try {
+    const [recentes, destaques, populares] = await Promise.all([
+      fetchProjects('/api/auth/home/recentes'),
+      fetchProjects('/api/auth/home/destaques'),
+      fetchProjects('/api/auth/home/populares')
+    ]);
 
-  renderProjects('recentes-container', recentes);
-  renderProjects('destaques-container', destaques);
-  renderProjects('populares-container', populares);
+    renderProjects('recentes-container', recentes);
+    renderProjects('destaques-container', destaques);
+    renderProjects('populares-container', populares);
 
-  // Inicializa scroll das seções
-  initCarousels();
+    initCarousels();
+  } catch (err) {
+    console.error('Erro ao carregar projetos:', err);
+  }
 }
 
-// Scroll horizontal
+// Scroll horizontal nas seções
 function initCarousels() {
   document.querySelectorAll('.carousel').forEach(carousel => {
     const container = carousel.querySelector('.section-blocks-container');
     const leftBtn = carousel.querySelector('.left-button');
     const rightBtn = carousel.querySelector('.right-button');
 
-    leftBtn.addEventListener('click', () => container.scrollBy({ left: -300, behavior: 'smooth' }));
-    rightBtn.addEventListener('click', () => container.scrollBy({ left: 300, behavior: 'smooth' }));
+    if (!container || !leftBtn || !rightBtn) return;
+
+    leftBtn.addEventListener('click', () =>
+      container.scrollBy({ left: -300, behavior: 'smooth' })
+    );
+    rightBtn.addEventListener('click', () =>
+      container.scrollBy({ left: 300, behavior: 'smooth' })
+    );
   });
 }
 
