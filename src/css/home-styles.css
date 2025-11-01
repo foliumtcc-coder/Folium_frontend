@@ -145,7 +145,7 @@ main {
 
 .project-footer {
   width: 100%;
-  flex: 1;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
